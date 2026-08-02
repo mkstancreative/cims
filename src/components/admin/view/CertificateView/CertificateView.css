@@ -1,0 +1,154 @@
+.cert-view-container {
+  padding: 8px;
+}
+
+.cert-view-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.cert-view-section {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.section-icon {
+  background: #f1f5f9;
+  color: #1a3a5f;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.section-item:last-child {
+  margin-bottom: 0;
+}
+
+.item-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.item-value {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.doc-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.doc-card:hover {
+  border-color: #1a3a5f;
+  background: #fff;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+}
+
+.doc-card-icon {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  color: #ef4444;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.doc-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.doc-card-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.cert-view-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cert-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cert-action-approve {
+  background: #10b981;
+  color: #fff;
+}
+
+.cert-action-approve:hover:not(:disabled) {
+  background: #0f9f6e;
+}
+
+.cert-action-reject {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.cert-action-reject:hover:not(:disabled) {
+  background: #fecaca;
+}

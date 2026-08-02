@@ -1,0 +1,67 @@
+.reset-button {
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #e74c3c, #ff6b5a);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+/* Hover */
+.reset-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c0392b, #ff5a4a);
+  transform: translateY(-1px);
+}
+
+.reset-button:focus {
+  border: none;
+}
+
+/* Active click */
+.reset-button:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow: 0 3px 8px rgba(192, 57, 43, 0.25);
+}
+
+/* Focus (keyboard users) */
+.reset-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.4);
+}
+
+/* Disabled */
+.reset-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* Loading state */
+.reset-button.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.reset-button.loading::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}

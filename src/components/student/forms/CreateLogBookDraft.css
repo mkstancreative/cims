@@ -1,0 +1,312 @@
+/* ── CreateLogBookDraft form styles ────────────────────────────────────────── */
+
+.lb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Sections */
+.lb-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lb-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.lb-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lb-badge {
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+}
+
+.lb-hours-total {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+/* Layout helpers */
+.lb-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+}
+
+.lb-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 680px) {
+  .lb-row-2,
+  .lb-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Activity accordion cards */
+.lb-activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lb-activity-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.lb-activity-card.expanded {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.lb-activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: var(--color-bg-secondary);
+  user-select: none;
+  gap: 10px;
+  transition: background 0.15s;
+}
+
+.lb-activity-header:hover {
+  background: var(--color-surface-overlay-hover, var(--color-bg-secondary));
+  filter: brightness(1.05);
+}
+
+.lb-activity-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lb-day-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  flex-shrink: 0;
+  text-transform: capitalize;
+}
+
+.lb-activity-title-preview {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-activity-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.lb-hrs-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.lb-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+
+.lb-remove-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: var(--shadow-glow-sm);
+}
+
+.lb-activity-body {
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+}
+
+.lb-textarea {
+  resize: vertical;
+  min-height: 72px;
+  font-family: inherit;
+  line-height: 1.55;
+}
+
+/* Skills */
+.lb-skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.lb-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  box-shadow: var(--shadow-glow-sm);
+}
+
+.lb-skill-tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #818cf8;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.lb-skill-tag button:hover {
+  opacity: 1;
+}
+
+.lb-skill-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.lb-skill-input-row .modal-input {
+  flex: 1;
+}
+
+.lb-add-skill-btn {
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    opacity 0.2s,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.lb-add-skill-btn:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow-float);
+  transform: translateY(-1px);
+}
+
+/* Add activity button */
+.lb-add-activity-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 8px 16px;
+  border: 1.5px dashed var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s ease;
+  width: fit-content;
+}
+
+.lb-add-activity-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Edit / loading state ───────────────────────────────────────────────────── */
+.lb-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px 20px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+}
+.lb-loading-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: lb-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes lb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

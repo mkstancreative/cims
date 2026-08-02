@@ -1,0 +1,186 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 4px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bolder;
+  text-transform: capitalize;
+}
+
+/* Student */
+.status-badge.active {
+  background: #e6f7ee;
+  color: #0f9d58;
+}
+
+.status-badge.inactive {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.archived {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.status-badge.withdrawn {
+  background: #fdecea;
+  color: #d32f2f;
+}
+
+.status-badge.present {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.absent {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.seeking_placement {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.placed {
+  background: #ffebee;
+  color: #0f9d58;
+}
+
+.status-badge.pending {
+  background: #fff8e1;
+  color: #f9a825;
+}
+
+/* Enrollment */
+.status-badge.enrolled {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.rejected {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* Academic */
+.status-badge.passed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.successful {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.failed {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.in-progress {
+  background: #fff8e1;
+  color: #f9a825;
+}
+
+/* Admission */
+.status-badge.applied {
+  background: #e8eaf6;
+  color: #3949ab;
+}
+
+.status-badge.admitted {
+  background: #e0f7fa;
+  color: #00838f;
+}
+
+/* Transactions / IT Status */
+.status-badge.uploaded {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.status-badge.pending_verification {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.status-badge.created {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.status-badge.completed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.approved {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.failed {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Admins / Lecturers */
+.status-badge.enabled {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.disabled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.ended {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.open {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.closed {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.awaiting {
+  background: #fff8e1;
+  color: #f9a825;
+}
+.status-badge.students_uploaded {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.status-badge.verified {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.status-badge.pending_verification {
+  background: #fff8e1;
+  color: #f9a825;
+}
+.status-badge.read {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.status-badge.unread {
+  background: #fff8e1;
+  color: #f9a825;
+}

@@ -1,0 +1,55 @@
+.spinner-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.spinner {
+  border: 3px solid;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  box-sizing: border-box;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animated dots after "Processing" */
+/* .spinner-text::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: bounceDots 1s infinite steps(3, end);
+} */
+
+@keyframes bounceDots {
+  0% {
+    box-shadow: 6px 0 0 0 currentColor, 12px 0 0 0 currentColor,
+      18px 0 0 0 currentColor;
+  }
+  33% {
+    box-shadow: 6px -6px 0 0 currentColor, 12px 0 0 0 currentColor,
+      18px 0 0 0 currentColor;
+  }
+  66% {
+    box-shadow: 6px 0 0 0 currentColor, 12px -6px 0 0 currentColor,
+      18px 0 0 0 currentColor;
+  }
+  100% {
+    box-shadow: 6px 0 0 0 currentColor, 12px 0 0 0 currentColor,
+      18px 0 0 0 currentColor;
+  }
+}

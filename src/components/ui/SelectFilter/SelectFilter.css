@@ -1,0 +1,165 @@
+.dashboard-filter {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  padding: 25px;
+  background: var(--color-bg-secondary);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  max-width: 1200px;
+  margin: 2rem auto;
+}
+
+/* Label */
+.filter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Select Wrapper */
+.select-wrapper {
+  position: relative;
+}
+
+/* Select Input */
+.filter-select {
+  width: 100%;
+  height: 42px;
+  padding: 0 40px 0 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  appearance: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Focus */
+.filter-select:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow-sm);
+  outline: none;
+}
+
+.filter-select option {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.filter-select option:hover,
+.filter-select option:focus,
+.filter-select option:checked {
+  background-color: var(--color-accent) !important;
+  color: #fff !important;
+}
+
+.placeholder-active {
+  color: var(--color-text-muted);
+}
+
+/* Icons container */
+.icon-group {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Clear Button */
+.clear-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  color: var(--color-accent);
+}
+
+.custom-select-wrapper {
+  position: relative;
+  outline: none;
+}
+
+.custom-select-display {
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.custom-options-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: dropdownIn 0.15s ease-out;
+  padding: 4px;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-option {
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.custom-option:hover {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+.custom-option.selected {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.custom-option.selected:hover {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+/* Chevron */
+.chevron {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--color-text-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}

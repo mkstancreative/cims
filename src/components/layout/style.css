@@ -1,0 +1,811 @@
+/* ── Layout Design Tokens ────────────────────────────────────────────────── */
+:root {
+  --layout-sidebar-width: 260px;
+  --layout-sidebar-collapsed: 72px;
+  --layout-topbar-height: 64px;
+  --layout-footer-height: 52px;
+}
+
+/* ── Shell ───────────────────────────────────────────────────────────────── */
+.dash-shell {
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+  font-family: var(--font-sans);
+  --_sidebar-w: var(--layout-sidebar-width);
+}
+.dash-shell--collapsed {
+  --_sidebar-w: var(--layout-sidebar-collapsed);
+}
+
+/* Mobile backdrop */
+.dash-mobile-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.dash-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--layout-sidebar-width);
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: width 0.25s ease;
+  /* overflow:hidden removed — it was clipping the toggle button & icons */
+  overflow: visible;
+}
+.dash-sidebar--collapsed {
+  width: var(--layout-sidebar-collapsed);
+  overflow: hidden; /* only clip when narrow to hide text that hasn't faded yet */
+}
+
+/* sidebar logo */
+.dash-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px 0 16px;
+  height: var(--layout-topbar-height);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* When collapsed, center just the icon + collapse button */
+.dash-sidebar--collapsed .dash-sidebar__logo {
+  padding: 0 8px;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.dash-sidebar__logo-text {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dash-sidebar__logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* sidebar nav scroll area */
+.dash-sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-border) transparent;
+}
+.dash-sidebar__nav::-webkit-scrollbar {
+  width: 4px;
+}
+.dash-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dash-sidebar__nav::-webkit-scrollbar-thumb {
+  background: var(--color-surface-border);
+  border-radius: 4px;
+}
+
+/* section label */
+.dash-sidebar__section {
+  padding: 20px 20px 6px;
+}
+.dash-sidebar__section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* nav item */
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  margin: 1px 8px;
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Collapsed nav items: centre the icon within the 72px rail */
+.dash-nav-item--collapsed {
+  justify-content: center;
+  padding: 10px 0;
+  margin: 1px 6px;
+  gap: 0;
+}
+.dash-nav-item:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+.dash-nav-item--active {
+  background: var(--color-bg-secondary);
+  color: var(--color-accent);
+}
+.dash-nav-item--active .dash-nav-item__icon {
+  color: var(--color-accent);
+}
+.dash-nav-item__icon {
+  display: flex;
+  flex-shrink: 0;
+  color: inherit;
+}
+.dash-nav-item__label {
+  flex: 1;
+  line-height: 1;
+}
+
+.dash-nav-item__chevron {
+  display: flex;
+  color: var(--color-text-muted);
+  transition: transform 0.2s;
+}
+.dash-nav-item__chevron--open {
+  transform: rotate(180deg);
+}
+
+/* submenu */
+.dash-submenu {
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+  color: var(--color-text-primary);
+  /* border: 1px solid red; */
+}
+.dash-submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px 8px 48px;
+  margin: 1px 8px;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 13.5px;
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.dash-submenu-item::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  /* background: currentColor; */
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+.dash-submenu-item:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-accent);
+}
+.dash-submenu-item:hover::before {
+  opacity: 1;
+}
+.dash-submenu-item--active {
+  color: var(--color-accent);
+  background: var(--color-bg-secondary);
+}
+.dash-submenu-item--active::before {
+  opacity: 1;
+}
+
+/* sidebar footer */
+.dash-sidebar__footer {
+  padding: 12px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* collapse toggle button */
+.dash-sidebar__collapse-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-overlay);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  /* Never let the button get hidden */
+  position: relative;
+  z-index: 1;
+}
+
+/* In collapsed state the logo icon takes up most of the space;
+   the button needs margin:auto on both sides so it stays visible */
+.dash-sidebar--collapsed .dash-sidebar__collapse-btn {
+  margin-left: 0;
+}
+
+.dash-sidebar__collapse-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* user card (expanded only) */
+.dash-sidebar__user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border);
+}
+.dash-sidebar__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.dash-sidebar__user-info {
+  flex: 1;
+  overflow: hidden;
+}
+.dash-sidebar__user-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-sidebar__user-role {
+  font-size: 10.5px;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* logout button */
+.dash-sidebar__logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.dash-sidebar__logout-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+.dash-sidebar__logout-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.dash-sidebar__logout-btn.collapsed {
+  justify-content: center;
+  padding: 9px;
+}
+
+/* collapsed sidebar section divider */
+.dash-sidebar__section-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 6px 10px;
+}
+
+/* ── Top Bar ─────────────────────────────────────────────────────────────── */
+.dash-topbar {
+  position: fixed;
+  top: 0;
+  left: var(--_sidebar-w, var(--layout-sidebar-width));
+  right: 0;
+  height: var(--layout-topbar-height);
+  background: var(--color-bg-secondary);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 99;
+  transition: left 0.25s ease;
+  gap: 16px;
+}
+
+/* breadcrumb / page title */
+.dash-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.dash-topbar__mobile-menu-btn {
+  display: none;
+  flex-shrink: 0;
+}
+.dash-topbar__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.dash-topbar__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-topbar__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+.dash-topbar__breadcrumb-sep {
+  opacity: 0.4;
+}
+.dash-topbar__breadcrumb-current {
+  color: var(--color-accent);
+}
+
+/* topbar right actions */
+.dash-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dash-topbar__icon-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-surface-border);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.dash-topbar__icon-btn:hover {
+  background: var(--color-surface-overlay-hover);
+  color: var(--color-text-primary);
+}
+.dash-topbar__badge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 2px solid var(--color-bg-secondary);
+}
+.dash-topbar__divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-divider);
+  margin: 0 4px;
+}
+.dash-topbar__avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px 5px 5px;
+  border-radius: 10px;
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-surface-border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dash-topbar__avatar-btn:hover {
+  background: var(--color-surface-overlay-hover);
+}
+.dash-topbar__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+.dash-topbar__user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── User dropdown ───────────────────────────────────────────────────────── */
+.dash-topbar__user-menu {
+  position: relative;
+}
+.dash-topbar__dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 200;
+  animation: dropdownIn 0.15s ease;
+}
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dash-topbar__dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+}
+.dash-topbar__dropdown-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.dash-topbar__dropdown-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.dash-topbar__dropdown-role {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+.dash-topbar__dropdown-divider {
+  height: 1px;
+  background: var(--color-border);
+}
+.dash-topbar__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+.dash-topbar__dropdown-item:hover {
+  background: var(--color-surface-overlay);
+}
+.dash-topbar__dropdown-item.danger {
+  color: #ef4444;
+}
+.dash-topbar__dropdown-item.danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+.dash-topbar__dropdown-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Main content area ───────────────────────────────────────────────────── */
+.dash-main {
+  margin-left: var(--_sidebar-w, var(--layout-sidebar-width));
+  padding-top: var(--layout-topbar-height);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.25s ease;
+  background: var(--page-bg);
+}
+.dash-content {
+  flex: 1;
+  padding: 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1300px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  /* overflow: hidden removed — was causing width shift when content changes */
+}
+
+/* ── Table Wrapper ───────────────────────────────────────────────────────── */
+.dash-table-wrapper {
+  background: var(--color-bg-secondary);
+  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+.dash-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.dash-table-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.dash-table-header__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.dash-table-header__subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+.dash-table-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dash-table-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-surface-border);
+  border-radius: 10px;
+  padding: 0 14px;
+  height: 38px;
+  min-width: 220px;
+}
+.dash-table-search input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  width: 100%;
+}
+.dash-table-search input::placeholder {
+  color: var(--color-text-muted);
+}
+.dash-table-search__icon {
+  color: var(--color-text-muted);
+  display: flex;
+}
+.dash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition:
+    filter 0.15s,
+    transform 0.1s;
+  white-space: nowrap;
+}
+.dash-btn--primary {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+  color: var(--color-text-primary);
+  /* box-shadow: 0 4px 16px rgba(20, 184, 166, 0.3); */
+}
+.dash-btn--primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.dash-btn--ghost {
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-surface-border);
+  color: var(--color-text-muted);
+}
+.dash-btn--ghost:hover {
+  background: var(--color-surface-overlay-hover);
+  color: var(--color-text-primary);
+}
+/* placeholder rows for "empty table" state */
+.dash-table-body {
+  padding: 16px 0;
+}
+.dash-table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 20px;
+  gap: 12px;
+  color: var(--color-text-muted);
+}
+.dash-table-empty__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dash-table-empty__text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.dash-footer {
+  margin-top: auto;
+  height: var(--layout-footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-top: 1px solid var(--color-divider);
+  background: var(--color-footer-bg);
+}
+.dash-footer__copy {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+.dash-footer__copy span {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.dash-footer__links {
+  display: flex;
+  gap: 20px;
+}
+.dash-footer__link {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.dash-footer__link:hover {
+  color: var(--color-accent);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .dash-mobile-backdrop {
+    display: block;
+  }
+  .dash-sidebar {
+    transform: translateX(-100%);
+    width: var(
+      --layout-sidebar-width
+    ) !important; /* always full width on mobile */
+  }
+  .dash-sidebar--mobile-open {
+    transform: translateX(0);
+  }
+  .dash-sidebar__collapse-btn {
+    display: none; /* hide collapse btn on mobile */
+  }
+  .dash-topbar {
+    left: 0 !important;
+    padding: 0 16px;
+  }
+  .dash-topbar__mobile-menu-btn {
+    display: flex;
+  }
+  .dash-topbar__breadcrumb,
+  .dash-topbar__user-name,
+  .dash-topbar__user-chevron {
+    display: none;
+  }
+  .dash-topbar__avatar-btn {
+    padding: 2px;
+  }
+  .dash-main {
+    margin-left: 0 !important;
+  }
+  .dash-content {
+    padding: 20px 16px 0;
+  }
+  .dash-footer {
+    padding: 0 16px;
+  }
+}

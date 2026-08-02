@@ -1,0 +1,121 @@
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.action-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border, rgba(0, 0, 0, 0.08));
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    padding: 0;
+}
+
+.action-trigger:hover {
+    background: var(--sb-item-hover, rgba(0, 0, 0, 0.05));
+    border-color: var(--accent-gold, #ffb830);
+}
+
+.action-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #64748b;
+    display: block;
+}
+
+.action-trigger:hover .action-dot {
+    background: var(--accent-gold, #ffb830);
+}
+
+/* Menu */
+.action-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    min-width: 160px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    z-index: 10000;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease both;
+}
+
+html:not(.light-mode) .action-menu {
+    background: #0e1a30;
+    border-color: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 14px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+}
+
+html:not(.light-mode) .action-item {
+    color: #a8b3cf;
+}
+
+.action-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #0a1120;
+}
+
+html:not(.light-mode) .action-item:hover {
+    background: rgba(255, 184, 48, 0.07);
+    color: #fff;
+}
+
+.action-item.danger {
+    color: #ef4444;
+}
+
+.action-item.danger:hover {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+
+.action-item-icon {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.action-item:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,322 @@
+/* ─────────────────────────────────────────────────────────
+   Certificate.css  –  Enhanced Premium Design
+   ───────────────────────────────────────────────────────── */
+
+.certificate-paper {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  background: #ffffff;
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(240, 245, 255, 0.4) 100%
+    ),
+    url("https://www.transparenttextures.com/patterns/parchment.png");
+  background-size: cover;
+  padding: 5mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  font-family: "Georgia", serif;
+  color: #1a202c;
+  overflow: hidden; /* Ensure one page */
+}
+
+/* ── Premium Border ────────────────────────────────────────── */
+.cert-outer-border {
+  height: 100%;
+  padding: 0mm;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.cert-inner-border {
+  flex: 1;
+  padding: 5mm 8mm;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cert-header-row {
+  position: relative;
+  width: 100%;
+  margin-bottom: 25px;
+  padding: 15px 0;
+  text-align: center;
+  color: #1e3a8a;
+  min-height: 140px;
+}
+
+.cert-logo-left,
+.cert-logo-right {
+  position: absolute;
+  top: 55px;
+  width: 95px;
+}
+
+.cert-logo-left {
+  left: 0;
+}
+
+.cert-logo-right {
+  right: 0;
+}
+
+.cert-logo {
+  width: 100%;
+  height: auto;
+}
+
+.cert-header-text {
+  width: 100%;
+  padding: 0 10px; /* Minimal padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cert-inst-name {
+  width: 100%;
+  font-size: 30px; /* Even bolder */
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.05);
+}
+
+.cert-inst-sub {
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+  margin: 5px 0;
+  letter-spacing: 1.5px;
+}
+
+.cert-centre-title {
+  font-size: 19px;
+  font-weight: 800;
+  margin: 12px auto 0;
+  color: #1e40af;
+  border-top: 1px solid rgba(30, 58, 138, 0.2);
+  width: fit-content;
+  padding: 8px 30px 0;
+}
+
+.cert-siwes-tag {
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  margin-top: 2px;
+}
+
+/* ── Date Row ───────────────────────────────────────────────── */
+.cert-date-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.cert-date-label {
+  font-weight: 700;
+  color: #334155;
+}
+
+/* ── Title Block ────────────────────────────────────────────── */
+.cert-main-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #1e3a8a;
+  margin: 10px 0 5px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.cert-level-sub {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 20px;
+}
+
+/* ── Body with Full Width Dotted Lines ──────────────────────── */
+.cert-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cert-line-wrapper {
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  gap: 10px;
+  font-size: 16.5px;
+}
+
+.cert-label {
+  white-space: nowrap;
+  color: #475569;
+}
+
+.cert-full-dotted {
+  flex: 1;
+  border-bottom: 1.5px dotted #94a3b8;
+  position: relative;
+  height: 24px;
+}
+
+.cert-value {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: "Georgia", serif;
+  font-weight: 700;
+  font-style: italic;
+  color: #1e293b;
+  font-size: 18px;
+}
+
+.cert-para {
+  line-height: 1.7;
+  font-size: 15.5px;
+  text-align: justify;
+  color: #334155;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.cert-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+  padding-bottom: 15px;
+  width: 100%;
+  gap: 20px;
+}
+
+.cert-sig-block {
+  text-align: center;
+  width: 180px; /* Slightly narrower to create space */
+  flex: 0 0 180px;
+}
+
+.director-sig {
+  position: relative;
+}
+
+.sig-overlay {
+  position: absolute;
+  top: -90px; /* Move higher to accommodate larger images */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 120px;
+  pointer-events: none;
+  z-index: 99;
+}
+
+.cert-signature-img {
+  position: absolute;
+  bottom: 17px; /* Lifted up further */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 170px;
+  height: auto;
+  opacity: 1;
+}
+
+.cert-stamp-img {
+  position: absolute;
+  top: 0;
+  left: 55%; /* Slightly offset for realistic overlap */
+  transform: translateX(-50%) rotate(-10deg);
+  width: 140px;
+  height: auto;
+  opacity: 0.85;
+}
+
+.cert-sig-name {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.cert-sig-line {
+  border-top: 1.5px solid #1e3a8a;
+  margin-bottom: 5px;
+}
+
+.cert-sig-dotted {
+  border-top: 1.5px dashed #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.cert-sig-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #1e3a8a;
+  line-height: 1.2;
+}
+
+.cert-qr-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1; /* Take remaining center space */
+  padding: 0 15px;
+}
+
+.cert-qr-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+/* ── Bottom Section ─────────────────────────────────────────── */
+.cert-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.cert-serial {
+  font-family: monospace;
+  font-size: 14px;
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.cert-program {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+@media print {
+  .certificate-paper {
+    box-shadow: none;
+    margin: 0;
+  }
+}

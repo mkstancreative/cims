@@ -1,0 +1,251 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Light Mode (default) ────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --color-bg-primary: #f0f4f8;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #e8edf3;
+  --color-bg-footer: #dde3ea;
+  --color-bg-dark-gradient: #c8d5e3;
+
+  /* Brand / Accent */
+  --color-accent: #0d9488; /* teal — buttons, highlights */
+  --color-accent-hover: #0f766e;
+  --color-accent-muted: rgba(13, 148, 136, 0.1);
+  --color-accent-border: rgba(13, 148, 136, 0.3);
+  --colo-accent-gradient: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+
+  /* Secondary Accent */
+  --color-purple: #6366f1;
+  --color-purple-muted: rgba(99, 102, 241, 0.08);
+  --color-purple-border: rgba(99, 102, 241, 0.3);
+
+  /* Borders */
+  --color-border: #d1dae5;
+
+  /* Text */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
+  --color-text-faint: #cbd5e1;
+
+  /* Stats bar */
+  --color-stats-bg: #0d9488;
+  --color-stats-text: #ffffff;
+  --color-stats-label: #134e4a;
+
+  /* Amber */
+  --color-amber: #d97706;
+
+  /* Surface overlays (replicate rgba whites as proper light-mode values) */
+  --color-surface-overlay: rgba(0, 0, 0, 0.04);
+  --color-surface-overlay-hover: rgba(0, 0, 0, 0.07);
+  --color-surface-border: rgba(0, 0, 0, 0.08);
+  --color-divider: rgba(0, 0, 0, 0.08);
+  --color-footer-bg: rgba(240, 244, 248, 0.8);
+
+  /* Page bg (slightly offset from bg-primary) */
+  --page-bg: #e8edf3;
+
+  /* ─── Shadow Scale ─────────────────────────────────────────────────────── */
+  /* xs — barely lifted, tight outline effect */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+
+  /* sm — default card, subtle lift */
+  --shadow-sm:
+    0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.05);
+
+  /* md — standard component shadow */
+  --shadow-md:
+    0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+
+  /* lg — dropdowns, popovers */
+  --shadow-lg:
+    0 10px 15px -3px rgba(15, 23, 42, 0.08),
+    0 4px 6px -4px rgba(15, 23, 42, 0.05);
+
+  /* xl — sidebars, drawers */
+  --shadow-xl:
+    0 20px 25px -5px rgba(15, 23, 42, 0.1),
+    0 8px 10px -6px rgba(15, 23, 42, 0.06);
+
+  /* 2xl — modals, dialogs */
+  --shadow-2xl: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
+
+  /* Special: inset (pressed / well) */
+  --shadow-inset: inset 0 2px 4px rgba(15, 23, 42, 0.06);
+
+  /* Special: floating action / elevated button */
+  --shadow-float:
+    0 8px 24px -4px rgba(15, 23, 42, 0.12),
+    0 2px 8px -2px rgba(15, 23, 42, 0.08);
+
+  /* Special: card (combines border + soft shadow) */
+  --shadow-card:
+    0 0 0 1px rgba(15, 23, 42, 0.06), 0 4px 16px -4px rgba(15, 23, 42, 0.1);
+
+  /* Special: modal / overlay */
+  --shadow-modal:
+    0 32px 64px -12px rgba(15, 23, 42, 0.22),
+    0 8px 24px -8px rgba(15, 23, 42, 0.12);
+
+  /* Special: accent glow (teal brand colour) */
+  --shadow-glow:
+    0 0 0 3px rgba(13, 148, 136, 0.2), 0 4px 16px rgba(13, 148, 136, 0.15);
+  --shadow-glow-sm: 0 0 0 2px rgba(13, 148, 136, 0.18);
+
+  /* Legacy alias — keeps old code working */
+  --box-shadow: var(--shadow-md);
+}
+
+/* ─── Dark Mode ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --color-bg-primary: #0d1117;
+  --color-bg-secondary: #111827;
+  --color-bg-tertiary: #161d2b;
+  --color-bg-footer: #0a0e17;
+  --color-bg-dark-gradient: #0d1f2d;
+
+  /* Brand / Accent */
+  --color-accent: #2dd4bf;
+  --color-accent-hover: #14b8a6;
+  --color-accent-muted: rgba(45, 212, 191, 0.1);
+  --color-accent-border: rgba(45, 212, 191, 0.3);
+
+  /* Secondary Accent */
+  --color-purple: #818cf8;
+  --color-purple-muted: rgba(129, 140, 248, 0.05);
+  --color-purple-border: rgba(129, 140, 248, 0.3);
+
+  /* Borders */
+  --color-border: #1f2d3d;
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+  --color-text-subtle: #6b7280;
+  --color-text-faint: #4b5563;
+
+  /* Stats bar */
+  --color-stats-bg: #2dd4bf;
+  --color-stats-text: #0d1117;
+  --color-stats-label: #0d3330;
+
+  /* Amber */
+  --color-amber: #f59e0b;
+
+  /* Surface overlays */
+  --color-surface-overlay: rgba(255, 255, 255, 0.04);
+  --color-surface-overlay-hover: rgba(255, 255, 255, 0.08);
+  --color-surface-border: rgba(255, 255, 255, 0.07);
+  --color-divider: rgba(255, 255, 255, 0.08);
+  --color-footer-bg: rgba(11, 18, 32, 0.5);
+
+  /* Page bg */
+  --page-bg: #0d1117;
+
+  /* ─── Shadow Scale (dark) ──────────────────────────────────────────────── */
+  /* Deep black shadows are visible on dark surfaces */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.24);
+
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.48), 0 4px 6px -4px rgba(0, 0, 0, 0.28);
+
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.52), 0 8px 10px -6px rgba(0, 0, 0, 0.32);
+
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.64);
+
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+
+  --shadow-float:
+    0 8px 24px -4px rgba(0, 0, 0, 0.56), 0 2px 8px -2px rgba(0, 0, 0, 0.36);
+
+  --shadow-card:
+    0 0 0 1px rgba(255, 255, 255, 0.04), 0 4px 16px -4px rgba(0, 0, 0, 0.48);
+
+  --shadow-modal:
+    0 32px 64px -12px rgba(0, 0, 0, 0.72), 0 8px 24px -8px rgba(0, 0, 0, 0.48);
+
+  /* accent glow (teal shifts to bright cyan in dark mode) */
+  --shadow-glow:
+    0 0 0 3px rgba(45, 212, 191, 0.22), 0 4px 20px rgba(45, 212, 191, 0.16);
+  --shadow-glow-sm: 0 0 0 2px rgba(45, 212, 191, 0.2);
+
+  --box-shadow: var(--shadow-md);
+}
+
+input {
+  border: 1px solid var(--color-accent-border);
+  outline: none;
+}
+
+input:focus,
+input:active {
+  border: 1px solid var(--color-accent-border);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+  outline: none;
+}
+
+input:hover {
+  cursor: pointer;
+}
+
+button {
+  border: none;
+  outline: none;
+}
+
+button:focus,
+button:active {
+  border: 1px solid var(--color-accent);
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+/* ─── Toast Container (dark mode) ────────────────────────────────────────── */
+/* Toastify */
+/* Success toast background */
+.Toastify__toast--success {
+  background: var(--color-bg-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Success icon */
+.Toastify__toast--success .Toastify__toast-icon svg {
+  fill: var(--color-accent) !important;
+}
+
+/* Progress bar */
+.Toastify__progress-bar--success {
+  background: var(--color-accent) !important;
+}
+/* --- Remita Global Fix ---------------------------------------------------- */
+/* Force Remita to overlay EVERYTHING including sidebar and dashboard elements */
+iframe[name='remita-pay-inline-widget'], 
+#remita-inline-widget-container,
+.remita-overlay,
+div[id*='remita-'] {
+  z-index: 9999999 !important;
+}
