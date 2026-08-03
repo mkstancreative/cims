@@ -18,6 +18,7 @@ import {
   useReviewLogbook,
 } from "../../../hooks/useSchoolSupervisor";
 import { useCurriculum } from "../../../hooks/useCurriculum";
+import type { Topic, Subtopic } from "../../../api/types/curriculum";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import "./AssignedStudentLogBookView.css";
 
@@ -71,8 +72,8 @@ export default function AssignedStudentLogBookView() {
   const statusEntry = logbook ? STATUS_META[logbook.status] : null;
 
   // Resolve curriculum names
-  const topicObj = curriculum?.topics?.find((t) => t._id === logbook?.topic);
-  const subtopicObj = topicObj?.subtopics?.find((s) => s._id === logbook?.subtopic);
+  const topicObj = curriculum?.topics?.find((t: Topic) => t._id === logbook?.topic);
+  const subtopicObj = topicObj?.subtopics?.find((s: Subtopic) => s._id === logbook?.subtopic);
 
   const curriculumName = curriculum?.name ?? "—";
   const topicTitle = topicObj?.title ?? "—";
