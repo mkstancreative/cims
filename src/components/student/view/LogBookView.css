@@ -229,19 +229,12 @@
   word-break: break-word;
 }
 
-.lbv-skills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.lbv-skill-chip {
+/* Curriculum the entry was logged against */
+.lbv-curriculum-path {
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  color: var(--color-text-secondary);
+  opacity: 0.85;
 }
 
 /* Reflections */
@@ -367,4 +360,61 @@
 .lbv-review-date {
   font-size: 11px;
   color: var(--color-text-muted);
+}
+
+/* ── Details Grid for curriculum details ──────────────────── */
+.lbv-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.lbv-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+}
+
+.lbv-detail-row + .lbv-detail-row {
+  border-top: 1px dashed var(--color-border);
+}
+
+.lbv-detail-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.lbv-detail-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ── Activity Notes Card ─────────────────────────────────── */
+.lbv-notes-card {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.lbv-notes-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

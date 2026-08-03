@@ -81,6 +81,11 @@ export interface CompositeResultsResponse {
 }
 
 export interface CompositeResultsParams {
+  department?: string;    // case-insensitive department name
+  batchId?: string;       // batch _id
+  search?: string;        // registration number match
+  status?: "pending" | "completed";
+  grade?: "A" | "B" | "C" | "D" | "E" | "F";
   page?: number;
   limit?: number;
 }

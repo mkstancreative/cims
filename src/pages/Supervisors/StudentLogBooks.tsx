@@ -76,7 +76,7 @@ export default function StudentLogBooks() {
           <div>
             <h2 className="page-title">Student Log Books</h2>
             <p className="page-sub">
-              Review and manage weekly log book entries
+              Review and manage daily log book entries
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function StudentLogBooks() {
           onChange={(val) =>
             setFilters((prev) => ({ ...prev, search: val, page: 1 }))
           }
-          placeholder="Search by title…"
+          placeholder="Search by notes…"
           onClear={() =>
             setFilters((prev) => ({ ...prev, search: "", page: 1 }))
           }

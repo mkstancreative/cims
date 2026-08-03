@@ -49,23 +49,35 @@ export default function AssignedStudentLogBookTable({
 }: AssignedStudentLogBookTableProps) {
   const columns: Column<LogbookSummary>[] = [
     {
-      header: "Week",
+      header: "Date",
       render: (row) => (
-        <span className="lbt-week-badge">Week {row.weekNumber}</span>
+        <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>
+          {row.date ? formatDate(row.date) : "—"}
+        </span>
       ),
     },
     {
-      header: "Title",
-      render: (row) => <span className="lbt-title">{row.title}</span>,
-    },
-    {
-      header: "Period",
-      render: (row) =>
-        `${formatDate(row.weekStartDate)} – ${formatDate(row.weekEndDate)}`,
+      header: "Notes",
+      render: (row) => (
+        <span
+          style={{
+            maxWidth: 280,
+            display: "block",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            color: "var(--color-text-secondary)",
+            fontSize: 12.5,
+          }}
+          title={row.notes}
+        >
+          {row.notes || "—"}
+        </span>
+      ),
     },
     {
       header: "Hours",
-      render: (row) => <span className="lbt-hours">{row.totalHours}h</span>,
+      render: (row) => <span className="lbt-hours">{row.hoursSpent} hrs</span>,
     },
     {
       header: "Status",
@@ -90,11 +102,7 @@ export default function AssignedStudentLogBookTable({
   return (
     <>
       <style>{`
-        .lbt-week-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:700;background:var(--color-accent-muted);color:var(--color-accent)}
-        .lbt-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
         .lbt-hours{font-size:13px;font-weight:600;color:#10b981}
-        .lbt-rating{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#f59e0b}
-        .lbt-no-rating{color:var(--color-text-secondary);font-size:13px}
         .lbt-status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;text-transform:capitalize}
         .lbt-status-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
         .lbt-status--draft{background:rgba(99,102,241,.12);color:#818cf8}

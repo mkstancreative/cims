@@ -1,52 +1,40 @@
 import { CheckCircle2, TrendingUp } from "lucide-react";
-import { useGetMe } from "../../hooks/useAuth";
 import { useStudentDashboard } from "../../hooks/useDashboard";
-import { useStudentProgress } from "../../hooks/useITStudents";
-import { useMyEvaluation } from "../../hooks/useEvaluations";
-import { useMyCurriculum } from "../../hooks/useCurriculum";
-import { useMyInternshipHistory } from "../../hooks/useInternships";
-import { useCertificateStatus } from "../../hooks/useCertificate";
 import {
   SectionHead,
   DashboardSkeleton,
   DashboardBanner,
+  DashboardError,
 } from "../../components/shared/dashboard/DashboardKit";
 import "../../components/shared/dashboard/dashboard.css";
-import { CertificateStatusBanner } from "../../components/student/dashboard/CertificateStatusBanner";
-import {
-  StudentMetricsGrid,
-  type DashboardEvaluationSummary,
-} from "../../components/student/dashboard/StudentMetricsGrid";
+import { StudentMetricsGrid } from "../../components/student/dashboard/StudentMetricsGrid";
 import { ProgressSection } from "../../components/student/dashboard/ProgressSection";
 import { FinalDetailsSection } from "../../components/student/dashboard/FinalDetailsSection";
 import { NotificationsSection } from "../../components/student/dashboard/NotificationsSection";
-import type { StudentDashNotifications } from "../../api/types/dashboard";
 import { fmt, ago } from "../../helpers/utilities";
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function DashBoardStudent() {
-  const { data: meResp, isLoading: loadingMe } = useGetMe();
-  const { data: dashResp } = useStudentDashboard();
-  const { data: progressResp } = useStudentProgress();
-  const { data: evalResp } = useMyEvaluation();
-  const { data: curriculumResp } = useMyCurriculum();
-  const { data: internshipResp } = useMyInternshipHistory();
-  const { data: certResp, isLoading: loadingCert } = useCertificateStatus();
+  const { data: dashResp, isLoading } = useStudentDashboard();
 
-  if (loadingMe) return <DashboardSkeleton cards={6} wide />;
+  if (isLoading) return <DashboardSkeleton cards={6} wide />;
+  if (!dashResp?.data) return <DashboardError />;
 
-  const user = meResp?.data?.user;
-  const profile = meResp?.data?.profile;
+  const data = dashResp.data;
+  const student = data.student;
+  const progress = data.progress;
+  const logbooks = data.logbooks;
+  const supervisor = data.supervisor;
+  const batch = data.batch;
+  const notifications = data.notifications;
+  const evaluation = data.evaluation;
 
-  // Identity for the banner (defensive — FMC shapes may vary).
-  const fullName =
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Student";
-  const regNumber = profile?.registrationNumber ?? "—";
-  const department = profile?.department?.name ?? "—";
-  const program = profile?.program
-    ? `${profile.program.type} ${profile.program.level}`.trim()
-    : "—";
-  const itStatus = profile?.itStatus ?? "active";
+  // Identity info from dashboard response
+  const fullName = student.name || "Student";
+  const regNumber = student.registrationNumber || "—";
+  const department = student.department || "—";
+  const program = student.program || "—";
+  const itStatus = student.itStatus || "active";
 
   const initials = fullName
     .split(" ")
@@ -55,32 +43,7 @@ export default function DashBoardStudent() {
     .slice(0, 2)
     .toUpperCase();
 
-  const progress = progressResp?.data;
-  const progressPercent = progress?.progressPercent ?? 0;
-
-  const summary = evalResp?.data?.summary;
-  const evaluation: DashboardEvaluationSummary = {
-    hasEvaluation: summary?.hasEvaluation ?? false,
-    status: summary?.status,
-    finalScore: summary?.finalScore,
-    finalGrade: summary?.finalGrade,
-  };
-
-  const curriculumCount = curriculumResp?.data?.curricula?.length ?? 0;
-
-  const certificate = certResp?.data ?? null;
-
-  // Current (or most recent) internship for the details panel.
-  const internships = internshipResp?.data ?? [];
-  const currentInternship =
-    internships.find((i) => i.isCurrent) ?? internships[0];
-
-  // Notifications come from the dashboard endpoint (render defensively).
-  const notifications: StudentDashNotifications =
-    dashResp?.data?.notifications ?? { unreadCount: 0, latest: [] };
-
-  const itPeriodStart = profile?.itPeriod?.startDate ?? null;
-  const itPeriodEnd = profile?.itPeriod?.endDate ?? null;
+  const curriculumPercent = progress.curriculum?.percent ?? 0;
 
   return (
     <div className="db-page">
@@ -122,15 +85,10 @@ export default function DashBoardStudent() {
               stroke="rgba(255,255,255,.7)"
               strokeWidth={5}
               strokeLinecap="round"
-              strokeDasharray={`${(progressPercent / 100) * 276} 276`}
+              strokeDasharray={`${(curriculumPercent / 100) * 276} 276`}
             />
           </svg>
         }
-      />
-
-      <CertificateStatusBanner
-        certificate={certificate}
-        loadingCert={loadingCert}
       />
 
       <div>
@@ -142,24 +100,24 @@ export default function DashBoardStudent() {
         />
         <StudentMetricsGrid
           progress={progress}
-          evaluation={evaluation}
-          curriculumCount={curriculumCount}
-          certificateStatus={certificate?.approvalStatus}
+          logbooks={logbooks}
           unreadNotifications={notifications.unreadCount}
+          evaluation={evaluation}
         />
       </div>
 
       <ProgressSection
         progress={progress}
         evaluation={evaluation}
-        startDate={itPeriodStart}
-        endDate={itPeriodEnd}
+        startDate={progress.startDate}
+        endDate={progress.endDate}
         fmt={fmt}
       />
 
       <FinalDetailsSection
-        internship={currentInternship}
-        certificate={certificate}
+        batch={batch}
+        itStatus={itStatus}
+        supervisor={supervisor}
         fmt={fmt}
       />
 

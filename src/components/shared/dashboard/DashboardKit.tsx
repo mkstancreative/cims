@@ -45,7 +45,7 @@ export function KpiCard({
   progress,
   className = "",
 }: KpiCardProps) {
-  const c = COLOR_MAP[color];
+  const c = COLOR_MAP[color] ?? COLOR_MAP["teal"];
   return (
     <div className={`db-kpi ${className}`}>
       <div className="db-kpi__accent-bar" style={{ background: c.bar }} />

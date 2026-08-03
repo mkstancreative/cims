@@ -86,10 +86,13 @@ export interface MyQuizCurriculumProgress {
 export interface MyQuizResponse {
   success: boolean;
   data: {
-    quiz: StudentQuiz | null;
-    locked: boolean;
+    quiz: StudentQuiz | { _id: string; title: string } | null;
+    locked?: boolean;
     curriculum?: MyQuizCurriculumProgress;
     message?: string;
+    alreadySubmitted?: boolean;
+    score?: number;
+    passed?: boolean;
   };
 }
 

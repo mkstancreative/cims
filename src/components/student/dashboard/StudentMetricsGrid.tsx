@@ -2,109 +2,76 @@ import React from "react";
 import {
   CalendarCheck2,
   BookOpen,
-  GraduationCap,
   BookMarked,
-  Award,
   Bell,
+  CheckCircle,
+  FileCheck,
 } from "lucide-react";
 import { KpiCard } from "../../shared/dashboard/DashboardKit";
-import type { StudentProgress } from "../../../api/types/itstudent";
-
-export interface DashboardEvaluationSummary {
-  hasEvaluation: boolean;
-  status?: string;
-  finalScore?: number;
-  finalGrade?: string;
-}
+import type { StudentDashProgress, StudentDashLogbooks } from "../../../api/types/dashboard";
 
 interface StudentMetricsGridProps {
-  progress?: StudentProgress;
-  evaluation?: DashboardEvaluationSummary;
-  curriculumCount: number;
-  certificateStatus?: string;
+  progress: StudentDashProgress;
+  logbooks: StudentDashLogbooks;
   unreadNotifications: number;
+  evaluation: unknown;
 }
 
 export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
   progress,
-  evaluation,
-  curriculumCount,
-  certificateStatus,
+  logbooks,
   unreadNotifications,
 }) => {
-  const weeksCompleted = progress?.weeksCompleted ?? 0;
-  const totalWeeks = progress?.totalWeeks ?? 0;
-  const daysRemaining = progress?.daysRemaining ?? 0;
-  const progressPercent = progress?.progressPercent ?? 0;
-  const logbooksApproved = progress?.logbooksApproved ?? 0;
-  const logbooksSubmitted = progress?.logbooksSubmitted ?? 0;
-  const minimumRequired = progress?.minimumRequired ?? 0;
-  const meetsRequirement = progress?.meetsRequirement ?? false;
-
-  const certLabel = certificateStatus
-    ? certificateStatus.charAt(0).toUpperCase() + certificateStatus.slice(1)
-    : "Not Requested";
+  const daysRemaining = progress.daysRemaining ?? 0;
+  const curriculumPercent = progress.curriculum?.percent ?? 0;
+  const totalSubtopics = progress.curriculum?.totalSubtopics ?? 0;
+  const approvedSubtopics = progress.curriculum?.approvedSubtopics ?? 0;
 
   return (
     <div className="db-kpi-grid db-kpi-grid--wide" style={{ marginTop: 16 }}>
       <KpiCard
-        label="Weeks Completed"
-        value={`${weeksCompleted}/${totalWeeks}`}
-        sub={`${daysRemaining} days remaining`}
+        label="Days Remaining"
+        value={daysRemaining}
+        sub="till the end of rotation"
         icon={<CalendarCheck2 size={18} />}
         color="teal"
-        trend={`${progressPercent}%`}
-        trendType={progressPercent >= 80 ? "up" : "warn"}
-        progress={progressPercent}
       />
       <KpiCard
-        label="Logbooks Approved"
-        value={logbooksApproved}
-        sub={`of ${logbooksSubmitted} submitted`}
-        icon={<BookOpen size={18} />}
-        color="purple"
-        trend={meetsRequirement ? "✓ Met" : `Need ${minimumRequired}`}
-        trendType={meetsRequirement ? "up" : "warn"}
-        progress={Math.round(
-          (logbooksApproved / Math.max(minimumRequired, 1)) * 100,
-        )}
-      />
-      <KpiCard
-        label="Curriculum"
-        value={curriculumCount}
-        sub={curriculumCount === 1 ? "assigned curriculum" : "assigned curricula"}
+        label="Curriculum Progress"
+        value={`${approvedSubtopics}/${totalSubtopics}`}
+        sub="approved subtopics"
         icon={<BookMarked size={18} />}
         color="blue"
-        trend={curriculumCount > 0 ? "Available" : "None"}
-        trendType={curriculumCount > 0 ? "up" : "neutral"}
+        trend={`${curriculumPercent}%`}
+        trendType={curriculumPercent >= 80 ? "up" : "warn"}
+        progress={curriculumPercent}
       />
       <KpiCard
-        label="Final Score"
-        value={evaluation?.finalScore ?? "Pending"}
-        sub={
-          evaluation?.hasEvaluation
-            ? "Evaluation complete"
-            : "Awaiting evaluation"
-        }
-        icon={<GraduationCap size={18} />}
+        label="Draft Logbooks"
+        value={logbooks.draft}
+        sub="awaiting edits/submission"
+        icon={<BookOpen size={18} />}
+        color="purple"
+        trend={logbooks.draft > 0 ? "Pending" : "None"}
+        trendType={logbooks.draft > 0 ? "warn" : "neutral"}
+      />
+      <KpiCard
+        label="Submitted Logbooks"
+        value={logbooks.submitted}
+        sub="pending supervisor review"
+        icon={<FileCheck size={18} />}
+        color="amber"
+        trend={logbooks.submitted > 0 ? "Awaiting" : "None"}
+        trendType={logbooks.submitted > 0 ? "warn" : "neutral"}
+      />
+      <KpiCard
+        label="Approved Logbooks"
+        value={logbooks.approved}
+        sub="successfully verified"
+        icon={<CheckCircle size={18} />}
         color="green"
-        trend={evaluation?.finalGrade ?? "—"}
-        trendType={
-          !evaluation?.finalGrade
-            ? "neutral"
-            : evaluation.finalGrade === "A" || evaluation.finalGrade === "B"
-              ? "up"
-              : "warn"
-        }
-      />
-      <KpiCard
-        label="Certificate"
-        value={certLabel}
-        sub="Completion certificate"
-        icon={<Award size={18} />}
-        color={certificateStatus === "approved" ? "green" : "slate"}
-        trend={certificateStatus === "approved" ? "Ready" : "Pending"}
-        trendType={certificateStatus === "approved" ? "up" : "neutral"}
+        trend={logbooks.approved > 0 ? "Completed" : "None"}
+        trendType={logbooks.approved > 0 ? "up" : "neutral"}
       />
       <KpiCard
         label="Notifications"

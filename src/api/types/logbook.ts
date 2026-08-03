@@ -7,40 +7,63 @@ export type LogBookStatus =
   | "rejected"
   | "needs_revision";
 
+// ─── Curriculum references on an entry ────────────────────────────────────────
+// The API may return these expanded or as raw ids — read them through the
+// helpers in `helpers/logbook.ts` rather than touching the union directly.
+
+export interface LogBookCurriculumRef {
+  _id: string;
+  name: string;
+}
+
+export interface LogBookTopicRef {
+  _id: string;
+  title: string;
+  order?: number;
+}
+
+export interface LogBookSubtopicRef {
+  _id: string;
+  title: string;
+  order?: number;
+}
+
+/** One day's entry, tied to a curriculum topic/subtopic rather than free text. */
 export interface LogBookActivity {
   _id?: string;
   date: string;
-  dayOfWeek?: string;
-  activity: string;
-  description: string;
+  curriculum: string | LogBookCurriculumRef;
+  topic: string | LogBookTopicRef;
+  subtopic: string | LogBookSubtopicRef;
+  notes: string;
   hoursSpent: number;
-  skillsUsed: string[];
 }
 
+/**
+ * What we SEND. Distinct from `LogBookActivity` because the request always
+ * carries plain ids, while the response may carry populated documents.
+ */
+export interface LogBookActivityPayload {
+  date: string;
+  curriculum: string;
+  topic: string;
+  subtopic: string;
+  notes: string;
+  hoursSpent: number;
+}
+
+/** A flat single-activity logbook entry as returned by GET /logbooks/:id. */
 export interface LogBook {
   _id: string;
   student?: string;
-  weekNumber: number;
-  title: string;
-  weekStartDate?: string;
-  weekEndDate?: string;
-  activities: LogBookActivity[];
-  challengesFaced?: string;
-  lessonsLearned?: string;
-  nextWeekPlan?: string;
+  internship?: string;
+  curriculum: string;
+  topic: string;
+  subtopic: string;
+  notes: string;
+  hoursSpent: number;
+  date: string;
   status: LogBookStatus;
-  industrialReview?: {
-    rating?: number | null;
-    comments?: string;
-    reviewedAt?: string;
-    approvalMethod?: string;
-  };
-  schoolReview?: {
-    reviewedAt?: string;
-    comments?: string;
-  };
-  aiFraudScore?: number;
-  totalHours?: number;
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
@@ -48,15 +71,17 @@ export interface LogBook {
 
 // ─── List (getAll) response ───────────────────────────────────────────────────
 
+/** One row in the GET /logbooks list response. */
 export interface LogBookListItem {
   _id: string;
-  weekNumber: number;
-  title: string;
-  weekStartDate?: string;
-  weekEndDate?: string;
+  curriculum: string;
+  topic: string;
+  subtopic: string;
+  notes: string;
+  hoursSpent: number;
+  date: string;
   status: LogBookStatus;
   createdAt?: string;
-  totalHours?: number;
 }
 
 export interface LogBookListResponse {
@@ -74,10 +99,24 @@ export interface LogBookDetailResponse {
 
 // ─── Request Payloads ─────────────────────────────────────────────────────────
 
+/**
+ * POST /logbooks — create a single activity entry.
+ * Only these six fields are accepted; the rest (weekNumber, title, reflections)
+ * are not required by the API.
+ */
+export interface CreateLogBookEntryPayload {
+  curriculum: string;
+  topic: string;
+  subtopic: string;
+  notes: string;
+  hoursSpent: number;
+  date: string;
+}
+
 export interface CreateLogBookPayload {
   weekNumber: number;
   title: string;
-  activities: Omit<LogBookActivity, "_id">[];
+  activities: LogBookActivityPayload[];
   challengesFaced?: string;
   lessonsLearned?: string;
   nextWeekPlan?: string;

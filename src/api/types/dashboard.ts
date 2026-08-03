@@ -27,13 +27,17 @@ export interface StudentDashSupervisors {
   };
 }
 
+export interface StudentDashCurriculumProgress {
+  totalSubtopics: number;
+  approvedSubtopics: number;
+  percent: number;
+}
+
 export interface StudentDashProgress {
-  weeksCompleted: number;
-  totalWeeks: number;
   daysRemaining: number;
-  progressPercent: number;
   startDate: string;
   endDate: string;
+  curriculum: StudentDashCurriculumProgress;
 }
 
 export interface StudentDashLogbooks {
@@ -42,9 +46,6 @@ export interface StudentDashLogbooks {
   submitted: number;
   approved: number;
   rejected: number;
-  averageRating: number;
-  minimumRequired: number;
-  meetsRequirement: boolean;
 }
 
 export interface StudentDashEvaluation {
@@ -78,14 +79,33 @@ export interface StudentDashNotifications {
   latest: StudentDashNotification[];
 }
 
+export interface StudentDashBatch {
+  _id: string;
+  name: string;
+  session: string;
+  status: string;
+  itPeriod?: {
+    name: string;
+    startDate: string;
+    endDate: string;
+    duration: number;
+  };
+}
+
+export interface StudentDashSupervisor {
+  name: string;
+  specialization?: string;
+}
+
 export interface StudentDashboardData {
+  internshipId: string;
+  hasMultipleInternships: boolean;
+  batch: StudentDashBatch;
   student: StudentDashStudent;
-  placement: StudentDashPlacement;
-  supervisors: StudentDashSupervisors;
+  supervisor?: StudentDashSupervisor | null;
   progress: StudentDashProgress;
   logbooks: StudentDashLogbooks;
-  evaluation: StudentDashEvaluation;
-  report: StudentDashReport;
+  evaluation: unknown | null;
   notifications: StudentDashNotifications;
 }
 

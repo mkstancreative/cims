@@ -13,7 +13,6 @@ import type {
 interface LogBookTableProps {
   search?: string;
   status?: LogBookStatus | "";
-  weekNumber?: string;
   page: number;
   limit: number;
   onPageChange: (p: number) => void;
@@ -35,7 +34,6 @@ const STATUS_CLS: Record<string, string> = {
 export default function LogBookTable({
   search,
   status,
-  weekNumber,
   page,
   limit,
   onPageChange,
@@ -49,7 +47,6 @@ export default function LogBookTable({
     limit,
     search,
     status,
-    weekNumber: weekNumber ? Number(weekNumber) : undefined,
   });
 
   const logbooks: LogBookListItem[] = data?.data ?? [];
@@ -67,27 +64,35 @@ export default function LogBookTable({
 
   const columns: Column<LogBookListItem>[] = [
     {
-      header: "Week #",
+      header: "Date",
       render: (row) => (
-        <span style={{ fontWeight: 700 }}>Week {row.weekNumber}</span>
+        <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>
+          {row.date ? formatDate(row.date) : "—"}
+        </span>
       ),
     },
     {
-      header: "Title",
-      accessor: "title",
+      header: "Notes",
+      render: (row) => (
+        <span
+          style={{
+            maxWidth: 260,
+            display: "block",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            color: "var(--color-text-secondary)",
+            fontSize: 12.5,
+          }}
+          title={row.notes}
+        >
+          {row.notes || "—"}
+        </span>
+      ),
     },
     {
-      header: "Start Date",
-      render: (row) =>
-        row.weekStartDate ? formatDate(row.weekStartDate) : "—",
-    },
-    {
-      header: "End Date",
-      render: (row) => (row.weekEndDate ? formatDate(row.weekEndDate) : "—"),
-    },
-    {
-      header: "Total Hours",
-      render: (row) => `${row.totalHours ?? 0} hrs`,
+      header: "Hours",
+      render: (row) => `${row.hoursSpent} hrs`,
     },
     {
       header: "Status",
@@ -106,11 +111,10 @@ export default function LogBookTable({
               label: "View Details",
               icon: <Eye size={13} />,
               onClick: () => onView(row),
-              // disabled: row.status === "submitted",
             },
             {
               label:
-                row.status === "needs_revision" ? "Revise Log" : "Edit Draft",
+                row.status === "needs_revision" ? "Revise Entry" : "Edit Entry",
               icon: <Pencil size={13} />,
               onClick: () => onEdit(row),
               disabled:

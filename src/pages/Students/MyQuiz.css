@@ -1,0 +1,390 @@
+/* ── Quiz Page Layout ─────────────────────────────────────────────────────── */
+.mq-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Center-panel wrapper (Locked / Intro / Result / Form) ───────────────── */
+.mq-center-panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Intro / Landing Card ────────────────────────────────────────────────── */
+.mq-intro-card {
+  width: 100%;
+  max-width: 540px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 40px 36px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.mq-intro-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.mq-intro-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+/* Meta row */
+.mq-intro-meta-grid {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 26px;
+}
+
+.mq-intro-meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 10px;
+}
+
+.mq-intro-meta-icon {
+  color: var(--color-accent);
+}
+
+.mq-intro-meta-label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mq-intro-meta-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+/* Instructions */
+.mq-intro-instructions {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.mq-intro-instr-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 10px;
+}
+
+.mq-intro-instr-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mq-intro-instr-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.mq-intro-instr-list li svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+/* Start button */
+.mq-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  width: 100%;
+  justify-content: center;
+}
+
+.mq-start-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.mq-start-btn:active {
+  transform: translateY(0);
+}
+
+
+
+/* ── Locked Card ─────────────────────────────────────────────────────────── */
+.mq-locked-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.mq-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.mq-icon-wrap.amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.mq-icon-wrap.green {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.mq-icon-wrap.red {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.mq-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.mq-card-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────────── */
+.mq-progress-wrap {
+  text-align: left;
+}
+
+.mq-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--color-text-muted);
+}
+
+.mq-progress-label span:last-child {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.mq-progress-track {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--color-surface-overlay, #e5e7eb);
+  overflow: hidden;
+}
+
+.mq-progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+  transition: width 0.6s ease;
+}
+
+.mq-progress-pct {
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: #d97706;
+  margin-top: 6px;
+}
+
+/* ── Result Card ─────────────────────────────────────────────────────────── */
+.mq-result-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.mq-result-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0 0 4px;
+}
+
+.mq-result-label {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 4px;
+}
+
+.mq-result-score {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+  margin: 6px 0;
+}
+
+.mq-result-score.passed {
+  color: #10b981;
+}
+
+.mq-result-score.failed {
+  color: #ef4444;
+}
+
+.mq-result-verdict {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mq-result-verdict.passed {
+  color: #10b981;
+}
+
+.mq-result-verdict.failed {
+  color: #ef4444;
+}
+
+/* ── Quiz Form ────────────────────────────────────────────────────────────── */
+.mq-form-wrap {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mq-quiz-header {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 22px;
+}
+
+.mq-quiz-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 4px;
+}
+
+.mq-quiz-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0 0 6px;
+}
+
+.mq-quiz-meta {
+  font-size: 12px;
+  color: var(--color-text-subtle, var(--color-text-muted));
+  margin: 0;
+}
+
+/* ── Question card ───────────────────────────────────────────────────────── */
+.mq-question-card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.mq-question-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.mq-question-num {
+  color: var(--color-accent);
+  margin-right: 8px;
+}
+
+.mq-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mq-option-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mq-option-label.selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.mq-option-label input[type="radio"] {
+  flex-shrink: 0;
+  accent-color: var(--color-accent);
+}
+
+/* ── Submit row ──────────────────────────────────────────────────────────── */
+.mq-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.mq-answered-count {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}

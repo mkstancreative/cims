@@ -246,19 +246,12 @@
   word-break: break-word;
 }
 
-.lbv2-skills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.lbv2-skill-chip {
+/* Curriculum the entry was logged against */
+.lbv2-curriculum-path {
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 9px;
-  border-radius: 20px;
-  background: rgba(99, 102, 241, 0.08);
-  color: #818cf8;
+  color: var(--color-text-secondary);
+  opacity: 0.85;
 }
 
 /* ── Reflections ─────────────────────────────────────────────────────────────── */
@@ -512,4 +505,73 @@
 
 .lbv2-check-icon {
   color: var(--color-accent);
+}
+
+/* ── Details Grid for curriculum details ──────────────────── */
+.lbv2-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.lbv2-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+}
+
+.lbv2-detail-row + .lbv2-detail-row {
+  border-top: 1px dashed var(--color-border);
+}
+
+.lbv2-detail-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.lbv2-detail-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ── Activity Notes Card ─────────────────────────────────── */
+.lbv2-notes-card {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.lbv2-notes-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Reject Button Styling ──────────────────────────────── */
+.lbv2-reject-btn {
+  background: #ef4444 !important;
+  border: 1px solid #ef4444 !important;
+  color: #ffffff !important;
+}
+
+.lbv2-reject-btn:hover {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
 }

@@ -76,11 +76,13 @@ export const useReviewLogbook = (studentId: string) => {
   return useMutation({
     mutationFn: ({
       logbookId,
+      action,
       comments,
     }: {
       logbookId: string;
+      action: "approve" | "reject";
       comments: string;
-    }) => reviewLogbook(logbookId, { comments }),
+    }) => reviewLogbook(logbookId, { action, comments }),
     onSuccess: (_data, { logbookId }) => {
       queryClient.invalidateQueries({
         queryKey: supervisorQueryKeys.logbooks(studentId),

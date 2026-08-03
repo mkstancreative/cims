@@ -2,7 +2,7 @@ import { api } from "./api";
 import type {
   LogBookListResponse,
   LogBookDetailResponse,
-  CreateLogBookPayload,
+  CreateLogBookEntryPayload,
   LogBookParams,
 } from "../types/logbook";
 
@@ -27,7 +27,7 @@ export const getLogBookById = async (
 // ─── Mutations ────────────────────────────────────────────────────────────────
 
 export const createLogBook = async (
-  payload: CreateLogBookPayload,
+  payload: CreateLogBookEntryPayload,
 ): Promise<LogBookDetailResponse> => {
   const response = await api.post(BASE, payload);
   return response.data;
@@ -35,7 +35,7 @@ export const createLogBook = async (
 
 export const updateLogBook = async (
   id: string,
-  payload: CreateLogBookPayload,
+  payload: CreateLogBookEntryPayload,
 ): Promise<LogBookDetailResponse> => {
   const response = await api.put(`${BASE}/${id}`, payload);
   return response.data;

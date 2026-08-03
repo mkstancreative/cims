@@ -11,6 +11,7 @@ import LogBookTable from "../../components/student/tables/LogBookTable";
 import CreateLogBookDraft from "../../components/student/forms/CreateLogBookDraft";
 import LogBookView from "../../components/student/view/LogBookView";
 import { useDeleteLogBook } from "../../hooks/useLogBooks";
+import { formatDate } from "../../helpers/utilities";
 
 // ─── Filter options ───────────────────────────────────────────────────────────
 
@@ -23,14 +24,6 @@ const STATUS_OPTIONS = [
   { value: "needs_revision", label: "Needs Revision" },
 ];
 
-const WEEK_OPTIONS = [
-  { value: "", label: "All Weeks" },
-  ...Array.from({ length: 26 }, (_, i) => ({
-    value: String(i + 1),
-    label: `Week ${i + 1}`,
-  })),
-];
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LogBook() {
@@ -40,7 +33,6 @@ export default function LogBook() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [status, setStatus] = useState<LogBookStatus | "">("");
-  const [weekNumber, setWeekNumber] = useState("");
 
   const [deleteTarget, setDeleteTarget] = useState<LogBookListItem | null>(
     null,
@@ -57,7 +49,6 @@ export default function LogBook() {
   const handleReset = () => {
     setSearch("");
     setStatus("");
-    setWeekNumber("");
     setPage(1);
   };
 
@@ -84,7 +75,7 @@ export default function LogBook() {
             <div>
               <h2 className="page-title">Log Book</h2>
               <p className="page-sub">
-                Record and manage your weekly IT training activities
+                Record and manage your daily IT training activities
               </p>
             </div>
           </div>
@@ -101,7 +92,7 @@ export default function LogBook() {
               setSearch(val);
               setPage(1);
             }}
-            placeholder="Search by title or week…"
+            placeholder="Search by notes…"
             onClear={handleReset}
           />
         </div>
@@ -118,16 +109,6 @@ export default function LogBook() {
             }}
             name="status"
           />
-          <SelectFilter
-            label="Week Number"
-            options={WEEK_OPTIONS}
-            value={weekNumber}
-            onChange={(val) => {
-              setWeekNumber(val);
-              setPage(1);
-            }}
-            name="weekNumber"
-          />
           <ResetButton onClick={handleReset} />
         </div>
 
@@ -136,7 +117,6 @@ export default function LogBook() {
           <LogBookTable
             search={search}
             status={status}
-            weekNumber={weekNumber}
             page={page}
             limit={limit}
             onPageChange={setPage}
@@ -158,7 +138,9 @@ export default function LogBook() {
         title="Delete Log Book Entry"
         message={
           deleteTarget
-            ? `Are you sure you want to delete "Week ${deleteTarget.weekNumber} – ${deleteTarget.title}"? This action cannot be undone.`
+            ? `Are you sure you want to delete the entry for ${
+                deleteTarget.date ? formatDate(deleteTarget.date) : "this day"
+              }? This action cannot be undone.`
             : ""
         }
         confirmText="Yes, Delete"

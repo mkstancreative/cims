@@ -8,7 +8,7 @@ import {
   deleteLogBook,
   submitLogBook,
 } from "../api/services/logbook";
-import type { CreateLogBookPayload, LogBookParams } from "../api/types/logbook";
+import type { CreateLogBookEntryPayload, LogBookParams } from "../api/types/logbook";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -55,7 +55,7 @@ export const useUpdateLogBook = () => {
       payload,
     }: {
       id: string;
-      payload: CreateLogBookPayload;
+      payload: CreateLogBookEntryPayload;
     }) => updateLogBook(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["logbooks"] });

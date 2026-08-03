@@ -1,12 +1,10 @@
+import type {
+  LogBookActivity as SharedLogBookActivity,
+  LogBookActivityPayload,
+} from "./logbook";
+
 // Create Log Book
-export type CreateLogBookActivity = {
-  date: string;
-  dayOfWeek: string;
-  activity: string;
-  description: string;
-  hoursSpent: number;
-  skillsUsed: string[];
-};
+export type CreateLogBookActivity = LogBookActivityPayload;
 
 export interface CreateLogBookPayload {
   weekNumber: number;
@@ -18,14 +16,7 @@ export interface CreateLogBookPayload {
 }
 
 // Update Log Book
-export type UpdateLogBookActivity = {
-  date: string;
-  dayOfWeek: string;
-  activity: string;
-  description: string;
-  hoursSpent: number;
-  skillsUsed: string[];
-};
+export type UpdateLogBookActivity = LogBookActivityPayload;
 
 export interface UpdateLogBookPayload {
   id: string;
@@ -58,14 +49,7 @@ export interface GetLogBooksResponse {
 }
 
 // Get Log Book By Id
-export interface LogBookActivity {
-  _id: string;
-  date: string;
-  activity: string;
-  description: string;
-  hoursSpent: number;
-  skillsUsed: string[];
-}
+export type LogBookActivity = SharedLogBookActivity;
 
 export interface LogBookDetails {
   _id: string;

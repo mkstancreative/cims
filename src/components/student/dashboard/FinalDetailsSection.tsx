@@ -1,15 +1,11 @@
 import React from "react";
-import { Briefcase, Award } from "lucide-react";
-import type {
-  Internship,
-  InternshipBatchRef,
-  InternshipSupervisorRef,
-} from "../../../api/types/internship";
-import type { CertificateStatus } from "../../../api/types/certificate";
+import { Briefcase } from "lucide-react";
+import type { StudentDashBatch, StudentDashSupervisor } from "../../../api/types/dashboard";
 
 interface FinalDetailsSectionProps {
-  internship?: Internship;
-  certificate: CertificateStatus | null;
+  batch: StudentDashBatch;
+  itStatus: string;
+  supervisor?: StudentDashSupervisor | null;
   fmt: (d: string | null) => string;
 }
 
@@ -95,31 +91,16 @@ function Panel({
 }
 
 export const FinalDetailsSection: React.FC<FinalDetailsSectionProps> = ({
-  internship,
-  certificate,
+  batch,
+  itStatus,
+  supervisor,
   fmt,
 }) => {
-  const batch =
-    internship?.batch && typeof internship.batch !== "string"
-      ? (internship.batch as InternshipBatchRef)
-      : undefined;
-  const batchLabel =
-    batch?.name ??
-    (typeof internship?.batch === "string" ? internship.batch : "—");
-  const session = internship?.session ?? batch?.session ?? "—";
-  const period = internship?.itPeriod ?? batch?.itPeriod;
-  const supervisor =
-    internship?.supervisor && typeof internship.supervisor !== "string"
-      ? (internship.supervisor as InternshipSupervisorRef)
-      : undefined;
-  const supervisorName = supervisor?.user
-    ? `${supervisor.user.firstName} ${supervisor.user.lastName}`.trim()
-    : (supervisor?.staffId ?? "—");
-
-  const certLabel = certificate?.approvalStatus
-    ? certificate.approvalStatus.charAt(0).toUpperCase() +
-      certificate.approvalStatus.slice(1)
-    : "Not Requested";
+  const batchLabel = batch?.name ?? "—";
+  const session = batch?.session ?? "—";
+  const period = batch?.itPeriod;
+  const supervisorName = supervisor?.name ?? "—";
+  const supervisorSpecialization = supervisor?.specialization ?? "—";
 
   return (
     <div className="db-panels">
@@ -127,16 +108,17 @@ export const FinalDetailsSection: React.FC<FinalDetailsSectionProps> = ({
         icon={<Briefcase size={16} />}
         iconBg="rgba(59, 130, 246, 0.1)"
         iconColor="#3b82f6"
-        title="Internship Details"
+        title="Placement & Rotation Details"
         subtitle={batchLabel}
       >
         <Row label="Batch" value={batchLabel} />
         <Row label="Session" value={session} />
+        <Row label="IT Rotation" value={period?.name ?? "—"} />
         <Row
           label="Status"
           value={
             <span style={{ textTransform: "capitalize" }}>
-              {internship?.itStatus ?? "—"}
+              {itStatus.replace(/_/g, " ")}
             </span>
           }
         />
@@ -146,22 +128,8 @@ export const FinalDetailsSection: React.FC<FinalDetailsSectionProps> = ({
         />
         <Row label="End Date" value={fmt(period?.endDate ?? null)} />
         <Row label="Supervisor" value={supervisorName} />
-      </Panel>
-
-      <Panel
-        icon={<Award size={16} />}
-        iconBg="rgba(13, 148, 136, 0.1)"
-        iconColor="#0d9488"
-        title="Certificate"
-        subtitle="Completion certificate status"
-      >
-        <Row label="Status" value={certLabel} />
-        <Row
-          label="Available"
-          value={certificate?.canDownload ? "Yes" : "No"}
-        />
-        {certificate?.certificateNumber && (
-          <Row label="Cert. No." value={certificate.certificateNumber} />
+        {supervisor?.specialization && (
+          <Row label="Specialization" value={supervisorSpecialization} />
         )}
       </Panel>
     </div>

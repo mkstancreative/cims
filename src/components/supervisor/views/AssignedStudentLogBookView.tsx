@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   BookOpen,
   Clock,
-  Calendar,
   MessageSquare,
   Loader2,
   CheckCircle2,
@@ -13,10 +12,12 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { formatDate } from "../../../helpers/utilities";
+import { dayOfWeek } from "../../../helpers/logbook";
 import {
   useLogbookDetail,
   useReviewLogbook,
 } from "../../../hooks/useSchoolSupervisor";
+import { useCurriculum } from "../../../hooks/useCurriculum";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import "./AssignedStudentLogBookView.css";
 
@@ -29,32 +30,6 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
   rejected: { label: "Rejected", cls: "lbv2-status--rejected" },
   needs_revision: { label: "Needs Revision", cls: "lbv2-status--revision" },
 };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h4 className="lbv2-section-title">{children}</h4>;
-}
-
-function ReflectionBlock({
-  label,
-  text,
-  color,
-}: {
-  label: string;
-  text: string;
-  color: "orange" | "green" | "blue";
-}) {
-  return (
-    <div className={`lbv2-reflection reflection-${color}`}>
-      <div className="lbv2-reflection-label">{label}</div>
-      <div
-        className="lbv2-reflection-text"
-        dangerouslySetInnerHTML={{ __html: text }}
-      />
-    </div>
-  );
-}
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -78,9 +53,8 @@ export default function AssignedStudentLogBookView() {
   }>();
   const navigate = useNavigate();
 
-  const { data: response, isLoading } = useLogbookDetail(studentId, logbookId);
-  const { mutate: submitReview, isPending: submitting } =
-    useReviewLogbook(studentId);
+  const { data: response, isLoading: loadingLogbook } = useLogbookDetail(studentId, logbookId);
+  const { mutate: submitReview, isPending: submitting } = useReviewLogbook(studentId);
 
   const [reviewText, setReviewText] = useState("");
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -88,15 +62,29 @@ export default function AssignedStudentLogBookView() {
   const logbook = response?.data?.logbook;
   const student = response?.data?.student;
 
+  // Resolve curriculum info for the supervisor view
+  const { data: currResponse, isLoading: loadingCurriculum } = useCurriculum(logbook?.curriculum ?? "");
+  const curriculum = currResponse?.data;
+
+  const isLoading = loadingLogbook || loadingCurriculum;
+
   const statusEntry = logbook ? STATUS_META[logbook.status] : null;
+
+  // Resolve curriculum names
+  const topicObj = curriculum?.topics?.find((t) => t._id === logbook?.topic);
+  const subtopicObj = topicObj?.subtopics?.find((s) => s._id === logbook?.subtopic);
+
+  const curriculumName = curriculum?.name ?? "—";
+  const topicTitle = topicObj?.title ?? "—";
+  const subtopicTitle = subtopicObj?.title ?? "—";
 
   // Review can only be submitted for submitted logbooks
   const canReview = logbook?.status === "submitted";
 
-  const handleSubmitReview = () => {
+  const handleSubmitReview = (action: "approve" | "reject") => {
     if (!reviewText.trim()) return;
     submitReview(
-      { logbookId, comments: reviewText },
+      { logbookId, action, comments: reviewText },
       { onSuccess: () => setReviewOpen(false) },
     );
   };
@@ -127,18 +115,15 @@ export default function AssignedStudentLogBookView() {
             <div className="lbv2-hero-left">
               <div className="lbv2-week-badge">
                 <BookOpen size={14} />
-                Week {logbook.weekNumber}
+                Logbook Entry
               </div>
-              <h2 className="lbv2-title">{logbook.title}</h2>
+              <h2 className="lbv2-title">
+                {logbook.date ? formatDate(logbook.date) : "—"} ({dayOfWeek(logbook.date)})
+              </h2>
               <div className="lbv2-meta-row">
                 <span className="lbv2-meta-item">
-                  <Calendar size={13} />
-                  {formatDate(logbook.weekStartDate)} –{" "}
-                  {formatDate(logbook.weekEndDate)}
-                </span>
-                <span className="lbv2-meta-item">
                   <Clock size={13} />
-                  {logbook.totalHours} total hours
+                  {logbook.hoursSpent} hours logged
                 </span>
               </div>
             </div>
@@ -178,80 +163,37 @@ export default function AssignedStudentLogBookView() {
             </div>
           </div>
 
-          {/* ── Activities ── */}
+          {/* ── Training Curriculum Details ── */}
           <div className="lbv2-section">
-            <SectionTitle>
-              Daily Activities ({logbook.activities.length})
-            </SectionTitle>
-            <div className="lbv2-activities">
-              {logbook.activities.map((act, i) => (
-                <div key={act._id ?? i} className="lbv2-activity-card">
-                  <div className="lbv2-activity-top">
-                    <div className="lbv2-activity-left">
-                      <span className="lbv2-date-chip">
-                        {formatDate(act.date)}
-                      </span>
-                      <span className="lbv2-activity-name">{act.activity}</span>
-                    </div>
-                    <span className="lbv2-hours">
-                      <Clock size={11} />
-                      {act.hoursSpent}h
-                    </span>
-                  </div>
-                  <div
-                    className="lbv2-desc"
-                    dangerouslySetInnerHTML={{ __html: act.description }}
-                  />
-                  {act.skillsUsed.length > 0 && (
-                    <div className="lbv2-skills">
-                      {act.skillsUsed.map((s) => (
-                        <span key={s} className="lbv2-skill-chip">
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+            <h4 className="lbv2-section-title">Training Curriculum Details</h4>
+            <div className="lbv2-details-grid">
+              <div className="lbv2-detail-row">
+                <span className="lbv2-detail-label">Curriculum</span>
+                <span className="lbv2-detail-value">{curriculumName}</span>
+              </div>
+              <div className="lbv2-detail-row">
+                <span className="lbv2-detail-label">Topic</span>
+                <span className="lbv2-detail-value">{topicTitle}</span>
+              </div>
+              <div className="lbv2-detail-row">
+                <span className="lbv2-detail-label">Subtopic</span>
+                <span className="lbv2-detail-value">{subtopicTitle}</span>
+              </div>
             </div>
           </div>
 
-          {/* ── Reflections ── */}
-          {(logbook.challengesFaced ||
-            logbook.lessonsLearned ||
-            logbook.nextWeekPlan) && (
-            <div className="lbv2-section">
-              <SectionTitle>Weekly Reflections</SectionTitle>
-              <div className="lbv2-reflections">
-                {logbook.challengesFaced && (
-                  <ReflectionBlock
-                    label="Challenges Faced"
-                    text={logbook.challengesFaced}
-                    color="orange"
-                  />
-                )}
-                {logbook.lessonsLearned && (
-                  <ReflectionBlock
-                    label="Lessons Learned"
-                    text={logbook.lessonsLearned}
-                    color="green"
-                  />
-                )}
-                {logbook.nextWeekPlan && (
-                  <ReflectionBlock
-                    label="Next Week's Plan"
-                    text={logbook.nextWeekPlan}
-                    color="blue"
-                  />
-                )}
-              </div>
+          {/* ── Activity Notes ── */}
+          <div className="lbv2-section">
+            <h4 className="lbv2-section-title">Activity Notes</h4>
+            <div className="lbv2-notes-card">
+              <p className="lbv2-notes-text">{logbook.notes}</p>
             </div>
-          )}
+          </div>
 
-          {/* ── School Review ── */}
+          {/* ── School Review Feedback ── */}
           {logbook.schoolReview?.comments && (
             <div className="lbv2-section">
-              <SectionTitle>School Supervisor's Review</SectionTitle>
+              <h4 className="lbv2-section-title">School Supervisor's Review</h4>
               <div className="lbv2-school-review">
                 <div className="lbv2-school-review-box">
                   <div className="lbv2-school-review-head">
@@ -290,16 +232,15 @@ export default function AssignedStudentLogBookView() {
             </button>
 
             {!canReview && (
-              <p className="lbv2-review-hint">
+              <div className="lbv2-review-hint">
                 {logbook.status === "approved" ? (
                   <span className="lbv2-approved-note">
-                    <CheckCircle2 size={13} /> This logbook has already been
-                    approved.
+                    <CheckCircle2 size={13} /> This logbook has already been approved.
                   </span>
                 ) : (
                   `Review is only available for logbooks in "submitted" status. Current status: ${logbook.status}.`
                 )}
-              </p>
+              </div>
             )}
 
             {reviewOpen && canReview && (
@@ -311,7 +252,7 @@ export default function AssignedStudentLogBookView() {
                 <textarea
                   className="modal-input"
                   rows={4}
-                  placeholder="Enter your review comments for this week's logbook…"
+                  placeholder="Enter your review comments for this logbook entry…"
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
                   disabled={submitting}
@@ -328,19 +269,34 @@ export default function AssignedStudentLogBookView() {
                   >
                     Cancel
                   </button>
-                  <button
+                   <button
                     type="button"
-                    className="modal-submit"
+                    className="modal-submit lbv2-reject-btn"
                     disabled={!reviewText.trim() || submitting}
-                    onClick={handleSubmitReview}
+                    onClick={() => handleSubmitReview("reject")}
                   >
                     {submitting ? (
                       <>
                         <Loader2 size={13} className="lbv2-spin" />
-                        Submitting…
+                        Rejecting…
                       </>
                     ) : (
-                      "Submit Review"
+                      "Reject Entry"
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="modal-submit"
+                    disabled={!reviewText.trim() || submitting}
+                    onClick={() => handleSubmitReview("approve")}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 size={13} className="lbv2-spin" />
+                        Approving…
+                      </>
+                    ) : (
+                      "Approve Entry"
                     )}
                   </button>
                 </div>

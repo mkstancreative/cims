@@ -1,3 +1,5 @@
+import type { LogBookActivity } from "./logbook";
+
 // ─── Shared / Base ───────────────────────────────────────
 
 export interface Department {
@@ -167,18 +169,14 @@ export interface LogbookIndustrialReview {
 
 export interface LogbookSummary {
   _id: string;
-  weekNumber: number;
-  title: string;
-  weekStartDate: string;
-  weekEndDate: string;
+  curriculum: string;
+  topic: string;
+  subtopic: string;
+  notes: string;
+  hoursSpent: number;
+  date: string;
   status: LogbookStatus;
-  totalHours: number;
   createdAt: string;
-  industrialReview?: LogbookIndustrialReview;
-  schoolReview?: {
-    reviewedAt?: string;
-    comments?: string;
-  };
 }
 
 export interface LogbookListResponse {
@@ -189,32 +187,22 @@ export interface LogbookListResponse {
   data: LogbookSummary[];
 }
 
-export interface LogbookActivity {
-  _id: string;
-  date: string;
-  activity: string;
-  description: string;
-  hoursSpent: number;
-  skillsUsed: string[];
-}
+/** Same entry shape the student writes — kept as one definition, not a copy. */
+export type LogbookActivity = LogBookActivity;
 
 export interface LogbookDetail {
   _id: string;
   student: string;
-  weekNumber: number;
-  title: string;
-  weekStartDate: string;
-  weekEndDate: string;
-  activities: LogbookActivity[];
-  challengesFaced: string;
-  lessonsLearned: string;
-  nextWeekPlan: string;
+  internship?: string;
+  curriculum: string;
+  topic: string;
+  subtopic: string;
+  notes: string;
+  hoursSpent: number;
+  date: string;
   status: LogbookStatus;
-  aiFraudScore: number;
-  totalHours: number;
   createdAt: string;
   updatedAt: string;
-  industrialReview?: LogbookIndustrialReview;
   schoolReview?: {
     reviewedAt?: string;
     comments?: string;
@@ -255,6 +243,7 @@ export interface LogbookDetailResponse {
 }
 
 export interface ReviewPayload {
+  action: "approve" | "reject";
   comments: string;
 }
 
