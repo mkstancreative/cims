@@ -128,10 +128,6 @@ const AdminCertTable: React.FC<AdminCertTableProps> = ({
       render: (req) => `${req.graduationMonth} ${req.graduationYear}`,
     },
     {
-      header: "Payment",
-      render: (req) => <StatusBadge status={req.paymentStatus} />,
-    },
-    {
       header: "Approval",
       render: (req) => <StatusBadge status={req.approvalStatus} />,
     },

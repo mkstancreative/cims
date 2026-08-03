@@ -22,7 +22,7 @@ export const useCertificateStatus = (internshipId?: string) => {
 export const useRequestCertificate = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: FormData) => requestCertificate(payload),
+    mutationFn: (payload: { internshipId: string }) => requestCertificate(payload),
     onSuccess: (data: { success?: boolean; message?: string }) => {
       if (data?.success === false) {
         toast.error(data.message || "Failed to request certificate");

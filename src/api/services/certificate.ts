@@ -1,24 +1,9 @@
 import { api } from "./api";
 
-export interface CertificateRequest {
-  graduationYear: string;
-  graduationMonth: string;
-  graduationDate: string;
-  ndStatementOfResult?: File;
-  itDischargeLetter?: File;
-  hndStatementOfResult?: File;
-  placeOfIT: string;
-}
-
 export const requestCertificate = async (
-  payload: FormData | CertificateRequest,
+  payload: { internshipId: string },
 ) => {
-  const response = await api.post("/certificates/request", payload, {
-    headers:
-      payload instanceof FormData
-        ? { "Content-Type": "multipart/form-data" }
-        : {},
-  });
+  const response = await api.post("/certificates/request", payload);
   return response.data;
 };
 

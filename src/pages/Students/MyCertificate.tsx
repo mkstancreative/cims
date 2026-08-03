@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { FileText, Download, RefreshCw } from "lucide-react";
+import {
+  FileText,
+  Download,
+  RefreshCw,
+  Clock,
+  Award,
+  XCircle,
+  CheckCircle,
+} from "lucide-react";
 import AddButton from "../../components/ui/AddButton/AddButton";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import Spinner from "../../components/ui/Spinner/Spinner";
@@ -7,13 +15,18 @@ import { CertificateRequestModal } from "../../components/student/view/Certifica
 import Certificate from "../../components/student/view/Certificate/Certificate";
 import { useCertificateStatus } from "../../hooks/useCertificate";
 import { useCertificateDownload } from "../../hooks/useCertificateDownload";
+import { useStudentDashboard } from "../../hooks/useDashboard";
 import type { CertificateStatus } from "../../api/types/certificate";
+import "./MyCertificate.css";
 
 export default function MyCertificate() {
   const { data, isLoading } = useCertificateStatus();
+  const { data: dashResp } = useStudentDashboard();
   const [requestOpen, setRequestOpen] = useState(false);
   const { certRef, downloadingCert, certData, handleDownloadCert } =
     useCertificateDownload();
+
+  const internshipId = dashResp?.data?.internshipId;
 
   // The status endpoint returns { success, data: CertificateStatus }
   const status = (
@@ -24,8 +37,20 @@ export default function MyCertificate() {
   const canDownload = Boolean(status?.canDownload);
   const hasRequest = Boolean(approval);
 
+  // Status icon mapping
+  const getStatusIcon = () => {
+    switch (approval) {
+      case "approved":
+        return <Award size={24} />;
+      case "rejected":
+        return <XCircle size={24} />;
+      default:
+        return <Clock size={24} />;
+    }
+  };
+
   return (
-    <div className="page-container">
+    <div className="page-container cert-container">
       <div className="page-header">
         <div className="page-header-left">
           <div className="page-icon orange">
@@ -42,7 +67,9 @@ export default function MyCertificate() {
           {(!hasRequest || approval === "rejected") && (
             <AddButton
               text={
-                approval === "rejected" ? "Re-request Certificate" : "Request Certificate"
+                approval === "rejected"
+                  ? "Re-request Certificate"
+                  : "Request Certificate"
               }
               onClick={() => setRequestOpen(true)}
               icon={<RefreshCw size={14} />}
@@ -52,67 +79,155 @@ export default function MyCertificate() {
       </div>
 
       {isLoading ? (
-        <div style={{ padding: 40, display: "flex", justifyContent: "center" }}>
-          <Spinner size={26} color="var(--color-accent)" text="Loading…" />
+        <div style={{ padding: 60, display: "flex", justifyContent: "center" }}>
+          <Spinner size={28} color="var(--color-accent)" text="Loading status…" />
         </div>
       ) : !hasRequest ? (
-        <div className="empty-state" style={{ padding: 40, textAlign: "center" }}>
-          <p>You have not requested a certificate yet.</p>
-          <p className="page-sub">
-            Once your internship and evaluation are complete, request your
-            certificate here.
+        <div className="cert-empty-state">
+          <div className="cert-empty-icon">
+            <FileText size={28} />
+          </div>
+          <h3 className="cert-empty-title">No Certificate Requested Yet</h3>
+          <p className="cert-empty-sub">
+            Once you finalize your daily logbook entries and your supervisor submits your final evaluation, you can request your official SIWES IT placement certificate here.
           </p>
+          <button
+            type="button"
+            className="cert-empty-btn"
+            onClick={() => setRequestOpen(true)}
+          >
+            <RefreshCw size={15} />
+            Request Certificate Now
+          </button>
         </div>
       ) : (
-        <div
-          className="card"
-          style={{
-            padding: 24,
-            display: "flex",
-            flexDirection: "column",
-            gap: 16,
-            maxWidth: 640,
-          }}
-        >
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <strong>Approval status:</strong>
+        <div className="cert-status-card">
+          {/* Card Header */}
+          <div className="cert-status-header">
+            <div className="cert-status-title-area">
+              <div className={`cert-status-icon-wrap ${approval || "pending"}`}>
+                {getStatusIcon()}
+              </div>
+              <div>
+                <span className="cert-status-label">Request Status</span>
+                <h4 className="cert-status-value-title">
+                  {approval === "approved"
+                    ? "Approved & Issued"
+                    : approval === "rejected"
+                      ? "Request Rejected"
+                      : "Awaiting Admin Review"}
+                </h4>
+              </div>
+            </div>
             <StatusBadge status={approval ?? "pending"} />
           </div>
 
-          {status?.certificateNumber && (
-            <div>
-              <strong>Certificate number:</strong> {status.certificateNumber}
+          {/* Progress Steps Tracker */}
+          <div className="cert-steps">
+            <div className="cert-step completed">
+              <div className="cert-step-dot">
+                <CheckCircle size={14} />
+              </div>
+              <span className="cert-step-label">Submitted</span>
             </div>
-          )}
-
-          {approval === "rejected" && status?.rejectionReason && (
-            <div style={{ color: "var(--color-danger, #dc2626)" }}>
-              <strong>Reason:</strong> {status.rejectionReason}
-            </div>
-          )}
-
-          {approval === "approved" && (
-            <button
-              className="btn-login"
-              style={{ maxWidth: 240 }}
-              disabled={!canDownload || downloadingCert}
-              onClick={() => handleDownloadCert(canDownload)}
+            <div
+              className={`cert-step ${
+                approval === "approved"
+                  ? "completed"
+                  : approval === "rejected"
+                    ? ""
+                    : "active"
+              }`}
             >
-              {downloadingCert ? (
-                <Spinner size={14} color="#fff" />
-              ) : (
-                <>
-                  <Download size={14} /> Download Certificate
-                </>
-              )}
-            </button>
+              <div className="cert-step-dot">
+                {approval === "approved" ? <CheckCircle size={14} /> : "2"}
+              </div>
+              <span className="cert-step-label">Review</span>
+            </div>
+            <div className={`cert-step ${approval === "approved" ? "completed" : ""}`}>
+              <div className="cert-step-dot">
+                {approval === "approved" ? <CheckCircle size={14} /> : "3"}
+              </div>
+              <span className="cert-step-label">Issued</span>
+            </div>
+          </div>
+
+          {/* Rejection block */}
+          {approval === "rejected" && status?.rejectionReason && (
+            <div className="cert-rejection-box">
+              <div className="cert-rejection-title">Feedback from Admin</div>
+              <p className="cert-rejection-reason">{status.rejectionReason}</p>
+            </div>
           )}
+
+          {/* Details Block */}
+          <div className="cert-success-box">
+            {status?.certificateNumber && (
+              <div className="cert-detail-row">
+                <span className="cert-detail-lbl">Certificate ID</span>
+                <span className="cert-detail-val">{status.certificateNumber}</span>
+              </div>
+            )}
+            <div className="cert-detail-row">
+              <span className="cert-detail-lbl">Document Type</span>
+              <span className="cert-detail-val">Official Placement Certificate</span>
+            </div>
+            {status?.issuedAt && (
+              <div className="cert-detail-row">
+                <span className="cert-detail-lbl">Date Issued</span>
+                <span className="cert-detail-val">
+                  {new Date(status.issuedAt).toLocaleDateString()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Action trigger */}
+          <div className="cert-action-area">
+            {approval === "approved" ? (
+              <button
+                type="button"
+                className="cert-download-btn"
+                disabled={!canDownload || downloadingCert}
+                onClick={() => handleDownloadCert(canDownload)}
+              >
+                {downloadingCert ? (
+                  <Spinner size={14} color="#fff" />
+                ) : (
+                  <>
+                    <Download size={16} /> Download Certificate
+                  </>
+                )}
+              </button>
+            ) : approval === "rejected" ? (
+              <button
+                type="button"
+                className="cert-re-request-btn"
+                onClick={() => setRequestOpen(true)}
+              >
+                <RefreshCw size={14} />
+                Submit New Request
+              </button>
+            ) : (
+              <p
+                style={{
+                  fontSize: "13.5px",
+                  color: "var(--color-text-muted)",
+                  margin: 0,
+                  textAlign: "center",
+                }}
+              >
+                Your request is currently being reviewed by the department heads. You will be notified once it is approved.
+              </p>
+            )}
+          </div>
         </div>
       )}
 
       <CertificateRequestModal
         isOpen={requestOpen}
         onClose={() => setRequestOpen(false)}
+        internshipId={internshipId}
       />
 
       {/* Off-screen certificate used only for PDF generation */}

@@ -4,8 +4,6 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  TrendingUp,
-  DollarSign,
   Clock,
 } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
@@ -31,7 +29,6 @@ interface FilterStates {
   endDate: string;
   search: string;
   status: string | "";
-  paymentStatus: string | "";
   page: number;
   limit: number;
 }
@@ -52,7 +49,6 @@ export default function AdminCertificates() {
     endDate: "2026-12-31",
     search: "",
     status: "",
-    paymentStatus: "",
     page: 1,
     limit: 10,
   });
@@ -71,7 +67,6 @@ export default function AdminCertificates() {
       endDate: "2026-12-31",
       search: "",
       status: "",
-      paymentStatus: "",
       page: 1,
       limit: 10,
     });
@@ -282,27 +277,27 @@ export default function AdminCertificates() {
       >
         <StatCard
           label="Total Requests"
-          value={stats?.data?.overview?.totalRequests || 0}
+          value={stats?.data?.total || 0}
           icon={<FileText size={20} />}
           color="#0369a1"
         />
         <StatCard
-          label="Total Revenue"
-          value={`₦${(stats?.data?.revenue?.totalRevenue || 0).toLocaleString()}`}
-          icon={<DollarSign size={20} />}
-          color="#059669"
-        />
-        <StatCard
           label="Pending Approval"
-          value={stats?.data?.approvalStats?.pending || 0}
+          value={stats?.data?.byApprovalStatus?.pending || 0}
           icon={<Clock size={20} />}
           color="#d97706"
         />
         <StatCard
-          label="Success Rate"
-          value={`${stats?.data?.overview?.successRate || 0}%`}
-          icon={<TrendingUp size={20} />}
-          color="#7c3aed"
+          label="Approved Requests"
+          value={stats?.data?.byApprovalStatus?.approved || 0}
+          icon={<CheckCircle size={20} />}
+          color="#059669"
+        />
+        <StatCard
+          label="Rejected Requests"
+          value={stats?.data?.byApprovalStatus?.rejected || 0}
+          icon={<XCircle size={20} />}
+          color="#ef4444"
         />
       </div>
 
@@ -336,17 +331,6 @@ export default function AdminCertificates() {
           value={filters.status}
           onChange={(v) => setField("status", v)}
           name="status"
-        />
-        <SelectFilter
-          label="Payment Status"
-          options={[
-            { value: "", label: "All Payments" },
-            { value: "successful", label: "Successful" },
-            { value: "failed", label: "Failed" },
-          ]}
-          value={filters.paymentStatus}
-          onChange={(v) => setField("paymentStatus", v)}
-          name="paymentStatus"
         />
         <DateFilter
           label="Start Date"

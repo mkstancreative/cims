@@ -1,0 +1,316 @@
+/* ── Certificate Page Layout ─────────────────────────────────────────────── */
+.cert-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Empty State ─────────────────────────────────────────────────────────── */
+.cert-empty-state {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 48px 32px;
+  text-align: center;
+  max-width: 560px;
+  margin: 20px auto 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.cert-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(13, 148, 136, 0.08);
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.cert-empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.cert-empty-sub {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.cert-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.cert-empty-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ── Modern Status Card ──────────────────────────────────────────────────── */
+.cert-status-card {
+  width: 100%;
+  max-width: 680px;
+  margin: 20px auto 0;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cert-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.cert-status-title-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cert-status-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cert-status-icon-wrap.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.cert-status-icon-wrap.approved {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.cert-status-icon-wrap.rejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.cert-status-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.cert-status-value-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ── Rejection details box ────────────────────────────────────────────────── */
+.cert-rejection-box {
+  background: rgba(239, 68, 68, 0.04);
+  border: 1px dashed rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.cert-rejection-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.cert-rejection-reason {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Success Details box ──────────────────────────────────────────────────── */
+.cert-success-box {
+  background: rgba(16, 185, 129, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cert-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.08);
+  padding-bottom: 8px;
+}
+
+.cert-detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cert-detail-lbl {
+  color: var(--color-text-muted);
+}
+
+.cert-detail-val {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ── Progress tracking steps ────────────────────────────────────────────── */
+.cert-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 32px;
+  padding: 0 10px;
+}
+
+.cert-steps::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: var(--color-border);
+  z-index: 1;
+}
+
+.cert-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  position: relative;
+  flex: 1;
+}
+
+.cert-step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+.cert-step.active .cert-step-dot {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(13, 148, 136, 0.3);
+}
+
+.cert-step.completed .cert-step-dot {
+  border-color: #10b981;
+  background: #10b981;
+  color: #fff;
+}
+
+.cert-step-label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.cert-step.active .cert-step-label {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.cert-step.completed .cert-step-label {
+  color: #10b981;
+}
+
+/* ── Action Buttons ──────────────────────────────────────────────────────── */
+.cert-action-area {
+  display: flex;
+  justify-content: center;
+}
+
+.cert-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.cert-download-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.cert-download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.cert-re-request-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cert-re-request-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
