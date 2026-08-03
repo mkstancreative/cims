@@ -1,10 +1,14 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../Login/Login.css";
 import { useRegisterStudent } from "../../hooks/useRegistrations";
 import { usePublicInstitutions } from "../../hooks/useInstitutions";
 import { useStates } from "../../hooks/useLocation";
-import type { RegisterPayload } from "../../api/types/registration";
+import {
+  isRegistrationPaid,
+  type RegisterPayload,
+} from "../../api/types/registration";
 
 const PROGRAM_TYPES = [
   "ND",
@@ -63,6 +67,7 @@ const initialState: FormState = {
 };
 
 const Register = () => {
+  const navigate = useNavigate();
   const { mutate: register, isPending } = useRegisterStudent();
   const { data: institutionsResp, isLoading: loadingInstitutions } =
     usePublicInstitutions();
@@ -133,10 +138,30 @@ const Register = () => {
 
     register(payload, {
       onSuccess: (res) => {
+        // Already settled — there is nothing to pay for, so send them to sign in.
+        if (isRegistrationPaid(res)) {
+          toast.success(
+            "This registration is already paid. Please sign in to continue.",
+          );
+          navigate("/", { replace: true });
+          return;
+        }
+
+        // 200 means we resumed an existing unpaid attempt rather than creating
+        // a new one; the link below belongs to that same registration.
+        if (res.resumed) {
+          toast.info("Resuming your existing registration payment…");
+        }
+
         // Redirect the browser to Credo so the applicant can pay.
         if (res?.data?.authorizationUrl) {
           window.location.href = res.data.authorizationUrl;
+          return;
         }
+
+        setError(
+          "Your registration was saved but no payment link was returned. Please sign in to complete payment.",
+        );
       },
     });
   };

@@ -11,6 +11,11 @@ import {
 } from "../api/services/auth";
 import { storeTokens, clearTokens } from "../api/services/api";
 import { useAuth } from "../context/useAuth";
+import { isPaymentRequired } from "../api/types/auth";
+import {
+  storePendingRegistration,
+  clearPendingRegistration,
+} from "../helpers/pendingRegistration";
 import type {
   LoginPayload,
   ChangePasswordPayload,
@@ -41,9 +46,20 @@ export const useLoginUser = () => {
   return useMutation({
     mutationFn: (payload: LoginPayload) => loginUser(payload),
     onSuccess: (response) => {
-      const { accessToken, refreshToken, user } = response.data;
+      const { accessToken, refreshToken, user, pendingRegistration } =
+        response.data;
+
+      // The payment-gated branch issues an access token but NO refresh token.
+      // storeTokens handles the missing one; the session simply cannot renew.
       storeTokens(accessToken, refreshToken);
       setAuth(user);
+
+      if (isPaymentRequired(response)) {
+        storePendingRegistration(pendingRegistration ?? null);
+        navigate("/registrations/pending", { replace: true });
+        toast.info("Your registration payment is still outstanding.");
+        return;
+      }
 
       // ── If the user needs to change their password, a global modal will catch them.
       // We navigate to their respective dashboards normally.
@@ -97,6 +113,7 @@ export const useLogoutUser = () => {
     onSettled: () => {
       clearTokens();
       clearAuth();
+      clearPendingRegistration();
       queryClient.clear();
       navigate("/", { replace: true });
     },

@@ -4,6 +4,11 @@ import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import { useReviewQueue } from "../../../hooks/useRegistrations";
+import {
+  applicantName,
+  regNumber,
+  institutionName,
+} from "../../../helpers/registration";
 import type {
   Registration,
   ReviewQueueParams,
@@ -18,27 +23,6 @@ interface RegistrationsTableProps {
   onLimitChange: (l: number) => void;
   onEnroll: (registration: Registration) => void;
   onReject: (registration: Registration) => void;
-}
-
-// ── Helpers to read polymorphic refs ──────────────────────────────────────────
-export function applicantName(reg: Registration): string {
-  if (reg.student && typeof reg.student === "object") {
-    const u = reg.student.user;
-    if (u) return `${u.firstName} ${u.lastName}`.trim();
-  }
-  return "—";
-}
-function regNumber(reg: Registration): string {
-  if (reg.student && typeof reg.student === "object") {
-    return reg.student.registrationNumber ?? "—";
-  }
-  return "—";
-}
-function institutionName(reg: Registration): string {
-  if (reg.institution && typeof reg.institution === "object") {
-    return reg.institution.name;
-  }
-  return "—";
 }
 
 export default function RegistrationsTable({

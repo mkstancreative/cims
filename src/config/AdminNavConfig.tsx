@@ -12,6 +12,7 @@ import {
   Briefcase,
   Trophy,
   Settings,
+  Receipt,
 } from "lucide-react";
 
 export const ADMIN_NAV = [
@@ -27,6 +28,11 @@ export const ADMIN_NAV = [
         label: "Registrations",
         icon: <ClipboardList size={18} />,
         path: "/admin/registrations",
+      },
+      {
+        label: "Payments",
+        icon: <Receipt size={18} />,
+        path: "/admin/payments",
       },
     ],
   },

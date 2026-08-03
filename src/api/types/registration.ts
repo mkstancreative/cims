@@ -32,12 +32,38 @@ export interface RegisterResult {
   reference: string;
   authorizationUrl: string;
   amount: number;
+  /** Mirrored here by some responses — read it via `isRegistrationPaid()`. */
+  paid?: boolean;
 }
 
 export interface RegisterResponse {
   success: boolean;
   message?: string;
+  /** Every register / re-enroll / pay response now carries this. */
+  paid?: boolean;
   data: RegisterResult;
+}
+
+/**
+ * A register or re-enroll call, plus the HTTP status the API answered with.
+ *
+ * The status is meaningful and the two cases need different messaging:
+ *  - 200 — an existing unpaid registration was RESUMED; `authorizationUrl`
+ *    is a live link for that same registration.
+ *  - 201 — a registration was newly CREATED, or RESUBMITTED for a student
+ *    who had previously cancelled.
+ *
+ * Neither is an error; the old 409 dead end is gone.
+ */
+export interface RegisterOutcome extends RegisterResponse {
+  httpStatus: number;
+  /** True when the API answered 200, i.e. we resumed an existing attempt. */
+  resumed: boolean;
+}
+
+/** `paid` may arrive at the root or nested in `data` — check both. */
+export function isRegistrationPaid(res: RegisterResponse): boolean {
+  return res.paid === true || res.data?.paid === true;
 }
 
 export interface VerifyPaymentResponse {
@@ -121,4 +147,11 @@ export interface RejectPayload {
 export interface ReEnrollPayload {
   programType: string;
   programLevel: string;
+}
+
+/** `PUT /registrations/:id/cancel` — a cancelled student may register again. */
+export interface CancelRegistrationResponse {
+  success: boolean;
+  message?: string;
+  data?: Registration;
 }

@@ -13,6 +13,7 @@ const Institutions = lazy(() => import("../pages/Admin/Institutions"));
 const Curriculum = lazy(() => import("../pages/Admin/Curriculum"));
 const Quizzes = lazy(() => import("../pages/Admin/Quizzes"));
 const Registrations = lazy(() => import("../pages/Admin/Registrations"));
+const Payments = lazy(() => import("../pages/Admin/Payments"));
 const Internships = lazy(() => import("../pages/Admin/Internships"));
 const Results = lazy(() => import("../pages/Admin/Results"));
 const Settings = lazy(() => import("../pages/Admin/Settings"));
@@ -50,6 +51,7 @@ export default function AdminRoutes() {
 
         {/* ── Registration & review ── */}
         <Route path="registrations" element={<Registrations />} />
+        <Route path="payments" element={<Payments />} />
 
         {/* ── Setup ── */}
         <Route path="institutions" element={<Institutions />} />

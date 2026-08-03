@@ -8,6 +8,8 @@ import {
   enrollRegistration,
   rejectRegistration,
   reEnroll,
+  payRegistration,
+  cancelRegistration,
 } from "../api/services/registration";
 import type { ReviewQueueParams } from "../api/types/registration";
 
@@ -50,6 +52,35 @@ export const useReEnroll = () => {
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to re-enroll.")),
+  });
+};
+
+/**
+ * Starts or resumes payment for an existing registration, returning a live
+ * provider link. Drives the `paymentRequired` login branch.
+ */
+export const usePayRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: payRegistration,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["registrations", "my"] });
+    },
+    onError: (err: unknown) =>
+      toast.error(getErrMsg(err, "Could not start payment. Please try again.")),
+  });
+};
+
+export const useCancelRegistration = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: cancelRegistration,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["registrations"] });
+      toast.success("Registration cancelled.");
+    },
+    onError: (err: unknown) =>
+      toast.error(getErrMsg(err, "Failed to cancel registration.")),
   });
 };
 

@@ -4,7 +4,7 @@ import CustomModal from "../../ui/CustomModal/CustomModal";
 import Spinner from "../../ui/Spinner/Spinner";
 import { useRejectRegistration } from "../../../hooks/useRegistrations";
 import type { Registration } from "../../../api/types/registration";
-import { applicantName } from "../tables/RegistrationsTable";
+import { applicantName } from "../../../helpers/registration";
 
 interface RejectRegistrationFormProps {
   isOpen: boolean;

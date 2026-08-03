@@ -33,6 +33,11 @@ type StatusKey =
   | "unread"
   | "successful"
   | "approved"
+  | "abandoned"
+  | "reversed"
+  | "refunded"
+  | "cancelled"
+  | "pending_payment"
 
 const statusMap: Record<StatusKey, StatusKey> = {
   // Student / applicant
@@ -57,6 +62,11 @@ const statusMap: Record<StatusKey, StatusKey> = {
   pending_verification: "pending_verification",
   placed: "placed",
   failed: "failed",
+  abandoned: "abandoned",
+  reversed: "reversed",
+  refunded: "refunded",
+  cancelled: "cancelled",
+  pending_payment: "pending_payment",
 
   // Enrollment
   enrolled: "enrolled",

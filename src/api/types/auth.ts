@@ -11,14 +11,44 @@ export interface AuthUser {
   mustChangePassword?: boolean;
 }
 
+/**
+ * Returned on the `paymentRequired` login branch: the student authenticated
+ * but has a registration still awaiting payment.
+ */
+export interface PendingRegistration {
+  registrationId?: string;
+  _id?: string;
+  reference?: string;
+  amount?: number;
+  /** A live provider link, when the previous attempt is still resumable. */
+  authorizationUrl?: string;
+  status?: string;
+  program?: { type: string; level: string };
+  createdAt?: string;
+}
+
 export interface LoginResponse {
   success: boolean;
   message: string;
+  /**
+   * When true the login succeeded but the account is gated behind an unpaid
+   * registration: `data.refreshToken` is ABSENT and `data.pendingRegistration`
+   * describes what to pay for. Never assume a refresh token comes back.
+   */
+  paymentRequired?: boolean;
   data: {
     accessToken: string;
-    refreshToken: string;
+    /** Absent on the `paymentRequired` branch. */
+    refreshToken?: string;
     user: AuthUser;
+    paymentRequired?: boolean;
+    pendingRegistration?: PendingRegistration;
   };
+}
+
+/** `paymentRequired` may arrive at the root or nested in `data`. */
+export function isPaymentRequired(res: LoginResponse): boolean {
+  return res.paymentRequired === true || res.data?.paymentRequired === true;
 }
 
 export interface RefreshTokenResponse {

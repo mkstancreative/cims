@@ -1,0 +1,95 @@
+/* ── Payments summary cards ─────────────────────────────────────────────── */
+.payments-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+/* ── Status chips (drive the comma-separated `status` param) ─────────────── */
+.payments-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.payments-chip-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-right: 2px;
+}
+
+.payments-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--color-accent-border);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-transform: capitalize;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.payments-chip:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.payments-chip.is-active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.payments-chip:focus,
+.payments-chip:active {
+  border: 1px solid var(--color-accent);
+}
+
+/* ── Amount range inputs ────────────────────────────────────────────────── */
+.payments-amount-range {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payments-amount-range-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.payments-amount-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.payments-amount-input {
+  width: 110px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  outline: none;
+}
+
+.payments-amount-input:focus {
+  border-color: var(--color-accent);
+}
+
+.payments-amount-sep {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}

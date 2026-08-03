@@ -13,6 +13,7 @@ const MyQuiz = lazy(() => import("../pages/Students/MyQuiz"));
 const MyInternships = lazy(() => import("../pages/Students/MyInternships"));
 const MyEvaluation = lazy(() => import("../pages/Students/MyEvaluation"));
 const MyCertificate = lazy(() => import("../pages/Students/MyCertificate"));
+const MyPayments = lazy(() => import("../pages/Students/MyPayments"));
 
 export default function StudentRoutes() {
   return (
@@ -39,6 +40,7 @@ export default function StudentRoutes() {
         <Route path="internships" element={<MyInternships />} />
         <Route path="evaluation" element={<MyEvaluation />} />
         <Route path="certificate" element={<MyCertificate />} />
+        <Route path="payments" element={<MyPayments />} />
         <Route path="profile" element={<MyProfile />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="*" element={<NotFound />} />

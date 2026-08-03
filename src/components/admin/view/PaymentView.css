@@ -1,0 +1,79 @@
+.payment-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.payment-amount-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.payment-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+}
+
+.payment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.payment-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.payment-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+}
+
+.payment-row + .payment-row {
+  border-top: 1px dashed var(--color-border);
+}
+
+.payment-row-label {
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.payment-row-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+.payment-reverify-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.payment-note {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}

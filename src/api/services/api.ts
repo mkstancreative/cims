@@ -10,9 +10,18 @@ export const REFRESH_KEY = "siwes_refresh_token";
 export const getAccessToken = () => localStorage.getItem(TOKEN_KEY);
 export const getRefreshToken = () => localStorage.getItem(REFRESH_KEY);
 
-export const storeTokens = (accessToken: string, refreshToken: string) => {
+/**
+ * The login `paymentRequired` branch returns an access token with NO refresh
+ * token, so the refresh token is optional. When it is absent we clear any
+ * stale one rather than leaving a token from a previous session behind.
+ */
+export const storeTokens = (accessToken: string, refreshToken?: string) => {
   localStorage.setItem(TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_KEY, refreshToken);
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_KEY, refreshToken);
+  } else {
+    localStorage.removeItem(REFRESH_KEY);
+  }
 };
 
 export const clearTokens = () => {
@@ -20,9 +29,16 @@ export const clearTokens = () => {
   localStorage.removeItem(REFRESH_KEY);
 };
 
-export function dispatchSessionExpired() {
+export interface SessionExpiredDetail {
+  /** Shown to the user instead of the generic "session expired" copy. */
+  reason?: string;
+}
+
+export function dispatchSessionExpired(detail: SessionExpiredDetail = {}) {
   clearTokens();
-  window.dispatchEvent(new CustomEvent("siwes:session-expired"));
+  window.dispatchEvent(
+    new CustomEvent<SessionExpiredDetail>("siwes:session-expired", { detail }),
+  );
 }
 
 // ─── Axios Instance ────────────────────────────────────────────────────────────
@@ -87,6 +103,8 @@ api.interceptors.response.use(
 
       const refreshToken = getRefreshToken();
 
+      // No refresh token is expected on the `paymentRequired` login branch —
+      // that session is short-lived by design and cannot be renewed.
       if (!refreshToken) {
         dispatchSessionExpired();
         return Promise.reject(error);
@@ -106,7 +124,21 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        dispatchSessionExpired();
+        // Refresh now also 401s for deactivated accounts, which is not an
+        // expiry — surface the API's reason so the user isn't told to just
+        // log in again on a door that will stay shut.
+        const status = axios.isAxiosError(refreshError)
+          ? refreshError.response?.status
+          : undefined;
+        dispatchSessionExpired({
+          reason:
+            status === 401
+              ? getApiErrorMessage(
+                  refreshError,
+                  "Your session has expired. Please log in again.",
+                )
+              : undefined,
+        });
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

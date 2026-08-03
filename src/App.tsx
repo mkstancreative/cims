@@ -17,6 +17,7 @@ const AdminLayout = lazy(() => import("./layout/AdminLayout"));
 const StudentLayout = lazy(() => import("./layout/StudentLayout"));
 const SupervisorLayout = lazy(() => import("./layout/SuperVisorLayout"));
 const VerifyPayment = lazy(() => import("./pages/Register/VerifyPayment"));
+const PendingPayment = lazy(() => import("./pages/Register/PendingPayment"));
 const VerifyCertificate = lazy(
   () => import("./pages/Students/VerifyCertificate/VerifyCertificate"),
 );
@@ -88,6 +89,11 @@ function App() {
                 <Route
                   path="/registrations/verify"
                   element={<VerifyPayment />}
+                />
+                {/* Payment-gated login lands here — authenticated, but no dashboard yet */}
+                <Route
+                  path="/registrations/pending"
+                  element={<PendingPayment />}
                 />
                 <Route
                   path="/reset-password/:token"

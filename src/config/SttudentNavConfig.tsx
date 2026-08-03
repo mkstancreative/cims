@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Award,
   User,
+  Receipt,
 } from "lucide-react";
 
 export const STUDENT_NAV = [
@@ -64,6 +65,11 @@ export const STUDENT_NAV = [
   {
     section: "Account",
     items: [
+      {
+        label: "Payments",
+        icon: <Receipt size={18} />,
+        path: "/student/payments",
+      },
       {
         label: "Notifications",
         icon: <Bell size={18} />,

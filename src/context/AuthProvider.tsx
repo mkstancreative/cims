@@ -57,9 +57,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   // ── Listen for session-expiry events fired by the Axios interceptor ─────────
   const navigate = useNavigate();
   useEffect(() => {
-    const handleExpired = () => {
+    const handleExpired = (event: Event) => {
       clearAuth();
-      toast.info("Your session has expired. Please log in again.", {
+      // A deactivated account gets its own reason from the API — telling that
+      // user to "log in again" would just send them in a circle.
+      const reason = (event as CustomEvent<{ reason?: string }>).detail?.reason;
+      toast.info(reason || "Your session has expired. Please log in again.", {
         toastId: "session-expired", // prevent duplicates
       });
       navigate("/", { replace: true });
