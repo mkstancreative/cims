@@ -32,7 +32,15 @@ export interface PaymentRegistrationRef {
   _id: string;
   status?: string;
   type?: string;
+  isOpen?: boolean;
   program?: { type: string; level: string };
+  payment?: {
+    amount: number;
+    status: string;
+    reference: string;
+    references?: string[];
+  };
+  createdAt?: string;
 }
 
 export interface PaymentInstitutionRef {
@@ -45,6 +53,8 @@ export interface Payment {
   _id: string;
   /** Provider transaction reference. Supports partial matching when filtering. */
   reference: string;
+  /** Credo-side transaction reference. */
+  credoReference?: string;
   amount: number;
   currency?: string;
   status: PaymentStatus | string;
@@ -56,12 +66,32 @@ export interface Payment {
   authorizationUrl?: string;
   paidAt?: string;
   verifiedAt?: string;
+  registrationType?: string;
+  attemptNumber?: number;
+  user?: string | { _id: string };
   student?: string | PaymentStudentRef;
   registration?: string | PaymentRegistrationRef;
   institution?: string | PaymentInstitutionRef;
+  program?: { type: string; level: string };
   metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+}
+
+/** One entry in the `attempts` array returned by `GET /payments/:id`. */
+export interface PaymentAttempt {
+  _id: string;
+  reference: string;
+  attemptNumber: number;
+  amount: number;
+  status: PaymentStatus | string;
+  createdAt: string;
+}
+
+/** Shape of `data` in the detailed single-payment endpoint. */
+export interface PaymentDetailData {
+  payment: Payment;
+  attempts: PaymentAttempt[];
 }
 
 /**
@@ -122,7 +152,7 @@ export interface PaymentListResponse {
 export interface PaymentResponse {
   success: boolean;
   message?: string;
-  data: Payment;
+  data: PaymentDetailData;
 }
 
 /** One row of the status breakdown returned by `GET /payments/summary`. */
