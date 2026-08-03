@@ -238,20 +238,15 @@ export default function MyCertificate() {
             studentName={`${certData.user.firstName} ${certData.user.lastName}`}
             regNumber={certData.student.registrationNumber}
             department={certData.student.department.name}
-            program={certData.student.program.type}
-            level={
-              certData.student.program.level?.toUpperCase().includes("HND")
-                ? "HND"
-                : "ND"
-            }
-            graduationYear={certData.graduationYear}
-            graduationMonth={certData.graduationMonth}
-            graduationDate={certData.graduationDate}
+            program={`${certData.student.program.type} ${certData.student.program.level}`}
+            level={certData.student.program.level}
             placeOfIT={certData.placeOfIT}
             certificateNumber={certData.certificateNumber}
             issuedAt={certData.issuedAt}
-            itStartDate={certData.student.batch?.itPeriod?.startDate}
-            itEndDate={certData.student.batch?.itPeriod?.endDate}
+            finalGrade={certData.finalGrade}
+            finalScore={certData.finalScore}
+            itStartDate={certData.student.itPeriod?.startDate}
+            itEndDate={certData.student.itPeriod?.endDate}
           />
         </div>
       )}

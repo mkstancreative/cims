@@ -1,25 +1,24 @@
 import { forwardRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import "./Certificate.css";
+import { useSettings } from "../../../../hooks/useSettings";
 
 interface CertificateProps {
   studentName: string;
   regNumber: string;
   department: string;
   program: string;
+  level: string;
   graduationYear?: number;
   graduationMonth?: string;
   graduationDate?: string;
-  level: "ND" | "HND";
   placeOfIT?: string;
-  organizationName?: string;
-  serialNumber?: string;
-  issueDate?: string;
   certificateNumber?: string;
-  verifyUrl?: string;
   itStartDate?: string;
   itEndDate?: string;
   issuedAt?: string;
+  finalGrade?: string;
+  finalScore?: number;
 }
 
 const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
@@ -31,19 +30,32 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
       program,
       level,
       placeOfIT,
-      organizationName = "NITDA (National Information Technology Development Agency)",
-      serialNumber = "3845",
-      issueDate,
       certificateNumber,
-      verifyUrl,
       itStartDate,
       itEndDate,
       issuedAt,
     },
     ref,
   ) => {
-    const displayOrg = placeOfIT || organizationName;
-    const activeIssueDate = issuedAt || issueDate;
+    const { data: settingsResp } = useSettings();
+    const settings = settingsResp?.settings;
+
+    // Resolve logo URL – relative paths are prefixed with the API server base
+    const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(
+      /\/api(\/v\d+)?\/?$/,
+      "",
+    );
+    const rawLogoPath = settings?.logo?.url ?? "/logo.png";
+    const logoUrl = rawLogoPath.startsWith("http")
+      ? rawLogoPath
+      : `${apiBase}${rawLogoPath.startsWith("/") ? "" : "/"}${rawLogoPath}`;
+
+    const institutionName = settings?.name ?? "CIMS IT Portal";
+    const institutionAddress = settings?.address ?? "Federal Polytechnic Nekede, Owerri, Imo State";
+    const institutionCode = settings?.code ?? "CIMS-PORTAL";
+
+    const displayOrg = placeOfIT ?? "—";
+    const activeIssueDate = issuedAt;
     const displayDate = activeIssueDate
       ? new Date(activeIssueDate).toLocaleDateString("en-GB", {
           day: "numeric",
@@ -56,9 +68,7 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
           year: "numeric",
         });
 
-    const qrValue =
-      verifyUrl ||
-      `${window.location.origin}/certificates/verify/${encodeURIComponent(certificateNumber || serialNumber)}`;
+    const qrValue = `${window.location.origin}/certificates/verify/${encodeURIComponent(certificateNumber ?? "")}`;
 
     return (
       <div className="certificate-paper" ref={ref}>
@@ -67,19 +77,19 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
             {/* ── HEADER ── */}
             <div className="cert-header-row">
               <div className="cert-logo-left">
-                <img src="/logo.png" alt="Poly Logo" className="cert-logo" />
+                <img src={logoUrl} alt="Institution Logo" className="cert-logo" />
               </div>
               <div className="cert-header-text">
                 <h1 className="cert-inst-name">
-                  FEDERAL POLYTECHNIC NEKEDE, OWERRI.
+                  {institutionName.toUpperCase()}
                 </h1>
                 <p className="cert-inst-sub">
-                  PMB 1036 OWERRI - IMO STATE NIGERIA
+                  {institutionAddress.toUpperCase()}
                 </p>
                 <h2 className="cert-centre-title">
-                  INDUSTRIAL PLACEMENT CENTRE
+                  CLINICAL INTERNSHIP CENTER
                 </h2>
-                <p className="cert-siwes-tag">(SIWES DIRECTORATE)</p>
+                {/* <p className="cert-siwes-tag">(SIWES DIRECTORATE)</p> */}
               </div>
               <div className="cert-logo-right">
                 <img
@@ -134,8 +144,8 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
               </div>
 
               <p className="cert-para">
-                Federal Polytechnic Nekede, Owerri, Imo State has undergone a
-                mandatory Industrial Training in our organization under
+                {institutionAddress} has undergone a mandatory Industrial
+                Training in our organization under
               </p>
 
               <div className="cert-line-wrapper">
@@ -214,7 +224,7 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
                 </div>
                 <div className="cert-sig-line" />
                 <p className="cert-sig-name">Engr. Dr. Okorie N.K.</p>
-                <p className="cert-sig-label">DIRECTOR, IPC/SIWES</p>
+                <p className="cert-sig-label">DIRECTOR, IPC/CIMS</p>
               </div>
 
               <div className="cert-qr-block">
@@ -241,9 +251,9 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
             {/* ── BOTTOM ── */}
             <div className="cert-bottom-row">
               <div className="cert-serial">
-                FPN/IPC/SIWES/{" "}
+                {institutionCode}/{" "}
                 <span style={{ fontSize: "18px" }}>
-                  {certificateNumber || serialNumber}
+                  {certificateNumber}
                 </span>
               </div>
               <div className="cert-program">{program}</div>

@@ -9,28 +9,10 @@ import {
   isRegistrationPaid,
   type RegisterPayload,
 } from "../../api/types/registration";
-
-const PROGRAM_TYPES = [
-  "ND",
-  "HND",
-  "BSc",
-  "BNSc",
-  "RN",
-  "RM",
-  "Diploma",
-  "Other",
-] as const;
-
-const PROGRAM_LEVELS_BY_TYPE: Record<string, string[]> = {
-  ND: ["ND1", "ND2"],
-  HND: ["HND1", "HND2"],
-  BSc: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
-  BNSc: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
-  RN: ["Year 1", "Year 2", "Year 3"],
-  RM: ["Year 1", "Year 2"],
-  Diploma: ["Year 1", "Year 2", "Year 3"],
-  Other: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"],
-};
+import {
+  PROGRAM_TYPES,
+  PROGRAM_LEVELS_BY_TYPE,
+} from "../../helpers/programConstants";
 
 const GENDERS = ["male", "female"];
 

@@ -38,14 +38,12 @@ export interface AdminCertificateRequest {
     };
     _id: string;
     registrationNumber: string;
-    batch?: {
-      itPeriod: {
-        name: string;
-        startDate: string;
-        endDate: string;
-        duration: number;
-      };
-      _id: string;
+    /** itPeriod lives directly on student in the certificate response */
+    itPeriod?: {
+      name: string;
+      startDate: string;
+      endDate: string;
+      duration: number;
     };
   };
   user: {
@@ -54,20 +52,26 @@ export interface AdminCertificateRequest {
     firstName: string;
     lastName: string;
   };
+  internship?: string;
   graduationYear: number;
   graduationMonth: string;
-  graduationDate: string;
-  placeOfIT: string;
-  paymentStatus: "pending" | "successful" | "failed";
-  paymentAmount?: number;
-  rrr?: string;
+  graduationDate?: string;
+  placeOfIT?: string;
   certificateNumber?: string;
+  finalGrade?: string;
+  finalScore?: number;
   issuedAt?: string;
   approvalStatus: "pending" | "approved" | "rejected";
-  documents: {
-    ndStatementOfResult?: { url: string };
-    hndStatementOfResult?: { url: string };
-    itDischargeLetter?: { url: string };
+  qrCodeData?: {
+    certificateId: string;
+    certificateNumber: string;
+    studentName: string;
+    registrationNumber: string;
+    department: string;
+    program: string;
+    graduationYear: number;
+    PlaceOfIT: string;
+    grade: string;
   };
   createdAt: string;
   updatedAt: string;

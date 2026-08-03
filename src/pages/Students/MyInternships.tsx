@@ -1,4 +1,5 @@
-import { Briefcase, Star } from "lucide-react";
+import { useState } from "react";
+import { Briefcase, RefreshCw, Star } from "lucide-react";
 import GeneralTable from "../../components/ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
@@ -9,6 +10,7 @@ import type {
   InternshipBatchRef,
   InternshipSupervisorRef,
 } from "../../api/types/internship";
+import ReEnrollForm from "../../components/student/forms/ReEnrollForm";
 
 function batchName(batch: Internship["batch"]): string {
   if (!batch) return "—";
@@ -49,6 +51,7 @@ function periodText(internship: Internship): string {
 export default function MyInternships() {
   const { data, isLoading } = useMyInternshipHistory();
   const internships: Internship[] = data?.data ?? [];
+  const [reEnrollOpen, setReEnrollOpen] = useState(false);
 
   const columns: Column<Internship>[] = [
     {
@@ -99,6 +102,15 @@ export default function MyInternships() {
             </p>
           </div>
         </div>
+
+        <button
+          type="button"
+          className="add-btn"
+          onClick={() => setReEnrollOpen(true)}
+        >
+          <RefreshCw size={15} />
+          Re-enroll (Next Cycle)
+        </button>
       </div>
 
       <div className="table-wrapper">
@@ -111,6 +123,11 @@ export default function MyInternships() {
           onLimitChange={() => {}}
         />
       </div>
+
+      <ReEnrollForm
+        isOpen={reEnrollOpen}
+        onClose={() => setReEnrollOpen(false)}
+      />
     </div>
   );
 }
