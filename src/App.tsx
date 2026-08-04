@@ -90,6 +90,10 @@ function App() {
                   path="/registrations/verify"
                   element={<VerifyPayment />}
                 />
+                <Route
+                  path="/registration/payment-callback"
+                  element={<VerifyPayment />}
+                />
                 {/* Payment-gated login lands here — authenticated, but no dashboard yet */}
                 <Route
                   path="/registrations/pending"

@@ -2,12 +2,14 @@ import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import "../Login/Login.css";
 import { useVerifyPayment } from "../../hooks/useRegistrations";
+import { useAuth } from "../../context/useAuth";
 
 type Phase = "loading" | "success" | "failed" | "pending" | "missing";
 
 const VerifyPayment = () => {
   const [searchParams] = useSearchParams();
   const reference = searchParams.get("reference");
+  const { isAuthenticated } = useAuth();
 
   const { data, isLoading, isError } = useVerifyPayment(reference);
 
@@ -150,14 +152,18 @@ const VerifyPayment = () => {
           )}
 
           {phase === "success" && (
-            <Link to="/" className="btn-login" style={{ display: "block" }}>
-              Continue to Sign In
+            <Link
+              to={isAuthenticated ? "/student/dashboard" : "/"}
+              className="btn-login"
+              style={{ display: "block" }}
+            >
+              {isAuthenticated ? "Go to Dashboard" : "Continue to Sign In"}
             </Link>
           )}
 
           {(phase === "failed" || phase === "pending" || phase === "missing") && (
             <Link
-              to="/"
+              to={isAuthenticated ? "/student/dashboard" : "/"}
               style={{
                 display: "inline-block",
                 marginTop: 8,
@@ -167,7 +173,7 @@ const VerifyPayment = () => {
                 fontSize: 14,
               }}
             >
-              Back to Sign In
+              {isAuthenticated ? "Back to Dashboard" : "Back to Sign In"}
             </Link>
           )}
         </div>

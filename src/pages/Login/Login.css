@@ -213,6 +213,11 @@ body {
   box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
 }
 
+.form-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
 .form-input-wrap {
   position: relative;
 }
