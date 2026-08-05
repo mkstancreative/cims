@@ -45,6 +45,15 @@ export default function Curriculum() {
 
   const openCreate = () =>
     openModal(<CurriculumForm key="new" isOpen onClose={closeModal} />);
+  const openEdit = (curriculum: CurriculumListItem) =>
+    openModal(
+      <CurriculumForm
+        key={curriculum._id}
+        isOpen
+        onClose={closeModal}
+        editingId={curriculum._id}
+      />,
+    );
   const openView = (curriculum: CurriculumListItem) =>
     openModal(
       <CurriculumViewModal
@@ -107,6 +116,7 @@ export default function Curriculum() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onView={openView}
+          onEdit={openEdit}
           onDeactivateRequest={setDeactivateTarget}
         />
       </div>

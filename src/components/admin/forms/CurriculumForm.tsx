@@ -2,8 +2,15 @@ import { useState, type FormEvent } from "react";
 import { BookOpen, Plus, Trash2 } from "lucide-react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import Spinner from "../../ui/Spinner/Spinner";
-import { useCreateCurriculum } from "../../../hooks/useCurriculum";
-import type { CreateCurriculumPayload } from "../../../api/types/curriculum";
+import {
+  useCreateCurriculum,
+  useUpdateCurriculum,
+  useCurriculum,
+} from "../../../hooks/useCurriculum";
+import type {
+  CreateCurriculumPayload,
+  Curriculum,
+} from "../../../api/types/curriculum";
 import "./BuilderForm.css";
 
 // ── Builder types (local, order is derived on submit) ─────────────────────────
@@ -20,15 +27,95 @@ interface DraftTopic {
 interface CurriculumFormProps {
   isOpen: boolean;
   onClose: () => void;
+  editingId?: string;
 }
 
-export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [topics, setTopics] = useState<DraftTopic[]>([
-    { title: "", description: "", subtopics: [{ title: "", description: "" }] },
-  ]);
-  const { mutate: create, isPending } = useCreateCurriculum();
+export default function CurriculumForm({
+  isOpen,
+  onClose,
+  editingId,
+}: CurriculumFormProps) {
+  const { data, isLoading: loadingCurriculum } = useCurriculum(editingId || "");
+  const curriculum = data?.data;
+
+  if (editingId && loadingCurriculum) {
+    return (
+      <CustomModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Edit Curriculum"
+        subtitle="Loading curriculum details…"
+        icon={<BookOpen size={16} />}
+        size="large"
+        isLoading={true}
+        footer={
+          <button
+            type="button"
+            className="modal-cancel"
+            onClick={onClose}
+            disabled={true}
+          >
+            Cancel
+          </button>
+        }
+      >
+        <div style={{ height: 100 }} />
+      </CustomModal>
+    );
+  }
+
+  return (
+    <CurriculumFormInner
+      isOpen={isOpen}
+      onClose={onClose}
+      editingId={editingId}
+      defaultValues={curriculum}
+    />
+  );
+}
+
+function CurriculumFormInner({
+  isOpen,
+  onClose,
+  editingId,
+  defaultValues,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  editingId?: string;
+  defaultValues?: Curriculum;
+}) {
+  const [name, setName] = useState(defaultValues?.name ?? "");
+  const [description, setDescription] = useState(
+    defaultValues?.description ?? "",
+  );
+  const [topics, setTopics] = useState<DraftTopic[]>(() => {
+    if (defaultValues?.topics && defaultValues.topics.length > 0) {
+      return [...defaultValues.topics]
+        .sort((a, b) => a.order - b.order)
+        .map((t) => ({
+          title: t.title,
+          description: t.description || "",
+          subtopics: (t.subtopics || [])
+            .sort((a, b) => a.order - b.order)
+            .map((s) => ({
+              title: s.title,
+              description: s.description || "",
+            })),
+        }));
+    }
+    return [
+      {
+        title: "",
+        description: "",
+        subtopics: [{ title: "", description: "" }],
+      },
+    ];
+  });
+
+  const { mutate: create, isPending: creating } = useCreateCurriculum();
+  const { mutate: update, isPending: updating } = useUpdateCurriculum();
+  const isPending = creating || updating;
 
   const addTopic = () =>
     setTopics((prev) => [
@@ -50,7 +137,13 @@ export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps)
     setTopics((prev) =>
       prev.map((t, i) =>
         i === ti
-          ? { ...t, subtopics: [...t.subtopics, { title: "", description: "" }] }
+          ? {
+              ...t,
+              subtopics: [
+                ...t.subtopics,
+                { title: "", description: "" },
+              ],
+            }
           : t,
       ),
     );
@@ -101,15 +194,23 @@ export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps)
             })),
         })),
     };
-    create(payload, { onSuccess: onClose });
+    if (editingId) {
+      update({ id: editingId, data: payload }, { onSuccess: onClose });
+    } else {
+      create(payload, { onSuccess: onClose });
+    }
   };
 
   return (
     <CustomModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Add Curriculum"
-      subtitle="Define the curriculum with topics and subtopics"
+      title={editingId ? "Edit Curriculum" : "Add Curriculum"}
+      subtitle={
+        editingId
+          ? "Update the curriculum topics and subtopics"
+          : "Define the curriculum with topics and subtopics"
+      }
       icon={<BookOpen size={16} />}
       size="large"
       footer={
@@ -130,6 +231,8 @@ export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps)
           >
             {isPending ? (
               <Spinner size={14} color="#fff" text="" />
+            ) : editingId ? (
+              "Save Changes"
             ) : (
               "Create Curriculum"
             )}
@@ -137,7 +240,11 @@ export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps)
         </>
       }
     >
-      <form id="curriculum-form" onSubmit={handleSubmit} className="builder-form">
+      <form
+        id="curriculum-form"
+        onSubmit={handleSubmit}
+        className="builder-form"
+      >
         <div className="form-group">
           <label className="modal-label">
             Curriculum Name <span>*</span>
@@ -163,7 +270,11 @@ export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps)
 
         <div className="builder-toolbar">
           <span className="modal-label">Topics</span>
-          <button type="button" className="builder-add-btn" onClick={addTopic}>
+          <button
+            type="button"
+            className="builder-add-btn"
+            onClick={addTopic}
+          >
             <Plus size={13} /> Add Topic
           </button>
         </div>
@@ -193,7 +304,9 @@ export default function CurriculumForm({ isOpen, onClose }: CurriculumFormProps)
               className="modal-input"
               placeholder="Topic description (optional)"
               value={topic.description}
-              onChange={(e) => setTopicField(ti, "description", e.target.value)}
+              onChange={(e) =>
+                setTopicField(ti, "description", e.target.value)
+              }
             />
 
             <div className="builder-sublist">

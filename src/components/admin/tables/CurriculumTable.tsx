@@ -1,4 +1,4 @@
-import { Eye, Ban } from "lucide-react";
+import { Eye, Ban, Pencil } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
@@ -17,6 +17,7 @@ interface CurriculumTableProps {
   onPageChange: (p: number) => void;
   onLimitChange: (l: number) => void;
   onView: (curriculum: CurriculumListItem) => void;
+  onEdit: (curriculum: CurriculumListItem) => void;
   onDeactivateRequest: (curriculum: CurriculumListItem) => void;
 }
 
@@ -28,6 +29,7 @@ export default function CurriculumTable({
   onPageChange,
   onLimitChange,
   onView,
+  onEdit,
   onDeactivateRequest,
 }: CurriculumTableProps) {
   const params: CurriculumParams = {
@@ -82,6 +84,11 @@ export default function CurriculumTable({
               label: "View Topics",
               icon: <Eye size={13} />,
               onClick: () => onView(row),
+            },
+            {
+              label: "Edit",
+              icon: <Pencil size={13} />,
+              onClick: () => onEdit(row),
             },
             {
               label: "Deactivate",
