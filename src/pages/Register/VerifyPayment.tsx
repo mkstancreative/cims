@@ -21,10 +21,16 @@ const VerifyPayment = () => {
     if (isError || !data) return "failed";
 
     const status = (data.data?.status ?? "").toLowerCase();
-    if (["success", "successful", "paid", "completed"].includes(status)) {
+    if (
+      ["success", "successful", "paid", "completed", "new", "enrolled"].includes(
+        status,
+      )
+    ) {
       return "success";
     }
-    if (["pending", "processing", "ongoing"].includes(status)) {
+    if (
+      ["pending", "processing", "ongoing", "pending_payment"].includes(status)
+    ) {
       return "pending";
     }
     return "failed";

@@ -15,7 +15,7 @@ import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
 interface FilterStates {
   batchId: string;
   department: string;
-  itStatus: ITStatus | "";
+  itStatus: ITStatus;
   search: string;
   page: number;
   limit: number;
@@ -28,7 +28,7 @@ export default function Students() {
   const [filters, setFilters] = useState<FilterStates>({
     batchId: "",
     department: "",
-    itStatus: "",
+    itStatus: "placed",
     search: "",
     page: 1,
     limit: 10,
@@ -93,7 +93,7 @@ export default function Students() {
     setFilters({
       batchId: "",
       department: "",
-      itStatus: "",
+      itStatus: "placed",
       search: "",
       page: 1,
       limit: 10,
@@ -168,13 +168,12 @@ export default function Students() {
         <SelectFilter
           label="IT Status"
           options={[
-            { value: "", label: "All IT Status" },
             { value: "placed", label: "Placed" },
             { value: "active", label: "Active" },
             { value: "completed", label: "Completed" },
           ]}
           value={filters.itStatus}
-          onChange={(value) => setField("itStatus", value as ITStatus | "")}
+          onChange={(value) => setField("itStatus", value as ITStatus)}
           name="itStatus"
         />
         <ResetButton onClick={handleReset} />
