@@ -74,6 +74,12 @@ export interface InternshipParams {
   page?: number;
   limit?: number;
   status?: InternshipStatus | "";
+  studentId?: string;
+  batchId?: string;
+  itStatus?: InternshipStatus | "";
+  session?: string;
+  program?: string;
+  level?: string;
 }
 
 export interface UpdateInternshipStatusPayload {

@@ -1,6 +1,12 @@
 // ─── Batch Types (FMC Clinical Placement) ─────────────────────────────────────
 
-export type BatchStatus = "created" | "active" | "completed" | "archived";
+export type BatchStatus =
+  | "created"
+  | "students_uploaded"
+  | "in_progress"
+  | "completed"
+  | "archived"
+  | "active";
 
 export interface ITPeriod {
   name: string;

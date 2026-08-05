@@ -258,7 +258,7 @@ export default function Batches() {
   const [filter, setFilter] = useState<FilterState>({
     search: "",
     page: 1,
-    limit: 10,
+    limit: 1000,
     status: "",
     session: "",
   });
@@ -287,7 +287,7 @@ export default function Batches() {
     );
 
   const handleReset = () => {
-    setFilter({ search: "", page: 1, limit: 10, status: "", session: "" });
+    setFilter({ search: "", page: 1, limit: 1000, status: "", session: "" });
   };
 
   return (
@@ -319,13 +319,14 @@ export default function Batches() {
           />
         </div>
 
-        <div className="filter-selects-block">
+        <div className="filter-selects-block" style={{ flexWrap: "wrap", gap: "12px 14px" }}>
           <SelectFilter
             label="Status"
             options={[
               { value: "", label: "All Status" },
               { value: "created", label: "Created" },
-              { value: "active", label: "Active" },
+              { value: "students_uploaded", label: "Students Uploaded" },
+              { value: "in_progress", label: "In Progress" },
               { value: "completed", label: "Completed" },
               { value: "archived", label: "Archived" },
             ]}
@@ -333,6 +334,28 @@ export default function Batches() {
             onChange={(value) => setField("status", value as BatchStatus | "")}
             name="status"
           />
+
+          <div className="filter-container">
+            <label className="filter-label">Session</label>
+            <input
+              className="modal-input"
+              placeholder="e.g. 2023/2024"
+              value={filter.session}
+              onChange={(e) => setField("session", e.target.value)}
+              style={{
+                height: 38,
+                padding: "0 12px",
+                borderRadius: 8,
+                border: "1px solid var(--color-accent-border)",
+                background: "var(--color-bg-primary)",
+                color: "var(--color-text-primary)",
+                fontSize: 13,
+                outline: "none",
+                width: 140,
+              }}
+            />
+          </div>
+
           <ResetButton onClick={handleReset} />
         </div>
 

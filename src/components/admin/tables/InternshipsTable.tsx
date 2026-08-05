@@ -16,6 +16,12 @@ import type {
 interface InternshipsTableProps {
   search?: string;
   status?: InternshipStatus | "";
+  studentId?: string;
+  batchId?: string;
+  itStatus?: InternshipStatus | "";
+  session?: string;
+  program?: string;
+  level?: string;
   page: number;
   limit: number;
   onPageChange: (p: number) => void;
@@ -32,6 +38,12 @@ import {
 export default function InternshipsTable({
   search,
   status,
+  studentId,
+  batchId,
+  itStatus,
+  session,
+  program,
+  level,
   page,
   limit,
   onPageChange,
@@ -42,6 +54,12 @@ export default function InternshipsTable({
     page,
     limit,
     ...(status ? { status } : {}),
+    ...(studentId ? { studentId } : {}),
+    ...(batchId ? { batchId } : {}),
+    ...(itStatus ? { itStatus } : {}),
+    ...(session ? { session } : {}),
+    ...(program ? { program } : {}),
+    ...(level ? { level } : {}),
   };
 
   const { data, isLoading } = useInternships(params);

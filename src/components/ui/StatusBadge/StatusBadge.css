@@ -87,6 +87,11 @@
   color: #f9a825;
 }
 
+.status-badge.in_progress {
+  background: #fff8e1;
+  color: #f9a825;
+}
+
 /* Admission */
 .status-badge.applied {
   background: #e8eaf6;
