@@ -1,7 +1,7 @@
 import type {
   Payment,
   PaymentStudentRef,
-  PaymentSummaryData,
+  PaymentSummaryResponse,
 } from "../api/types/payment";
 
 /** Formats an amount in Naira. Amounts come from the API in major units. */
@@ -57,29 +57,20 @@ export function canReverify(payment: Payment): boolean {
 }
 
 /**
- * The summary endpoint may report totals directly or only as a `byStatus`
- * breakdown, so derive whichever half is missing rather than showing zeros.
+ * Normalizes the updated payment summary response metrics.
  */
-export function normalizeSummary(data?: PaymentSummaryData) {
-  const buckets = data?.byStatus ?? [];
-  const bucketFor = (status: string) =>
-    buckets.find((b) => b.status?.toLowerCase() === status);
-
-  const sum = (pick: (b: { count: number; amount: number }) => number) =>
-    buckets.reduce((total, b) => total + (pick(b) || 0), 0);
-
-  const success = bucketFor("success");
-  const pending = bucketFor("pending");
-  const failed = bucketFor("failed");
-
+export function normalizeSummary(response?: PaymentSummaryResponse) {
+  const totals = response?.totals;
   return {
-    totalCount: data?.totalCount ?? sum((b) => b.count),
-    totalAmount: data?.totalAmount ?? sum((b) => b.amount),
-    paidCount: data?.paidCount ?? success?.count ?? 0,
-    paidAmount: data?.paidAmount ?? success?.amount ?? 0,
-    pendingCount: data?.pendingCount ?? pending?.count ?? 0,
-    pendingAmount: data?.pendingAmount ?? pending?.amount ?? 0,
-    failedCount: data?.failedCount ?? failed?.count ?? 0,
-    byStatus: buckets,
+    totalCount: totals?.attempts ?? 0,
+    paidCount: totals?.successful?.count ?? 0,
+    paidAmount: totals?.collected ?? 0,
+    pendingCount: totals?.pending?.count ?? 0,
+    pendingAmount: totals?.pending?.amount ?? 0,
+    failedCount: totals?.failed?.count ?? 0,
+    abandonedCount: totals?.abandoned?.count ?? 0,
+    settledAmount: totals?.settled ?? 0,
+    gatewayFees: totals?.gatewayFees ?? 0,
+    settlementGap: totals?.settlementGap ?? 0,
   };
 }

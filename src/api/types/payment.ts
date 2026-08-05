@@ -155,28 +155,44 @@ export interface PaymentResponse {
   data: PaymentDetailData;
 }
 
-/** One row of the status breakdown returned by `GET /payments/summary`. */
-export interface PaymentSummaryBucket {
-  status: string;
+export interface PaymentStatusStats {
   count: number;
   amount: number;
+  debitedAmount: number;
+  settlementAmount: number;
 }
 
-export interface PaymentSummaryData {
-  totalCount?: number;
-  totalAmount?: number;
-  /** Amount actually collected (successful payments only). */
-  paidAmount?: number;
-  paidCount?: number;
-  pendingAmount?: number;
-  pendingCount?: number;
-  failedCount?: number;
-  byStatus?: PaymentSummaryBucket[];
+export interface PaymentSummaryTotals {
+  attempts: number;
+  pending: PaymentStatusStats;
+  successful: PaymentStatusStats;
+  failed: PaymentStatusStats;
+  abandoned: PaymentStatusStats;
+  collected: number;
+  settled: number;
+  gatewayFees: number;
+  settlementGap: number;
+  missingFeeData: number;
+  missingSettlementData: number;
+}
+
+export interface PaymentSummaryGroupItem {
+  _id: string | null;
+  attempts: number;
+  successful: number;
+  collected: number;
+  settled: number;
+  debited: number;
+  missingSettlement: number;
+  label: string;
 }
 
 export interface PaymentSummaryResponse {
   success: boolean;
-  data: PaymentSummaryData;
+  groupBy: string;
+  dateField: string;
+  totals: PaymentSummaryTotals;
+  data: PaymentSummaryGroupItem[];
 }
 
 /** `POST /payments/:id/reverify` — re-checks the transaction with the provider. */

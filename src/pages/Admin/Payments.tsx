@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Receipt, CircleCheck, Clock, XCircle } from "lucide-react";
+import {
+  Receipt,
+  CircleCheck,
+  Clock,
+  XCircle,
+  AlertTriangle,
+  CreditCard,
+  DollarSign,
+  Activity,
+} from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
@@ -108,7 +117,7 @@ export default function Payments() {
   delete summaryParams.limit;
 
   const { data: summaryResponse } = usePaymentSummary(summaryParams);
-  const summary = normalizeSummary(summaryResponse?.data);
+  const summary = normalizeSummary(summaryResponse);
 
   const openView = (payment: Payment) =>
     openModal(
@@ -137,12 +146,41 @@ export default function Payments() {
       </div>
 
       {/* ── Summary ── */}
+      <div className="section-title-divider" style={{ marginTop: 0, marginBottom: 12 }}>Financial Reconciliation</div>
       <div className="payments-summary-grid">
         <StatCard
           label="Total Collected"
           value={formatAmount(summary.paidAmount)}
-          icon={<CircleCheck size={20} />}
+          icon={<DollarSign size={20} />}
           color="#0f9d58"
+        />
+        <StatCard
+          label="Total Settled"
+          value={formatAmount(summary.settledAmount)}
+          icon={<CircleCheck size={20} />}
+          color="#1976d2"
+        />
+        <StatCard
+          label="Gateway Fees"
+          value={formatAmount(summary.gatewayFees)}
+          icon={<CreditCard size={20} />}
+          color="#f59e0b"
+        />
+        <StatCard
+          label="Settlement Gap"
+          value={formatAmount(summary.settlementGap)}
+          icon={<AlertTriangle size={20} />}
+          color={summary.settlementGap > 0 ? "#ef4444" : "#6b7280"}
+        />
+      </div>
+
+      <div className="section-title-divider" style={{ marginTop: 18, marginBottom: 12 }}>Transaction Statuses</div>
+      <div className="payments-summary-grid">
+        <StatCard
+          label="Total Attempts"
+          value={summary.totalCount}
+          icon={<Activity size={20} />}
+          color="#7b1fa2"
         />
         <StatCard
           label="Successful"
@@ -157,8 +195,8 @@ export default function Payments() {
           color="#f9a825"
         />
         <StatCard
-          label="Failed"
-          value={summary.failedCount}
+          label="Failed / Abandoned"
+          value={`${summary.failedCount} / ${summary.abandonedCount}`}
           icon={<XCircle size={20} />}
           color="#c62828"
         />
@@ -181,7 +219,7 @@ export default function Payments() {
           <button
             key={status}
             type="button"
-            className={`payments-chip${
+            className={`payments-chip payments-chip--${status}${
               filters.statuses.includes(status) ? " is-active" : ""
             }`}
             onClick={() => toggleStatus(status)}

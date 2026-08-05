@@ -11,47 +11,87 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
 }
 
 .payments-chip-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--color-text-secondary);
-  margin-right: 2px;
+  margin-right: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .payments-chip {
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid var(--color-accent-border);
-  background: transparent;
-  font-size: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--color-text-secondary);
   cursor: pointer;
   text-transform: capitalize;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .payments-chip:hover {
-  border-color: var(--color-accent);
+  border-color: var(--color-text-secondary);
   color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
+/* Base style for active status chips using custom colors */
 .payments-chip.is-active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
   color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Success status */
+.payments-chip--success.is-active {
+  background: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Pending status */
+.payments-chip--pending.is-active {
+  background: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* Failed & Cancelled status */
+.payments-chip--failed.is-active,
+.payments-chip--cancelled.is-active {
+  background: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Abandoned status */
+.payments-chip--abandoned.is-active {
+  background: #6b7280;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+/* Reversed & Refunded status */
+.payments-chip--reversed.is-active,
+.payments-chip--refunded.is-active {
+  background: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .payments-chip:focus,
 .payments-chip:active {
-  border: 1px solid var(--color-accent);
+  outline: none;
 }
 
 /* ── Amount range inputs ────────────────────────────────────────────────── */
