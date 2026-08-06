@@ -5,7 +5,6 @@ import {
   TrendingUp,
   Users,
   UserCheck,
-  AlertCircle,
   Building2,
 } from "lucide-react";
 import { useAdminDashboard } from "../../hooks/useDashboard";
@@ -26,19 +25,17 @@ export default function DashBoardAdmin() {
   const { user } = useAuth();
   const { data: resp, isLoading } = useAdminDashboard();
 
-  if (isLoading) return <DashboardSkeleton cards={8} wide />;
+  if (isLoading) return <DashboardSkeleton cards={7} wide />;
   if (!resp?.data) return <DashboardError />;
 
   const students = resp.data?.students ?? {
     total: 0,
-    uploaded: 0,
-    seekingPlacement: 0,
-    pendingVerification: 0,
+    totalInternships: 0,
     placed: 0,
     active: 0,
     completed: 0,
   };
-  const supervisors = resp.data?.supervisors ?? { school: 0, industrial: 0 };
+  const supervisors = resp.data?.supervisors ?? { total: 0 };
   const logbooks = resp.data?.logbooks ?? {
     pending: 0,
     approved: 0,
@@ -51,10 +48,10 @@ export default function DashBoardAdmin() {
     `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase();
 
   const placementRate =
-    students.total > 0
+    students.totalInternships > 0
       ? Math.round(
           ((students.placed + students.active + students.completed) /
-            students.total) *
+            students.totalInternships) *
             100,
         )
       : 0;
@@ -90,7 +87,7 @@ export default function DashBoardAdmin() {
       <div>
         <SectionHead
           title="Student Overview"
-          sub={`${students.total} total students`}
+          sub={`${students.total} total students · ${students.totalInternships} internships`}
           icon={<Users size={16} />}
           color="teal"
         />
@@ -104,6 +101,13 @@ export default function DashBoardAdmin() {
             sub="All enrolments"
             icon={<Users size={18} />}
             color="teal"
+          />
+          <KpiCard
+            label="Internships"
+            value={students.totalInternships}
+            sub="Students with internship"
+            icon={<Building2 size={18} />}
+            color="blue"
           />
           <KpiCard
             label="Placed"
@@ -127,17 +131,8 @@ export default function DashBoardAdmin() {
             sub="IT fully completed"
             icon={<CheckCircle2 size={18} />}
             color="green"
-            trend={`${placementRate}% placed`}
+            trend={`${placementRate}% placement rate`}
             trendType={placementRate >= 60 ? "up" : "warn"}
-          />
-          <KpiCard
-            label="Seeking Placement"
-            value={students.seekingPlacement}
-            sub="Awaiting placement"
-            icon={<AlertCircle size={18} />}
-            color={students.seekingPlacement > 0 ? "rose" : "slate"}
-            trend={students.seekingPlacement > 0 ? "Needs attention" : "None"}
-            trendType={students.seekingPlacement > 0 ? "danger" : "up"}
           />
           <KpiCard
             label="Placement Rate"
@@ -153,12 +148,7 @@ export default function DashBoardAdmin() {
             }
             progress={placementRate}
           />
-        </div>
-      </div>
-
-      {/* ── Logbook Ring ────────────────────────────────────────────────────── */}
-      <div className="db-panels">
-        <div className="db-ring-card">
+                 <div className="db-ring-card">
           <div className="db-ring-card__ring">
             <ProgressRing
               pct={logbookApprovalRate}
@@ -212,18 +202,22 @@ export default function DashBoardAdmin() {
             </div>
           </div>
         </div>
+        </div>
       </div>
+
+      {/* ── Logbook Ring ────────────────────────────────────────────────────── */}
+      {/* <div className="db-panels">
+ 
+      </div> */}
 
       {/* ── Supervisors, Batches & Logbook Info ─────────────────────────────── */}
       <div className="db-panels">
         <InfoPanel
           title="Supervisor Summary"
-          sub="School supervisors"
+          sub="Registered supervisors"
           icon={<UserCheck size={16} />}
           iconColor="purple"
-          rows={[
-            { label: "School Supervisors", value: supervisors.school },
-          ]}
+          rows={[{ label: "Total Supervisors", value: supervisors.total }]}
         />
         <InfoPanel
           title="Batch Overview"

@@ -118,9 +118,7 @@ export interface StudentDashboardResponse {
 
 export interface AdminDashStudents {
   total: number;
-  uploaded: number;
-  seekingPlacement: number;
-  pendingVerification: number;
+  totalInternships: number;
   placed: number;
   active: number;
   completed: number;
@@ -133,8 +131,7 @@ export interface AdminDashCompanies {
 }
 
 export interface AdminDashSupervisors {
-  school: number;
-  industrial: number;
+  total: number;
 }
 
 export interface AdminDashLogbooks {
@@ -150,7 +147,6 @@ export interface AdminDashBatches {
 
 export interface AdminDashboardData {
   students: AdminDashStudents;
-  companies: AdminDashCompanies;
   supervisors: AdminDashSupervisors;
   logbooks: AdminDashLogbooks;
   batches: AdminDashBatches;
