@@ -387,7 +387,7 @@ export default function MyProfile() {
                 <div className="mp-card">
                   <Section
                     icon={<UserCheck size={15} />}
-                    title="School Supervisor"
+                    title="Clinical Supervisor"
                   >
                     <div className="mp-info-list">
                       <InfoRow

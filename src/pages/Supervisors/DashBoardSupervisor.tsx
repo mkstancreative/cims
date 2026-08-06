@@ -55,7 +55,7 @@ export default function DashBoardSupervisor() {
   return (
     <div className="db-page">
       <DashboardBanner
-        greeting="School Supervisor Portal"
+        greeting="Clinical Supervisor Portal"
         name={`Hello, ${firstName}!`}
         meta={`${sup?.department ?? ""} · ${sup?.specialization ?? ""}`}
         badge={

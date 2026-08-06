@@ -225,7 +225,7 @@ export default function AdminStudentView() {
 
         {/* ── School Supervisor ── */}
         {school && (
-          <Section title="School Supervisor" icon={<User size={15} />}>
+          <Section title="Clinical Supervisor" icon={<User size={15} />}>
             <InfoRow
               label="Name"
               value={`${school.user.firstName} ${school.user.lastName}`}

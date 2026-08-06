@@ -42,7 +42,7 @@ export default function SupervisorPage() {
           <div>
             <h2 className="page-title">Supervisors</h2>
             <p className="page-sub">
-              Manage school supervisors in the institution
+              Manage clinical supervisors in the institution
             </p>
           </div>
         </div>

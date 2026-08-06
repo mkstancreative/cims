@@ -194,7 +194,7 @@ export default function AssignedStudentLogBookView() {
           {/* ── School Review Feedback ── */}
           {logbook.schoolReview?.comments && (
             <div className="lbv2-section">
-              <h4 className="lbv2-section-title">School Supervisor's Review</h4>
+              <h4 className="lbv2-section-title">Clinical Supervisor's Review</h4>
               <div className="lbv2-school-review">
                 <div className="lbv2-school-review-box">
                   <div className="lbv2-school-review-head">

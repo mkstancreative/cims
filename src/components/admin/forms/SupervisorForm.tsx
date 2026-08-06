@@ -43,7 +43,7 @@ export default function SupervisorForm({ isOpen, onClose }: SupervisorFormProps)
       isOpen={isOpen}
       onClose={onClose}
       title="Add Supervisor"
-      subtitle="Register a new school supervisor"
+      subtitle="Register a new clinical supervisor"
       icon={<UserRound size={16} />}
       size="medium"
       footer={
