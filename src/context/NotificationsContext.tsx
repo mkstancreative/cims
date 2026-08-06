@@ -19,6 +19,40 @@ interface NotificationsProviderProps {
 const NOTIFICATION_POPUP_DURATION = 5000;
 const POLL_INTERVAL = 30_000;
 
+// ── Soft chime via Web Audio API (no asset file required) ──────────────────
+function playNotificationSound() {
+  try {
+    const ctx = new (window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext)();
+
+    const play = (freq: number, startAt: number, duration: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + startAt);
+      gain.gain.setValueAtTime(0, ctx.currentTime + startAt);
+      gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + startAt + 0.01);
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        ctx.currentTime + startAt + duration,
+      );
+      osc.start(ctx.currentTime + startAt);
+      osc.stop(ctx.currentTime + startAt + duration);
+    };
+
+    play(880, 0, 0.25);   // A5
+    play(1108, 0.18, 0.3); // C#6
+
+    // Close the context once the sounds finish to free resources
+    setTimeout(() => ctx.close(), 700);
+  } catch {
+    // AudioContext may be blocked — silently ignore
+  }
+}
+
 export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
   children,
 }) => {
@@ -62,6 +96,7 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
         response.data.forEach((n) => seenIdsRef.current.add(n._id));
 
         if (hasLoadedOnceRef.current && freshUnread.length) {
+          playNotificationSound();
           setPopupNotifications((prev) => [...freshUnread, ...prev].slice(0, 5));
           freshUnread.forEach((n) =>
             setTimeout(() => dismissPopup(n._id), NOTIFICATION_POPUP_DURATION),

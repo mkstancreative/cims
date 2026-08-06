@@ -142,7 +142,6 @@ export default function UnAssignedStudents() {
           onLimitChange={(l) => setField("limit", l)}
           onView={handleView}
           onProgress={handleProgress}
-          onUpdateStatus={() => {}}
           hideSelection
           hideSession
           hideDeptCode
