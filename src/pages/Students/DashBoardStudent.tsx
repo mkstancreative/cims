@@ -18,7 +18,15 @@ export default function DashBoardStudent() {
   const { data: dashResp, isLoading } = useStudentDashboard();
 
   if (isLoading) return <DashboardSkeleton cards={6} wide />;
-  if (!dashResp?.data) return <DashboardError />;
+  if (!dashResp?.data)
+    return (
+      <DashboardError
+        message={
+          (dashResp as { message?: string } | undefined)?.message ??
+          "Unable to load dashboard."
+        }
+      />
+    );
 
   const data = dashResp.data;
   const student = data.student;

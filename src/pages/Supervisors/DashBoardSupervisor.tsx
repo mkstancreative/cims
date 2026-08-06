@@ -46,7 +46,6 @@ export default function DashBoardSupervisor() {
   const activeRate =
     totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
 
-  const capacityPct = sup?.capacityPercent ?? 0;
 
   const firstName = user?.firstName ?? "Supervisor";
   const initials =
@@ -57,7 +56,7 @@ export default function DashBoardSupervisor() {
       <DashboardBanner
         greeting="Clinical Supervisor Portal"
         name={`Hello, ${firstName}!`}
-        meta={`${sup?.department ?? ""} · ${sup?.specialization ?? ""}`}
+        meta={sup?.specialization ?? ""}
         badge={
           <>
             <Users size={12} /> {totalStudents} student
@@ -188,48 +187,6 @@ export default function DashBoardSupervisor() {
           </div>
         </div>
 
-        {/* Capacity ring */}
-        <div className="db-ring-card">
-          <div className="db-ring-card__ring">
-            <ProgressRing
-              pct={capacityPct}
-              color={
-                capacityPct >= 90
-                  ? "#ef4444"
-                  : capacityPct >= 70
-                    ? "#f59e0b"
-                    : "#6366f1"
-              }
-            />
-            <div className="db-ring-card__inner">
-              <span className="db-ring-card__pct">{capacityPct}%</span>
-              <span className="db-ring-card__pct-lbl">capacity</span>
-            </div>
-          </div>
-          <div className="db-ring-card__info">
-            <div className="db-ring-card__title">Supervisor Capacity</div>
-            <div className="db-ring-card__rows">
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Staff ID</span>
-                <span className="db-ring-card__row-val">
-                  {sup?.staffId ?? "—"}
-                </span>
-              </div>
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Current Students</span>
-                <span className="db-ring-card__row-val">
-                  {sup?.currentStudents ?? 0}
-                </span>
-              </div>
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Max Capacity</span>
-                <span className="db-ring-card__row-val">
-                  {sup?.maxStudents ?? 0}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* ── Info Panels ─────────────────────────────────────────────────────── */}

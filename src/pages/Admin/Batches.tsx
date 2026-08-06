@@ -325,7 +325,6 @@ export default function Batches() {
             options={[
               { value: "", label: "All Status" },
               { value: "created", label: "Created" },
-              { value: "students_uploaded", label: "Students Uploaded" },
               { value: "in_progress", label: "In Progress" },
               { value: "completed", label: "Completed" },
               { value: "archived", label: "Archived" },
