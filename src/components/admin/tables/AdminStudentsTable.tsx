@@ -1,4 +1,4 @@
-import { Eye, Pencil } from "lucide-react";
+import { Eye } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
@@ -13,7 +13,7 @@ interface AdminStudentsTableProps {
   onLimitChange: (l: number) => void;
   onView: (student: Student) => void;
   onProgress: (student: Student) => void;
-  onUpdateStatus: (student: Student) => void;
+  // onUpdateStatus: (student: Student) => void;
   // bulk selection (optional — omit for read-only tables)
   selectedIds?: Set<string>;
   onSelectionChange?: (ids: Set<string>) => void;
@@ -121,7 +121,7 @@ export default function AdminStudentsTable({
   onPageChange,
   onLimitChange,
   onView,
-  onUpdateStatus,
+  // onUpdateStatus,
   onProgress,
   selectedIds,
   onSelectionChange,
@@ -226,11 +226,11 @@ export default function AdminStudentsTable({
               icon: <Eye size={13} />,
               onClick: () => onProgress(row),
             },
-            {
-              label: "Update Status",
-              icon: <Pencil size={13} />,
-              onClick: () => onUpdateStatus(row),
-            },
+            // {
+            //   label: "Update Status",
+            //   icon: <Pencil size={13} />,
+            //   onClick: () => onUpdateStatus(row),
+            // },
           ]}
         />
       ),

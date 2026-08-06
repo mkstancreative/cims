@@ -64,10 +64,10 @@ export default function Students() {
   const hasSelection = selectedStudents.length > 0;
 
   /** Single-student update (row action dropdown) */
-  const openUpdateStatusSingle = (student: Student) =>
-    openModal(
-      <UpdateStudentStatus isOpen onClose={closeModal} students={[student]} />,
-    );
+  // const openUpdateStatusSingle = (student: Student) =>
+  //   openModal(
+  //     <UpdateStudentStatus isOpen onClose={closeModal} students={[student]} />,
+  //   );
 
   /** Bulk update — all currently selected students */
   const openUpdateStatusBulk = () => {
@@ -189,7 +189,7 @@ export default function Students() {
           onLimitChange={(l) => setField("limit", l)}
           onView={handleView}
           onProgress={handleProgress}
-          onUpdateStatus={openUpdateStatusSingle}
+          // onUpdateStatus={openUpdateStatusSingle}
           selectedIds={selectedIds}
           onSelectionChange={setSelectedIds}
         />

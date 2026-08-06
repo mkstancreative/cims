@@ -358,7 +358,7 @@ export default function StudentProgress() {
                 className="sv-info-value"
                 style={{ color: "#ef4444", fontWeight: 600 }}
               >
-                {logbookStats.missedWeeks.length}
+                {missedWeeks.length}
               </span>
             </div>
           </div>
