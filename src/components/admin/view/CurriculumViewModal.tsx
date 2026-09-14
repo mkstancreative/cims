@@ -33,11 +33,11 @@ export default function CurriculumViewModal({
               No topics defined.
             </p>
           )}
-          {[...(curriculum.topics ?? [])]
-            .sort((a, b) => a.order - b.order)
-            .map((topic) => (
+          {/* Already sorted by the API — render as it comes. The visible
+              number is the array position, because `order` is zero-based. */}
+          {(curriculum.topics ?? []).map((topic, ti) => (
               <div
-                key={topic._id ?? topic.order}
+                key={topic._id ?? ti}
                 style={{
                   border: "1px solid var(--color-border)",
                   borderRadius: 10,
@@ -45,7 +45,7 @@ export default function CurriculumViewModal({
                 }}
               >
                 <div style={{ fontWeight: 700, fontSize: 14 }}>
-                  {topic.order}. {topic.title}
+                  {ti + 1}. {topic.title}
                 </div>
                 {topic.description && (
                   <div
@@ -59,11 +59,9 @@ export default function CurriculumViewModal({
                   </div>
                 )}
                 <ul style={{ margin: "10px 0 0", paddingLeft: 18 }}>
-                  {[...(topic.subtopics ?? [])]
-                    .sort((a, b) => a.order - b.order)
-                    .map((sub) => (
+                  {(topic.subtopics ?? []).map((sub, si) => (
                       <li
-                        key={sub._id ?? sub.order}
+                        key={sub._id ?? si}
                         style={{ fontSize: 13, marginBottom: 4 }}
                       >
                         <span style={{ fontWeight: 600 }}>{sub.title}</span>

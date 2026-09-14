@@ -4,7 +4,9 @@ import { toast } from "react-toastify";
 import "../Login/Login.css";
 import { useRegisterStudent } from "../../hooks/useRegistrations";
 import { usePublicInstitutions } from "../../hooks/useInstitutions";
+import { usePublicDurations } from "../../hooks/useDurations";
 import { useStates } from "../../hooks/useLocation";
+import { durationLabel, formatPrice } from "../../helpers/duration";
 import {
   isRegistrationPaid,
   type RegisterPayload,
@@ -15,6 +17,22 @@ import {
 } from "../../helpers/programConstants";
 
 const GENDERS = ["male", "female"];
+
+const NOK_RELATIONSHIPS = [
+  "Father",
+  "Mother",
+  "Spouse",
+  "Brother",
+  "Sister",
+  "Son",
+  "Daughter",
+  "Guardian",
+  "Uncle",
+  "Aunt",
+  "Cousin",
+  "Friend",
+  "Other",
+];
 
 type FormState = Omit<RegisterPayload, "nextOfKin"> & {
   confirmPassword: string;
@@ -36,6 +54,7 @@ const initialState: FormState = {
   programType: "ND",
   programLevel: "",
   institutionId: "",
+  durationId: "",
   dateOfBirth: "",
   gender: "",
   address: "",
@@ -54,12 +73,17 @@ const Register = () => {
   const { data: institutionsResp, isLoading: loadingInstitutions } =
     usePublicInstitutions();
   const { data: states, isLoading: loadingStates } = useStates();
+  const { data: durationsResp, isLoading: loadingDurations } =
+    usePublicDurations();
 
   const [form, setForm] = useState<FormState>(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const institutions = institutionsResp?.data ?? [];
+  const durations = durationsResp?.data ?? [];
+  const selectedDuration =
+    durations.find((d) => d._id === form.durationId) ?? null;
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -89,6 +113,10 @@ const Register = () => {
       setError("Please select your institution.");
       return;
     }
+    if (!form.durationId) {
+      setError("Please select your placement period.");
+      return;
+    }
 
     const payload: RegisterPayload = {
       firstName: form.firstName,
@@ -101,6 +129,7 @@ const Register = () => {
       programType: form.programType,
       programLevel: form.programLevel,
       institutionId: form.institutionId,
+      durationId: form.durationId,
       dateOfBirth: form.dateOfBirth,
       gender: form.gender,
       address: form.address,
@@ -401,6 +430,70 @@ const Register = () => {
                 </div>
               </div>
 
+              {/* The applicant is about to be charged this, so the amount is
+                  spelled out before they hit pay. */}
+              <div className="form-group">
+                <label className="form-label">Placement Duration</label>
+                <div className="form-input-wrap">
+                  <select
+                    name="durationId"
+                    className="form-input"
+                    value={form.durationId}
+                    onChange={handleChange}
+                    required
+                    disabled={loadingDurations}
+                  >
+                    <option value="">
+                      {loadingDurations
+                        ? "Loading durations…"
+                        : "Select placement Duration"}
+                    </option>
+                    {durations.map((d) => (
+                      <option key={d._id} value={d._id}>
+                        {durationLabel(d)} — {formatPrice(d.price)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {selectedDuration && (
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    flexWrap: "wrap",
+                    padding: "12px 16px",
+                    marginTop: 4,
+                    marginBottom: 4,
+                    borderRadius: 10,
+                    border: "1px solid rgba(45, 212, 191, 0.35)",
+                    background: "rgba(45, 212, 191, 0.08)",
+                  }}
+                >
+                  <span style={{ fontSize: 13, color: "#cbd5e1" }}>
+                    You are registering for{" "}
+                    <strong style={{ color: "#fff" }}>
+                      {durationLabel(selectedDuration)}
+                    </strong>
+                    . This is what you will be charged now.
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 700,
+                      color: "#2dd4bf",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatPrice(selectedDuration.price)}
+                  </span>
+                </div>
+              )}
+
               <div className="form-group">
                 <label className="form-label">Registration Number</label>
                 <div className="form-input-wrap">
@@ -512,15 +605,20 @@ const Register = () => {
               <div className="form-group">
                 <label className="form-label">Relationship</label>
                 <div className="form-input-wrap">
-                  <input
+                  <select
                     name="nokRelationship"
-                    type="text"
                     className="form-input"
-                    placeholder="Father"
                     value={form.nokRelationship}
                     onChange={handleChange}
                     required
-                  />
+                  >
+                    <option value="">Select relationship</option>
+                    {NOK_RELATIONSHIPS.map((rel) => (
+                      <option key={rel} value={rel}>
+                        {rel}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

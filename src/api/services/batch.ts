@@ -10,6 +10,9 @@ import type {
   ReorderBatchCurriculaPayload,
   AssignBatchQuizPayload,
   DepartmentsResponse,
+  ActivateBatchResponse,
+  BatchMutationResponse,
+  BatchDetailResponse,
 } from "../types/batch";
 
 export const getBatches = async (
@@ -24,7 +27,9 @@ export const getMyBatches = async () => {
   return response.data;
 };
 
-export const getBatchById = async (id: string) => {
+export const getBatchById = async (
+  id: string,
+): Promise<BatchDetailResponse> => {
   const response = await api.get(`/batches/${id}`);
   return response.data;
 };
@@ -42,12 +47,23 @@ export const getBatchStats = async (id: string) => {
   return response.data;
 };
 
-export const createBatch = async (payload: BatchPayload) => {
+/** 201 now returns the created batch, not just a message. */
+export const createBatch = async (
+  payload: BatchPayload,
+): Promise<BatchMutationResponse> => {
   const response = await api.post("/batches", payload);
   return response.data;
 };
 
-export const updateBatch = async ({ id, data }: UpdateBatchPayload) => {
+/**
+ * Changing `durationId`, `weeks` or `itPeriod.startDate` recomputes the end
+ * date and re-syncs every non-completed internship in the batch — the message
+ * says how many students moved.
+ */
+export const updateBatch = async ({
+  id,
+  data,
+}: UpdateBatchPayload): Promise<BatchMutationResponse> => {
   const response = await api.put(`/batches/${id}`, data);
   return response.data;
 };
@@ -60,7 +76,7 @@ export const deleteBatch = async (id: string) => {
 export const activateBatch = async ({
   id,
   activateStudents = true,
-}: ActivateBatchParams) => {
+}: ActivateBatchParams): Promise<ActivateBatchResponse> => {
   const response = await api.patch(`/batches/${id}/activate`, null, {
     params: { activateStudents },
   });
@@ -87,11 +103,19 @@ export const unassignBatchSupervisor = async (id: string) => {
 };
 
 // ─── Curriculum linking ───────────────────────────────────────────────────────
+/**
+ * `order` means "insert at this position", so the response comes back sorted,
+ * unique and gap-free — it is safe to render straight from `data.curricula`.
+ */
 export const linkBatchCurriculum = async ({
   id,
   curriculumId,
+  order,
 }: LinkBatchCurriculumPayload) => {
-  const response = await api.post(`/batches/${id}/curriculum`, { curriculumId });
+  const response = await api.post(`/batches/${id}/curriculum`, {
+    curriculumId,
+    ...(order !== undefined ? { order } : {}),
+  });
   return response.data;
 };
 

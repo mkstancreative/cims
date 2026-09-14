@@ -8,6 +8,11 @@ import type { Notification } from "../../../api/types/notifications";
 import type { TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import { formatDateTime } from "../../../helpers/utilities";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import {
+  categoryIcon,
+  categoryLabel,
+  senderName,
+} from "../../../helpers/notifications";
 
 interface NotificationTableProps {
   data: Notification[];
@@ -66,9 +71,41 @@ export default function NotificationTable({
       ),
     },
     {
+      header: "Category",
+      render: (n: Notification) => (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 12.5,
+            color: "var(--color-text-secondary)",
+          }}
+        >
+          {categoryIcon(n.category)}
+          {categoryLabel(n.category)}
+        </span>
+      ),
+    },
+    {
       header: "Title",
       render: (n: Notification) => (
-        <div style={{ fontWeight: n.isRead ? "400" : "600" }}>{n.title}</div>
+        <div style={{ fontWeight: n.isRead ? "400" : "600" }}>
+          {n.title}
+          {/* Automatic events have no sender; a batch send names the admin. */}
+          {n.sentBy ? (
+            <span
+              style={{
+                display: "block",
+                fontSize: 11.5,
+                fontWeight: 400,
+                color: "var(--color-text-muted)",
+              }}
+            >
+              from {senderName(n.sentBy)}
+            </span>
+          ) : null}
+        </div>
       ),
     },
     {

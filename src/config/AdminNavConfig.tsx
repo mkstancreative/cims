@@ -9,6 +9,8 @@ import {
   BookOpen,
   ListChecks,
   ClipboardList,
+  ClipboardCheck,
+  Clock,
   Briefcase,
   Trophy,
   Settings,
@@ -59,6 +61,11 @@ export const ADMIN_NAV = [
         icon: <ListChecks size={18} />,
         path: "/admin/quizzes",
       },
+      {
+        label: "Durations",
+        icon: <Clock size={18} />,
+        path: "/admin/durations",
+      },
     ],
   },
   {
@@ -86,6 +93,11 @@ export const ADMIN_NAV = [
         label: "Internships",
         icon: <Briefcase size={18} />,
         path: "/admin/internships",
+      },
+      {
+        label: "Quiz Sittings",
+        icon: <ClipboardCheck size={18} />,
+        path: "/admin/quiz-sittings",
       },
       {
         label: "Results",

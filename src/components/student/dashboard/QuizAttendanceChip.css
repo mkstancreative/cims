@@ -1,0 +1,30 @@
+.qac {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 16px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.qac svg {
+  flex-shrink: 0;
+}
+
+.qac--live {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.qac--present {
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+}
+
+.qac--absent {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}

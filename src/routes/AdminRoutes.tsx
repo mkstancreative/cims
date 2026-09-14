@@ -12,6 +12,9 @@ const Supervisor = lazy(() => import("../pages/Admin/Supervisor"));
 const Institutions = lazy(() => import("../pages/Admin/Institutions"));
 const Curriculum = lazy(() => import("../pages/Admin/Curriculum"));
 const Quizzes = lazy(() => import("../pages/Admin/Quizzes"));
+const Durations = lazy(() => import("../pages/Admin/Durations"));
+const QuizSittings = lazy(() => import("../pages/Shared/QuizSittings"));
+const RollCall = lazy(() => import("../pages/Shared/RollCall"));
 const Registrations = lazy(() => import("../pages/Admin/Registrations"));
 const Payments = lazy(() => import("../pages/Admin/Payments"));
 const Internships = lazy(() => import("../pages/Admin/Internships"));
@@ -58,6 +61,11 @@ export default function AdminRoutes() {
         <Route path="batches" element={<Batches />} />
         <Route path="curriculum" element={<Curriculum />} />
         <Route path="quizzes" element={<Quizzes />} />
+        <Route path="durations" element={<Durations />} />
+
+        {/* ── Quiz attendance ── */}
+        <Route path="quiz-sittings" element={<QuizSittings />} />
+        <Route path="quiz-sittings/:id" element={<RollCall />} />
 
         {/* ── People ── */}
         <Route path="students" element={<Students />} />

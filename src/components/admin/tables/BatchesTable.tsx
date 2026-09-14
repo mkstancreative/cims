@@ -1,4 +1,13 @@
-import { Edit2, Zap, Archive, Trash2, UserPlus, BookOpen, HelpCircle } from "lucide-react";
+import {
+  Edit2,
+  Zap,
+  Archive,
+  Trash2,
+  UserPlus,
+  BookOpen,
+  HelpCircle,
+  Megaphone,
+} from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import "../forms/BatchForm.css";
 import type { Batch, BatchStatus } from "../../../api/types/batch";
@@ -10,6 +19,8 @@ import {
   useArchiveBatch,
 } from "../../../hooks/useBatches";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import { durationLabel, formatPrice } from "../../../helpers/duration";
+import { fmt } from "../../../helpers/utilities";
 
 interface BatchesTableProps {
   search?: string;
@@ -21,8 +32,9 @@ interface BatchesTableProps {
   onLimitChange: (l: number) => void;
   onEdit: (batch: Batch) => void;
   onAssignSupervisor: (batch: Batch) => void;
-  onLinkCurriculum: (batch: Batch) => void;
+  onManageCurricula: (batch: Batch) => void;
   onAssignQuiz: (batch: Batch) => void;
+  onAnnounce: (batch: Batch) => void;
   onDeleteRequest: (batch: Batch) => void;
 }
 
@@ -42,8 +54,9 @@ export default function BatchesTable({
   onLimitChange,
   onEdit,
   onAssignSupervisor,
-  onLinkCurriculum,
+  onManageCurricula,
   onAssignQuiz,
+  onAnnounce,
   onDeleteRequest,
 }: BatchesTableProps) {
   const { data, isLoading } = useBatches({
@@ -78,8 +91,48 @@ export default function BatchesTable({
       render: (row) => <StatusBadge status={row.status} />,
     },
     {
+      // `batch.duration` is the priced TIER. The number of weeks lives at
+      // `batch.itPeriod.duration` — same word, different thing.
+      header: "Duration",
+      render: (row) =>
+        row.duration ? (
+          <>
+            {durationLabel(row.duration)}
+            <span
+              style={{
+                display: "block",
+                fontSize: 11.5,
+                color: "var(--color-text-muted)",
+              }}
+            >
+              {formatPrice(row.duration.price)}
+              {row.itPeriod?.duration
+                ? ` · ${row.itPeriod.duration} week(s)`
+                : ""}
+            </span>
+          </>
+        ) : (
+          // Legacy batches keep a null duration until the backfill has run.
+          <span style={{ color: "var(--color-text-muted)" }}>Not set</span>
+        ),
+    },
+    {
       header: "IT Period",
-      render: (row) => row.itPeriod?.name ?? "—",
+      render: (row) => (
+        <>
+          {row.itPeriod?.name ?? "—"}
+          <span
+            style={{
+              display: "block",
+              fontSize: 11.5,
+              color: "var(--color-text-muted)",
+            }}
+          >
+            {fmt(row.itPeriod?.startDate ?? null)} →{" "}
+            {fmt(row.itPeriod?.endDate ?? null)}
+          </span>
+        </>
+      ),
     },
     {
       header: "Supervisor",
@@ -103,15 +156,21 @@ export default function BatchesTable({
               disabled: row.status === "archived",
             },
             {
-              label: "Link Curriculum",
+              label: "Curricula",
               icon: <BookOpen size={13} />,
-              onClick: () => onLinkCurriculum(row),
+              onClick: () => onManageCurricula(row),
               disabled: row.status === "archived",
             },
             {
               label: "Assign Quiz",
               icon: <HelpCircle size={13} />,
               onClick: () => onAssignQuiz(row),
+              disabled: row.status === "archived",
+            },
+            {
+              label: "Announce",
+              icon: <Megaphone size={13} />,
+              onClick: () => onAnnounce(row),
               disabled: row.status === "archived",
             },
             {

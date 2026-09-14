@@ -8,6 +8,7 @@ import {
 } from "../../components/shared/dashboard/DashboardKit";
 import "../../components/shared/dashboard/dashboard.css";
 import { StudentMetricsGrid } from "../../components/student/dashboard/StudentMetricsGrid";
+import { QuizAttendanceChip } from "../../components/student/dashboard/QuizAttendanceChip";
 import { ProgressSection } from "../../components/student/dashboard/ProgressSection";
 import { FinalDetailsSection } from "../../components/student/dashboard/FinalDetailsSection";
 import { NotificationsSection } from "../../components/student/dashboard/NotificationsSection";
@@ -98,6 +99,8 @@ export default function DashBoardStudent() {
           </svg>
         }
       />
+
+      <QuizAttendanceChip />
 
       <div>
         <SectionHead

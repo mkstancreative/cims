@@ -3,15 +3,15 @@ import { useModal } from "../../context/ModalContext";
 import {
   useDeleteBatch,
   useAssignBatchSupervisor,
-  useLinkBatchCurriculum,
   useAssignBatchQuiz,
 } from "../../hooks/useBatches";
 import { useSupervisors } from "../../hooks/useSupervisors";
-import { useCurricula } from "../../hooks/useCurriculum";
 import { useQuizzes } from "../../hooks/useQuizzes";
 import type { Batch, BatchStatus } from "../../api/types/batch";
 import BatchForm from "../../components/admin/forms/BatchForm";
-import { Layers, UserPlus, BookOpen, HelpCircle } from "lucide-react";
+import BatchAnnouncementForm from "../../components/admin/forms/BatchAnnouncementForm";
+import ManageBatchCurriculaModal from "../../components/admin/forms/ManageBatchCurriculaModal";
+import { Layers, UserPlus, HelpCircle } from "lucide-react";
 import AddButton from "../../components/ui/AddButton/AddButton";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
@@ -95,80 +95,6 @@ function AssignSupervisorModal({
               <option key={sv._id} value={sv._id}>
                 {sv.user.firstName} {sv.user.lastName}
                 {sv.staffId ? ` (${sv.staffId})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-      </form>
-    </CustomModal>
-  );
-}
-
-// ── Link curriculum modal ─────────────────────────────────────────────────────
-function LinkCurriculumModal({
-  batch,
-  onClose,
-}: {
-  batch: Batch;
-  onClose: () => void;
-}) {
-  const [curriculumId, setCurriculumId] = useState("");
-  const { data, isLoading } = useCurricula({ limit: 100, isActive: true });
-  const { mutate: link, isPending } = useLinkBatchCurriculum();
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!curriculumId) return;
-    link({ id: batch._id, curriculumId }, { onSuccess: onClose });
-  };
-
-  return (
-    <CustomModal
-      isOpen
-      onClose={onClose}
-      title="Link Curriculum"
-      subtitle={`Link a curriculum to ${batch.name}`}
-      icon={<BookOpen size={16} />}
-      size="medium"
-      footer={
-        <>
-          <button
-            type="button"
-            className="modal-cancel"
-            onClick={onClose}
-            disabled={isPending}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            form="link-curriculum-form"
-            className="modal-submit"
-            disabled={isPending || !curriculumId}
-          >
-            {isPending ? <Spinner size={14} color="#fff" text="" /> : "Link"}
-          </button>
-        </>
-      }
-    >
-      <form id="link-curriculum-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="modal-label">
-            Curriculum <span>*</span>
-          </label>
-          <select
-            className="modal-input"
-            value={curriculumId}
-            onChange={(e) => setCurriculumId(e.target.value)}
-            required
-            disabled={isLoading}
-          >
-            <option value="">
-              {isLoading ? "Loading…" : "Select a curriculum"}
-            </option>
-            {data?.data.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
               </option>
             ))}
           </select>
@@ -373,13 +299,27 @@ export default function Batches() {
                 <AssignSupervisorModal batch={batch} onClose={closeModal} />,
               )
             }
-            onLinkCurriculum={(batch) =>
+            onManageCurricula={(batch) =>
               openModal(
-                <LinkCurriculumModal batch={batch} onClose={closeModal} />,
+                <ManageBatchCurriculaModal
+                  key={batch._id}
+                  batch={batch}
+                  onClose={closeModal}
+                />,
               )
             }
             onAssignQuiz={(batch) =>
               openModal(<AssignQuizModal batch={batch} onClose={closeModal} />)
+            }
+            onAnnounce={(batch) =>
+              openModal(
+                <BatchAnnouncementForm
+                  key={batch._id}
+                  isOpen
+                  onClose={closeModal}
+                  batch={batch}
+                />,
+              )
             }
             onDeleteRequest={setDeleteTarget}
           />

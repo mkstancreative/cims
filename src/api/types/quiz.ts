@@ -83,12 +83,33 @@ export interface MyQuizCurriculumProgress {
   percent: number;
 }
 
+/**
+ * Machine-readable lock reason. Branch on this, never on the message text.
+ *
+ * A student must clear three gates: curriculum complete, a sitting unlocked,
+ * and marked present.
+ */
+export type QuizLockCode =
+  | "CURRICULUM_INCOMPLETE"
+  | "NO_SESSION"
+  | "SESSION_NOT_UNLOCKED"
+  | "NOT_MARKED_PRESENT"
+  | "ALREADY_SUBMITTED";
+
+export interface MyQuizSessionRef {
+  _id: string;
+  sitting: number;
+  status: "open" | "unlocked" | "closed";
+}
+
 export interface MyQuizResponse {
   success: boolean;
   data: {
     quiz: StudentQuiz | { _id: string; title: string } | null;
     locked?: boolean;
+    code?: QuizLockCode;
     curriculum?: MyQuizCurriculumProgress;
+    session?: MyQuizSessionRef | null;
     message?: string;
     alreadySubmitted?: boolean;
     score?: number;
@@ -101,6 +122,14 @@ export interface SubmitQuizPayload {
     questionIndex: number;
     selectedOptionIndex: number;
   }>;
+}
+
+/** A refused submit carries the same `code` as `GET /quizzes/my`. */
+export interface SubmitQuizError {
+  success: false;
+  message: string;
+  code?: QuizLockCode;
+  data?: { curriculum?: MyQuizCurriculumProgress };
 }
 
 export interface SubmitQuizResult {

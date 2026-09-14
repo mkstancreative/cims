@@ -1,5 +1,7 @@
 // ─── Registration & Payment (Credo) Types ─────────────────────────────────────
 
+import type { DurationRef } from "./duration";
+
 export interface NextOfKin {
   name: string;
   relationship: string;
@@ -18,6 +20,8 @@ export interface RegisterPayload {
   programType: string;
   programLevel: string;
   institutionId: string;
+  /** The priced period the applicant is buying. Required — no flat fee. */
+  durationId: string;
   dateOfBirth: string;
   gender: string;
   address: string;
@@ -108,6 +112,11 @@ export interface Registration {
         };
       };
   institution?: { _id: string; name: string; code: string } | string;
+  /**
+   * The tier the student paid for. Populated on `GET /registrations/my` and
+   * the review queue; `null` on registrations that predate the feature.
+   */
+  duration?: DurationRef | null;
   type: string;
   status: RegistrationStatus | string;
   isOpen: boolean;
@@ -147,6 +156,28 @@ export interface RejectPayload {
 export interface ReEnrollPayload {
   programType: string;
   programLevel: string;
+  /** Required. Any ACTIVE duration — including one already taken. */
+  durationId: string;
+}
+
+/**
+ * `PUT /registrations/:id/enroll`.
+ *
+ * A top-level `warning` can now ride along on a `success: true` response —
+ * it means the registration predates durations and could not be checked
+ * against the batch. Show it as an advisory banner, never as an error.
+ */
+export interface EnrollResponse {
+  success: boolean;
+  message?: string;
+  warning?: string;
+  data?: Registration;
+}
+
+/** `400` body when the batch's tier is not the one the student paid for. */
+export interface EnrollDurationMismatch {
+  paidDuration?: DurationRef;
+  batchDuration?: DurationRef;
 }
 
 /** `PUT /registrations/:id/cancel` — a cancelled student may register again. */

@@ -10,11 +10,12 @@ import { useMyCurriculum } from "../../hooks/useCurriculum";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import type { Curriculum, Topic } from "../../api/types/curriculum";
 
-function TopicRow({ topic }: { topic: Topic }) {
+function TopicRow({ topic, position }: { topic: Topic; position: number }) {
   const [open, setOpen] = useState(false);
-  const subtopics = [...(topic.subtopics ?? [])].sort(
-    (a, b) => a.order - b.order,
-  );
+  // The API returns these already sorted, so render them as they come. The
+  // number the student sees is the position in the list — `order` is a
+  // zero-based sort key, not a label.
+  const subtopics = topic.subtopics ?? [];
 
   return (
     <div
@@ -50,7 +51,7 @@ function TopicRow({ topic }: { topic: Topic }) {
             minWidth: 26,
           }}
         >
-          {topic.order}.
+          {position}.
         </span>
         <span style={{ flex: 1, fontWeight: 600, fontSize: 14 }}>
           {topic.title}
@@ -108,7 +109,7 @@ function TopicRow({ topic }: { topic: Topic }) {
                       minWidth: 30,
                     }}
                   >
-                    {topic.order}.{st.order}
+                    {position}.{i + 1}
                   </span>
                   <div>
                     <div style={{ fontWeight: 500 }}>{st.title}</div>
@@ -134,9 +135,7 @@ function TopicRow({ topic }: { topic: Topic }) {
 }
 
 function CurriculumCard({ curriculum }: { curriculum: Curriculum }) {
-  const topics = [...(curriculum.topics ?? [])].sort(
-    (a, b) => a.order - b.order,
-  );
+  const topics = curriculum.topics ?? [];
   const subtopicCount = topics.reduce(
     (sum, t) => sum + (t.subtopics?.length ?? 0),
     0,
@@ -198,7 +197,7 @@ function CurriculumCard({ curriculum }: { curriculum: Curriculum }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {topics.map((t, i) => (
-          <TopicRow key={t._id ?? i} topic={t} />
+          <TopicRow key={t._id ?? i} topic={t} position={i + 1} />
         ))}
       </div>
     </div>

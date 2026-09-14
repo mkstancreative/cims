@@ -29,17 +29,24 @@ function getErrMsg(err: unknown, fallback: string) {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export const useBatches = (params?: BatchParams) => {
+/**
+ * `enabled` lets a caller that serves both admins and supervisors mount both
+ * this and `useMyBatches` and only run the one the role can actually call —
+ * `/batches` answers 403 for a supervisor.
+ */
+export const useBatches = (params?: BatchParams, enabled = true) => {
   return useQuery({
     queryKey: ["batches", params],
     queryFn: () => getBatches(params),
+    enabled,
   });
 };
 
-export const useMyBatches = () => {
+export const useMyBatches = (enabled = true) => {
   return useQuery({
     queryKey: ["batches", "supervisor"],
     queryFn: getMyBatches,
+    enabled,
   });
 };
 
@@ -73,9 +80,9 @@ export const useCreateBatch = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createBatch,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["batches"] });
-      toast.success("Batch created successfully!");
+      toast.success(data?.message ?? "Batch created successfully!");
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to create batch.")),
@@ -86,9 +93,11 @@ export const useUpdateBatch = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateBatch,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["batches"] });
-      toast.success("Batch updated successfully!");
+      // The message names how many enrolled students were re-synced when the
+      // period moved — that count is the point, so don't replace it.
+      toast.success(data?.message ?? "Batch updated successfully!");
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to update batch.")),
@@ -112,9 +121,19 @@ export const useActivateBatch = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: activateBatch,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["batches"] });
-      toast.success("Batch activated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["internships"] });
+      toast.success(data?.message ?? "Batch activated successfully!");
+
+      // Students outside their IT period are skipped rather than activated.
+      // Without this the admin sees "8 of 12" with no explanation.
+      const skipped = data?.data?.skippedOutsidePeriod ?? 0;
+      if (skipped > 0) {
+        toast.info(
+          `${data.data.newlyActivated} student(s) activated. ${skipped} were skipped — they are outside their IT period.`,
+        );
+      }
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to activate batch.")),

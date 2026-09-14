@@ -4,6 +4,7 @@ import type {
   CreateCurriculumPayload,
   UpdateCurriculumPayload,
   CurriculumParams,
+  CurriculumDetailResponse,
   MyCurriculumResponse,
 } from "../types/curriculum";
 
@@ -19,7 +20,9 @@ export const getCurricula = async (
   return response.data;
 };
 
-export const getCurriculum = async (id: string) => {
+export const getCurriculum = async (
+  id: string,
+): Promise<CurriculumDetailResponse> => {
   const response = await api.get(`/curriculum/${id}`);
   return response.data;
 };

@@ -10,6 +10,11 @@ import AssignedStudentLogBookView from "../components/supervisor/views/AssignedS
 import StudentsEvaluations from "../pages/Supervisors/StudentsEvaluations";
 import Notifications from "../pages/Shared/Notifications";
 
+// Attendance is run by admin, coordinator, or the batch's own supervisor —
+// the API scopes a supervisor's list to their own batches.
+const QuizSittings = lazy(() => import("../pages/Shared/QuizSittings"));
+const RollCall = lazy(() => import("../pages/Shared/RollCall"));
+
 export default function SupervisorRoutes() {
   return (
     <Suspense
@@ -47,6 +52,10 @@ export default function SupervisorRoutes() {
           path="students/:studentId/logbooks/:logbookId"
           element={<AssignedStudentLogBookView />}
         />
+
+        {/* Quiz attendance */}
+        <Route path="quiz-sittings" element={<QuizSittings />} />
+        <Route path="quiz-sittings/:id" element={<RollCall />} />
 
         {/* Evaluation routes */}
         <Route path="students-evaluations" element={<StudentsEvaluations />} />

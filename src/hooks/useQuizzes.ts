@@ -91,7 +91,13 @@ export const useSubmitQuiz = () => {
         toast.info(`Quiz submitted. Score: ${data.data.score}`);
       }
     },
-    onError: (err: unknown) =>
-      toast.error(getErrMsg(err, "Failed to submit quiz.")),
+    onError: (err: unknown) => {
+      toast.error(getErrMsg(err, "Failed to submit quiz."));
+      // A refused submit carries a lock `code` — the gate state has moved on
+      // (the sitting closed, they were never marked present), so refetch so
+      // the page stops offering a quiz they cannot take.
+      queryClient.invalidateQueries({ queryKey: ["quizzes", "my"] });
+      queryClient.invalidateQueries({ queryKey: ["quiz-sessions", "my"] });
+    },
   });
 };

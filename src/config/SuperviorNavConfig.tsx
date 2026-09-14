@@ -1,5 +1,6 @@
 import {
   Bell,
+  ClipboardCheck,
   LayoutDashboard,
   Users,
 } from 'lucide-react';
@@ -22,6 +23,16 @@ export const SUPERVISOR_NAV = [
         label: 'Assigned Students',
         icon: <Users size={18} />,
         path: '/supervisor/assigned-students',
+      },
+    ],
+  },
+  {
+    section: 'Assessment',
+    items: [
+      {
+        label: 'Quiz Sittings',
+        icon: <ClipboardCheck size={18} />,
+        path: '/supervisor/quiz-sittings',
       },
     ],
   },

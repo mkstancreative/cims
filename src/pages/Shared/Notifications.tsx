@@ -12,8 +12,10 @@ import {
 } from "../../hooks/useNotifications";
 import type {
   NotificationType,
+  NotificationCategory,
   Notification,
 } from "../../api/types/notifications";
+import { CATEGORY_OPTIONS } from "../../helpers/notifications";
 import NotificationTable from "../../components/admin/tables/NotificationTable";
 import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
 
@@ -22,6 +24,7 @@ interface Filters {
   limit: number;
   type: NotificationType | "";
   isRead: "true" | "false" | "";
+  category: NotificationCategory | "";
 }
 
 export default function NotificationsPage() {
@@ -31,11 +34,15 @@ export default function NotificationsPage() {
     limit: 10,
     type: "",
     isRead: "",
+    category: "",
   });
   const [deleteTarget, setDeleteTarget] = useState<Notification | null>(null);
 
-  // Fetch notifications with filters
-  const { data, isLoading } = useGetNotifications(filters.page, filters.limit);
+  // `category` is a server-side filter; `type` and `isRead` stay client-side
+  // so the existing behaviour of those two controls is unchanged.
+  const { data, isLoading } = useGetNotifications(filters.page, filters.limit, {
+    ...(filters.category ? { category: filters.category } : {}),
+  });
   const notifications = data?.data ?? [];
   const meta = {
     page: data?.page ?? 1,
@@ -64,6 +71,7 @@ export default function NotificationsPage() {
       limit: 10,
       type: "",
       isRead: "",
+      category: "",
     });
   };
 
@@ -146,6 +154,19 @@ export default function NotificationsPage() {
               setField("type", value as NotificationType | "")
             }
             name="type"
+          />
+          <SelectFilter
+            label="Category"
+            options={CATEGORY_OPTIONS}
+            value={filters.category}
+            onChange={(value) =>
+              setFilters((prev) => ({
+                ...prev,
+                category: value as NotificationCategory | "",
+                page: 1,
+              }))
+            }
+            name="category"
           />
           <SelectFilter
             label="Status"

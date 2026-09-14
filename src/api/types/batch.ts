@@ -1,5 +1,7 @@
 // ─── Batch Types (FMC Clinical Placement) ─────────────────────────────────────
 
+import type { DurationRef } from "./duration";
+
 export type BatchStatus =
   | "created"
   | "students_uploaded"
@@ -11,7 +13,14 @@ export type BatchStatus =
 export interface ITPeriod {
   name: string;
   startDate: string;
+  /** Computed server-side as `startDate + weeks`. Never sent. */
   endDate: string;
+  /**
+   * The NUMBER OF WEEKS — not the priced tier. `batch.duration` is the tier
+   * object; `batch.itPeriod.duration` is the length. Same word, two things:
+   * the weeks stayed at this path because the activation job, certificates
+   * and enrolment snapshots already read it.
+   */
   duration?: number;
 }
 
@@ -29,6 +38,11 @@ export interface BatchSupervisorRef {
 
 export interface BatchCurriculumLink {
   _id: string;
+  /**
+   * Zero-based, and guaranteed sorted, unique and gap-free `0…n-1` by every
+   * add / reorder / remove response. Render the array as it comes and number
+   * off the index — `order` is a sort key, not a label.
+   */
   order: number;
   curriculum:
     | string
@@ -44,6 +58,8 @@ export interface Batch {
   name: string;
   session: string;
   status: BatchStatus;
+  /** The priced tier. `null` on legacy batches until the backfill has run. */
+  duration?: DurationRef | null;
   itPeriod: ITPeriod;
   supervisor?: BatchSupervisorRef | null;
   quiz?: string | { _id: string; title: string } | null;
@@ -82,10 +98,15 @@ export interface BatchDetailResponse {
 export interface BatchPayload {
   name: string;
   session: string;
+  /** Required — must reference an ACTIVE duration, else the API answers 404. */
+  durationId: string;
+  /** Required — must fall inside the chosen tier's minWeeks…maxWeeks. */
+  weeks: number;
   itPeriod: {
     name: string;
-    startDate: string; // "YYYY-MM-DD"
-    endDate: string; // "YYYY-MM-DD"
+    /** "YYYY-MM-DD" — cannot be in the past (compared by day). */
+    startDate: string;
+    // endDate is deliberately absent: the API rejects it outright.
   };
 }
 
@@ -102,6 +123,25 @@ export interface ActivateBatchParams {
   activateStudents?: boolean;
 }
 
+export interface ActivateBatchResponse {
+  success: boolean;
+  message?: string;
+  data: {
+    batchStatus: BatchStatus;
+    placedBeforeActivation: number;
+    newlyActivated: number;
+    /** Students outside their IT period, skipped rather than activated. */
+    skippedOutsidePeriod: number;
+    alreadyActive: number;
+  };
+}
+
+export interface BatchMutationResponse {
+  success: boolean;
+  message?: string;
+  data: Batch;
+}
+
 export interface UpdateBatchPayload {
   id: string;
   data: Partial<BatchPayload>;
@@ -115,6 +155,11 @@ export interface AssignBatchSupervisorPayload {
 export interface LinkBatchCurriculumPayload {
   id: string;
   curriculumId: string;
+  /**
+   * INSERT AT this position, zero-based — everything from here down shifts
+   * one. Omit to append. Values past the end are clamped; negative is a 400.
+   */
+  order?: number;
 }
 
 export interface ReorderBatchCurriculaPayload {

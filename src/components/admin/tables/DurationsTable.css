@@ -1,0 +1,48 @@
+/* ── Drag-to-reorder durations ────────────────────────────────────────────── */
+.dt-wrap {
+  position: relative;
+}
+
+.dt-wrap--saving {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.dt-saving {
+  position: absolute;
+  top: -26px;
+  right: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.dt-grip {
+  display: inline-flex;
+  color: var(--color-text-muted);
+  cursor: grab;
+}
+
+.dt-grip--off {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.dt-row {
+  cursor: grab;
+}
+
+.dt-row:active {
+  cursor: grabbing;
+}
+
+.dt-row--dragging {
+  opacity: 0.45;
+}
+
+/* The drop target gets a leading rule rather than a full outline, because a
+   <tr> cannot carry a border reliably across browsers. */
+.dt-row--over td {
+  box-shadow: inset 0 2px 0 0 var(--color-accent);
+  background: var(--color-accent-muted);
+}

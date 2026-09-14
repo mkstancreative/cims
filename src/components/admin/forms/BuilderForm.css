@@ -169,3 +169,93 @@
     flex: 1 1 100%;
   }
 }
+
+/* ── Reordering (curriculum topics & subtopics) ───────────────────────────── */
+.builder-grip {
+  display: inline-flex;
+  color: var(--color-text-muted);
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.builder-card[draggable="true"] .builder-card-head {
+  cursor: grab;
+}
+
+.builder-card--dragging {
+  opacity: 0.45;
+}
+
+.builder-card--over {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 2px 0 0 var(--color-accent);
+}
+
+.builder-move {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.builder-move--push {
+  margin-left: auto;
+}
+
+.builder-move-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--color-accent-border);
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    opacity 0.15s;
+}
+
+.builder-move-btn:hover:not(:disabled) {
+  background: var(--color-accent-muted);
+}
+
+.builder-move-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Position number — the display number is the array index, never `order`,
+   which the API re-numbers from zero. */
+.builder-subnum {
+  flex-shrink: 0;
+  min-width: 30px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.builder-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.builder-warn svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@media (max-width: 640px) {
+  .builder-move {
+    order: 3;
+  }
+}

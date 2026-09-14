@@ -5,7 +5,10 @@ import {
   markAsRead,
   markAllAsRead,
   deleteNotification,
+  sendBatchAnnouncement,
+  getBatchAnnouncements,
 } from "../api/services/notifications";
+import type { NotificationParams } from "../api/types/notifications";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -14,11 +17,24 @@ function getErrMsg(err: unknown, fallback: string) {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
-export const useGetNotifications = (page: number = 1, limit: number = 5) => {
+export const useGetNotifications = (
+  page: number = 1,
+  limit: number = 5,
+  filters: Omit<NotificationParams, "page" | "limit"> = {},
+) => {
   return useQuery({
-    queryKey: ["notifications", page, limit],
-    queryFn: () => getNotifications(page, limit),
+    queryKey: ["notifications", page, limit, filters],
+    queryFn: () => getNotifications(page, limit, filters),
     retry: 1,
+  });
+};
+
+/** Sent history for one batch — one row per send, with a read count. */
+export const useBatchAnnouncements = (batchId: string) => {
+  return useQuery({
+    queryKey: ["notifications", "batch", batchId],
+    queryFn: () => getBatchAnnouncements(batchId),
+    enabled: !!batchId,
   });
 };
 
@@ -68,6 +84,26 @@ export const useDeleteNotification = () => {
     onError: (error) => {
       const msg = getErrMsg(error, "Failed to delete notification");
       toast.error(msg);
+    },
+  });
+};
+
+export const useSendBatchAnnouncement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: sendBatchAnnouncement,
+    onSuccess: (data, variables) => {
+      toast.success(
+        data.message ?? `Announcement sent to ${data.data.recipients} student(s).`,
+      );
+      queryClient.invalidateQueries({
+        queryKey: ["notifications", "batch", variables.id],
+      });
+    },
+    onError: (error) => {
+      // 400 here means nobody matched the chosen audience — the API says so.
+      toast.error(getErrMsg(error, "Failed to send the announcement"));
     },
   });
 };

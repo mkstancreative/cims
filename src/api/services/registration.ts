@@ -10,6 +10,7 @@ import type {
   RejectPayload,
   ReEnrollPayload,
   CancelRegistrationResponse,
+  EnrollResponse,
 } from "../types/registration";
 
 /**
@@ -55,7 +56,15 @@ export const getReviewQueue = async (
   return response.data;
 };
 
-export const enrollRegistration = async ({ id, batchId }: EnrollPayload) => {
+/**
+ * Enrolment is refused when the batch's duration is not the one the student
+ * paid for. A legacy registration that predates durations comes back 200 with
+ * a top-level `warning` instead — show it, don't swallow it.
+ */
+export const enrollRegistration = async ({
+  id,
+  batchId,
+}: EnrollPayload): Promise<EnrollResponse> => {
   const response = await api.put(`/registrations/${id}/enroll`, { batchId });
   return response.data;
 };

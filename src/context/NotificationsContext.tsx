@@ -151,6 +151,14 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
   }, []);
 
   // ── Poll while authenticated ────────────────────────────────────────────────
+  //
+  // This provider polls rather than holding a socket. That happens to satisfy
+  // the broadcast rule for free: a batch announcement is delivered as one
+  // emit to everyone and so carries no per-recipient `_id`, and the rule is
+  // to refetch the list rather than push the payload in — which is exactly
+  // what a poll does. If a socket is ever wired up here, an incoming payload
+  // without an `_id` must call `fetchNotifications()`, never be appended:
+  // a row with no id has nothing for "mark as read" to act on.
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) return; // Public route — skip

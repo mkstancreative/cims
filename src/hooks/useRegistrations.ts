@@ -96,9 +96,12 @@ export const useEnrollRegistration = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: enrollRegistration,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["registrations"] });
-      toast.success("Registration enrolled into batch.");
+      toast.success(data?.message ?? "Registration enrolled into batch.");
+      // `warning` rides along on a success response for registrations that
+      // predate durations — advisory, not an error.
+      if (data?.warning) toast.warn(data.warning);
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to enroll registration.")),

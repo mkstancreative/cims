@@ -9,34 +9,105 @@ import {
   Target,
   HelpCircle,
   CheckCircle,
+  Clock,
+  ClipboardCheck,
+  UserX,
 } from "lucide-react";
 import { useMyQuiz, useSubmitQuiz } from "../../hooks/useQuizzes";
 import Spinner from "../../components/ui/Spinner/Spinner";
-import type { StudentQuiz } from "../../api/types/quiz";
+import type {
+  MyQuizCurriculumProgress,
+  MyQuizSessionRef,
+  QuizLockCode,
+  StudentQuiz,
+} from "../../api/types/quiz";
 import "./MyQuiz.css";
+
+/**
+ * Copy per lock reason. A student must clear three gates: curriculum
+ * complete, a sitting unlocked, and marked present. Branching on `code`
+ * rather than message text is what makes these distinguishable — several are
+ * waiting states, not failures.
+ */
+const LOCK_STATES: Record<
+  QuizLockCode,
+  {
+    icon: React.ReactNode;
+    tone: "amber" | "teal";
+    title: string;
+    body: string;
+    showProgress: boolean;
+  }
+> = {
+  CURRICULUM_INCOMPLETE: {
+    icon: <Lock size={30} />,
+    tone: "amber",
+    title: "Quiz Locked",
+    body: "You need to complete more of your curriculum before the quiz unlocks. Keep working through your approved subtopics.",
+    showProgress: true,
+  },
+  NO_SESSION: {
+    icon: <Clock size={30} />,
+    tone: "teal",
+    title: "Waiting for Your Sitting",
+    body: "Your quiz sitting hasn't been opened yet. There is nothing for you to do — your supervisor will open it and take attendance when it is time.",
+    showProgress: false,
+  },
+  SESSION_NOT_UNLOCKED: {
+    icon: <ClipboardCheck size={30} />,
+    tone: "teal",
+    title: "Attendance Is Being Taken",
+    body: "Your sitting is open and attendance is being taken. The quiz will appear here as soon as it is unlocked.",
+    showProgress: false,
+  },
+  NOT_MARKED_PRESENT: {
+    icon: <UserX size={30} />,
+    tone: "amber",
+    title: "Not Marked Present",
+    body: "You were not marked present for this quiz sitting, so the quiz is not open to you. Speak to your supervisor if you were in the room.",
+    showProgress: false,
+  },
+  ALREADY_SUBMITTED: {
+    icon: <Award size={30} />,
+    tone: "teal",
+    title: "Already Submitted",
+    body: "You have already taken this quiz. There is one attempt per student.",
+    showProgress: false,
+  },
+};
 
 // ─── Locked state ─────────────────────────────────────────────────────────────
 function LockedCard({
+  code,
   curriculum,
+  session,
   message,
 }: {
-  curriculum?: { totalSubtopics: number; approvedSubtopics: number; percent: number };
+  code?: QuizLockCode;
+  curriculum?: MyQuizCurriculumProgress;
+  session?: MyQuizSessionRef | null;
   message?: string;
 }) {
   const percent = curriculum?.percent ?? 0;
+  // An unrecognised or absent code falls back to the curriculum copy, which is
+  // what the only lock reason used to be.
+  const state = LOCK_STATES[code ?? "CURRICULUM_INCOMPLETE"] ??
+    LOCK_STATES.CURRICULUM_INCOMPLETE;
+
   return (
     <div className="mq-center-panel">
       <div className="mq-locked-card">
-        <div className="mq-icon-wrap amber">
-          <Lock size={30} />
-        </div>
-        <h3 className="mq-card-title">Quiz Locked</h3>
-        <p className="mq-card-desc">
-          {message ||
-            "You need to complete more of your curriculum before the quiz unlocks. Keep working through your approved subtopics."}
-        </p>
+        <div className={`mq-icon-wrap ${state.tone}`}>{state.icon}</div>
+        <h3 className="mq-card-title">{state.title}</h3>
+        <p className="mq-card-desc">{message || state.body}</p>
 
-        {curriculum && (
+        {session && (
+          <p className="mq-session-chip">
+            Sitting {session.sitting} · {session.status.replace(/_/g, " ")}
+          </p>
+        )}
+
+        {state.showProgress && curriculum && (
           <div className="mq-progress-wrap">
             <div className="mq-progress-label">
               <span>Curriculum Progress</span>
@@ -280,7 +351,9 @@ export default function MyQuiz() {
         <ResultCard score={quizData.score ?? 0} passed={quizData.passed ?? false} />
       ) : quizData.locked || !quizData.quiz ? (
         <LockedCard
+          code={quizData.code}
           curriculum={quizData.curriculum}
+          session={quizData.session}
           message={quizData.message}
         />
       ) : !started ? (

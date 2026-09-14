@@ -1,32 +1,11 @@
 import React, { useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/useAuth";
 import "./NotificationCenter.css";
 import { useNotifications } from "../../../context";
 import type { Notification } from "../../../api/types/notifications";
-import {
-  Bell,
-  Check,
-  CheckCheck,
-  Trash2,
-  Info,
-  AlertTriangle,
-  XCircle,
-  CheckCircle,
-} from "lucide-react";
-
-function typeIcon(type: string) {
-  switch (type) {
-    case "success":
-      return <CheckCircle size={13} />;
-    case "error":
-      return <XCircle size={13} />;
-    case "warning":
-      return <AlertTriangle size={13} />;
-    default:
-      return <Info size={13} />;
-  }
-}
+import { Bell, Check, CheckCheck, Trash2, XCircle } from "lucide-react";
+import { categoryIcon, categoryLabel } from "../../../helpers/notifications";
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
@@ -47,18 +26,25 @@ function NotificationItem({
   notification,
   onMarkRead,
   onDelete,
+  onOpen,
 }: {
   notification: Notification;
   onMarkRead: (id: string) => void;
   onDelete: (id: string) => void;
+  onOpen: (notification: Notification) => void;
 }) {
   return (
     <div
       className={`nc-item ${!notification.isRead ? "nc-item--unread" : ""} nc-item--${notification.type}`}
-      onClick={() => !notification.isRead && onMarkRead(notification._id)}
+      onClick={() => onOpen(notification)}
     >
-      <div className={`nc-type-icon nc-type-icon--${notification.type}`}>
-        {typeIcon(notification.type)}
+      {/* The icon says what happened, not just how loud it is — the type
+          still colours it. */}
+      <div
+        className={`nc-type-icon nc-type-icon--${notification.type}`}
+        title={categoryLabel(notification.category)}
+      >
+        {categoryIcon(notification.category)}
       </div>
 
       <div className="nc-item-body">
@@ -109,6 +95,7 @@ export const NotificationCenter: React.FC<{ onClose?: () => void }> = ({
     isConnected,
   } = useNotifications();
 
+  const navigate = useNavigate();
   const { user } = useAuth();
   const rolePrefix =
     user?.role === "admin"
@@ -118,6 +105,16 @@ export const NotificationCenter: React.FC<{ onClose?: () => void }> = ({
         : "/supervisor";
 
   const listRef = useRef<HTMLDivElement>(null);
+
+  // Notifications can now carry a deep link. Mark read first so the badge is
+  // right whether or not the link takes them off this screen.
+  const openNotification = (notification: Notification) => {
+    if (!notification.isRead) handleMarkAsRead(notification._id);
+    if (notification.actionUrl) {
+      onClose?.();
+      navigate(notification.actionUrl);
+    }
+  };
 
   // Scroll to top when new notifications arrive
   useEffect(() => {
@@ -181,6 +178,7 @@ export const NotificationCenter: React.FC<{ onClose?: () => void }> = ({
             notification={n}
             onMarkRead={handleMarkAsRead}
             onDelete={handleDeleteNotification}
+            onOpen={openNotification}
           />
         ))}
       </div>
