@@ -1,7 +1,30 @@
-import { useState, type FormEvent, type ChangeEvent } from "react";
+import {
+  useState,
+  type FormEvent,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "../Login/Login.css";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CircleAlert,
+  CreditCard,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  HeartHandshake,
+  KeyRound,
+  ShieldCheck,
+  Stethoscope,
+  User,
+  UserPlus,
+} from "lucide-react";
+import AuthBrandPanel, {
+  type AuthFeature,
+} from "../../components/auth/AuthBrandPanel";
+import "./RegisterPage.css";
 import { useRegisterStudent } from "../../hooks/useRegistrations";
 import { usePublicInstitutions } from "../../hooks/useInstitutions";
 import { usePublicDurations } from "../../hooks/useDurations";
@@ -33,6 +56,71 @@ const NOK_RELATIONSHIPS = [
   "Friend",
   "Other",
 ];
+
+const features: AuthFeature[] = [
+  {
+    icon: <UserPlus size={22} />,
+    tone: "navy",
+    title: "Fill in your details",
+    desc: "Personal, academic, and next-of-kin information.",
+  },
+  {
+    icon: <CreditCard size={22} />,
+    tone: "clay",
+    title: "Pay your placement fee",
+    desc: "Secure online payment through Credo.",
+  },
+  {
+    icon: <BadgeCheck size={22} />,
+    tone: "slate",
+    title: "Get enrolled",
+    desc: "Your coordinator reviews and confirms your place.",
+  },
+];
+
+function Field({
+  id,
+  label,
+  optional,
+  full,
+  children,
+}: {
+  id: string;
+  label: string;
+  optional?: boolean;
+  full?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`auth-field${full ? " reg-full" : ""}`}>
+      <label htmlFor={id} className="auth-label">
+        {label}
+        {optional && <span className="reg-optional"> (optional)</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function Section({
+  icon,
+  title,
+  children,
+}: {
+  icon: ReactNode;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <fieldset className="reg-section">
+      <legend className="reg-section__title">
+        {icon}
+        {title}
+      </legend>
+      <div className="reg-grid">{children}</div>
+    </fieldset>
+  );
+}
 
 type FormState = Omit<RegisterPayload, "nextOfKin"> & {
   confirmPassword: string;
@@ -177,581 +265,427 @@ const Register = () => {
     });
   };
 
-  const appName = import.meta.env.VITE_APP_NAME;
-
-  const sectionTitleStyle: React.CSSProperties = {
-    gridColumn: "1 / -1",
-    fontSize: 13,
-    fontWeight: 700,
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
-    color: "#d99b7f",
-    marginTop: 8,
-    marginBottom: 2,
-  };
+  const input = "auth-input auth-input--plain";
+  const select = "auth-input auth-input--plain reg-select";
 
   return (
-    <div
-      style={{
-        background:
-          "linear-gradient(135deg, #071820 0%, #0a1d26 50%, #0f3040 100%)",
-        color: "#fff",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "40px 20px",
-      }}
-    >
-      <div
-        className="login-card-wrapper"
-        style={{ width: "100%", maxWidth: 860 }}
-      >
-        <div className="login-card" style={{ maxWidth: "860px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 20,
-            }}
-          >
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 9,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <img src="/logo.png" alt="logo" width={36} height={36} />
-            </div>
-            <span style={{ fontWeight: 700, fontSize: 16 }}>{appName}</span>
-          </div>
+    <div className="auth-page auth-page--register">
+      <AuthBrandPanel
+        headline="Join the Program."
+        accent="Enrol in Minutes."
+        lead="Create your student account, choose your placement period, and pay securely online to get enrolled."
+        features={features}
+      />
 
-          <div className="login-card-title">Create an Account</div>
-          <div className="login-card-sub">
-            Student Registration &amp; Enrollment Portal
-          </div>
+      <section className="auth-form-side">
+        <div className="auth-card reg-card">
+          <div className="auth-card__blob" aria-hidden="true" />
+
+          <div className="auth-eyebrow">Get started</div>
+          <h2 className="auth-title">Create your account</h2>
+          <p className="auth-sub reg-sub">
+            Student Registration &amp; Enrollment Portal. Fill in your details
+            to register for your clinical placement.
+          </p>
 
           {error && (
-            <div className="login-error" style={{ marginBottom: 20 }}>
+            <div className="reg-error" role="alert">
+              <CircleAlert size={18} />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "10px 24px",
-                marginBottom: 24,
-              }}
-            >
-              {/* ── Account ── */}
-              <div style={sectionTitleStyle}>Personal Details</div>
-
-              <div className="form-group">
-                <label className="form-label">First Name</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="firstName"
-                    type="text"
-                    className="form-input"
-                    placeholder="Mary"
-                    value={form.firstName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Last Name</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="lastName"
-                    type="text"
-                    className="form-input"
-                    placeholder="Johnson"
-                    value={form.lastName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Email address</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="email"
-                    type="email"
-                    className="form-input"
-                    placeholder="you@university.edu"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Phone Number</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="phone"
-                    type="tel"
-                    className="form-input"
-                    placeholder="08098765432"
-                    value={form.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Date of Birth</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="dateOfBirth"
-                    type="date"
-                    className="form-input"
-                    max={new Date().toISOString().split("T")[0]}
-                    value={form.dateOfBirth}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Gender</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="gender"
-                    className="form-input"
-                    value={form.gender}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select gender</option>
-                    {GENDERS.map((g) => (
-                      <option key={g} value={g}>
-                        {g}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">State of Origin</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="stateOfOrigin"
-                    className="form-input"
-                    value={form.stateOfOrigin}
-                    onChange={handleChange}
-                    required
-                    disabled={loadingStates}
-                  >
-                    <option value="">
-                      {loadingStates ? "Loading states…" : "Select state"}
+          <form onSubmit={handleSubmit} className="auth-form">
+            <Section icon={<User size={16} />} title="Personal Details">
+              <Field id="firstName" label="First Name">
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  className={input}
+                  placeholder="Mary"
+                  value={form.firstName}
+                  onChange={handleChange}
+                  required
+                  autoComplete="given-name"
+                />
+              </Field>
+              <Field id="lastName" label="Last Name">
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  className={input}
+                  placeholder="Johnson"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  required
+                  autoComplete="family-name"
+                />
+              </Field>
+              <Field id="email" label="Email Address">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  className={input}
+                  placeholder="you@institution.edu"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  autoComplete="email"
+                />
+              </Field>
+              <Field id="phone" label="Phone Number">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  className={input}
+                  placeholder="08098765432"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                  autoComplete="tel"
+                />
+              </Field>
+              <Field id="dateOfBirth" label="Date of Birth">
+                <input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  className={input}
+                  max={new Date().toISOString().split("T")[0]}
+                  value={form.dateOfBirth}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+              <Field id="gender" label="Gender">
+                <select
+                  id="gender"
+                  name="gender"
+                  className={`${select} reg-select--capitalize`}
+                  value={form.gender}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select gender</option>
+                  {GENDERS.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
                     </option>
-                    {(states ?? []).map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Nationality</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="nationality"
-                    type="text"
-                    className="form-input"
-                    placeholder="Nigeria"
-                    value={form.nationality}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group" style={{ gridColumn: "1 / -1" }}>
-                <label className="form-label">Residential Address</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="address"
-                    type="text"
-                    className="form-input"
-                    placeholder="123 Main Street, Owerri, Imo State"
-                    value={form.address}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* ── Academic ── */}
-              <div style={sectionTitleStyle}>Academic Details</div>
-
-              <div className="form-group">
-                <label className="form-label">Institution</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="institutionId"
-                    className="form-input"
-                    value={form.institutionId}
-                    onChange={handleChange}
-                    required
-                    disabled={loadingInstitutions}
-                  >
-                    <option value="">
-                      {loadingInstitutions
-                        ? "Loading institutions…"
-                        : "Select institution"}
+                  ))}
+                </select>
+              </Field>
+              <Field id="stateOfOrigin" label="State of Origin">
+                <select
+                  id="stateOfOrigin"
+                  name="stateOfOrigin"
+                  className={select}
+                  value={form.stateOfOrigin}
+                  onChange={handleChange}
+                  required
+                  disabled={loadingStates}
+                >
+                  <option value="">
+                    {loadingStates ? "Loading states…" : "Select state"}
+                  </option>
+                  {(states ?? []).map((s) => (
+                    <option key={s} value={s}>
+                      {s}
                     </option>
-                    {institutions.map((inst) => (
-                      <option key={inst._id} value={inst._id}>
-                        {inst.name} ({inst.code})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                  ))}
+                </select>
+              </Field>
+              <Field id="nationality" label="Nationality">
+                <input
+                  id="nationality"
+                  name="nationality"
+                  type="text"
+                  className={input}
+                  placeholder="Nigeria"
+                  value={form.nationality}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+              <Field id="address" label="Residential Address" full>
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  className={input}
+                  placeholder="123 Main Street, Owerri, Imo State"
+                  value={form.address}
+                  onChange={handleChange}
+                  required
+                  autoComplete="street-address"
+                />
+              </Field>
+            </Section>
+
+            <Section icon={<GraduationCap size={16} />} title="Academic Details">
+              <Field id="institutionId" label="Institution">
+                <select
+                  id="institutionId"
+                  name="institutionId"
+                  className={select}
+                  value={form.institutionId}
+                  onChange={handleChange}
+                  required
+                  disabled={loadingInstitutions}
+                >
+                  <option value="">
+                    {loadingInstitutions
+                      ? "Loading institutions…"
+                      : "Select institution"}
+                  </option>
+                  {institutions.map((inst) => (
+                    <option key={inst._id} value={inst._id}>
+                      {inst.name} ({inst.code})
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
               {/* The applicant is about to be charged this, so the amount is
                   spelled out before they hit pay. */}
-              <div className="form-group">
-                <label className="form-label">Placement Duration</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="durationId"
-                    className="form-input"
-                    value={form.durationId}
-                    onChange={handleChange}
-                    required
-                    disabled={loadingDurations}
-                  >
-                    <option value="">
-                      {loadingDurations
-                        ? "Loading durations…"
-                        : "Select placement Duration"}
+              <Field id="durationId" label="Placement Duration">
+                <select
+                  id="durationId"
+                  name="durationId"
+                  className={select}
+                  value={form.durationId}
+                  onChange={handleChange}
+                  required
+                  disabled={loadingDurations}
+                >
+                  <option value="">
+                    {loadingDurations
+                      ? "Loading durations…"
+                      : "Select placement duration"}
+                  </option>
+                  {durations.map((d) => (
+                    <option key={d._id} value={d._id}>
+                      {durationLabel(d)} — {formatPrice(d.price)}
                     </option>
-                    {durations.map((d) => (
-                      <option key={d._id} value={d._id}>
-                        {durationLabel(d)} — {formatPrice(d.price)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                  ))}
+                </select>
+              </Field>
 
               {selectedDuration && (
-                <div
-                  style={{
-                    gridColumn: "1 / -1",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    flexWrap: "wrap",
-                    padding: "12px 16px",
-                    marginTop: 4,
-                    marginBottom: 4,
-                    borderRadius: 10,
-                    border: "1px solid rgba(217, 155, 127, 0.35)",
-                    background: "rgba(217, 155, 127, 0.08)",
-                  }}
-                >
-                  <span style={{ fontSize: 13, color: "#cbd5e1" }}>
+                <div className="reg-price reg-full">
+                  <span>
                     You are registering for{" "}
-                    <strong style={{ color: "#fff" }}>
-                      {durationLabel(selectedDuration)}
-                    </strong>
-                    . This is what you will be charged now.
+                    <strong>{durationLabel(selectedDuration)}</strong>. This is
+                    what you will be charged now.
                   </span>
-                  <span
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: "#d99b7f",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <span className="reg-price__amount">
                     {formatPrice(selectedDuration.price)}
                   </span>
                 </div>
               )}
 
-              <div className="form-group">
-                <label className="form-label">Registration Number</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="registrationNumber"
-                    type="text"
-                    className="form-input"
-                    placeholder="2024/ENG/045"
-                    value={form.registrationNumber}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Department</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="departmentName"
-                    type="text"
-                    className="form-input"
-                    placeholder="Electrical Engineering"
-                    value={form.departmentName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Program Type</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="programType"
-                    className="form-input"
-                    value={form.programType}
-                    onChange={handleChange}
-                    required
-                  >
-                    {PROGRAM_TYPES.map((p) => (
+              <Field id="registrationNumber" label="Registration Number">
+                <input
+                  id="registrationNumber"
+                  name="registrationNumber"
+                  type="text"
+                  className={input}
+                  placeholder="2024/ENG/045"
+                  value={form.registrationNumber}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+              <Field id="departmentName" label="Department">
+                <input
+                  id="departmentName"
+                  name="departmentName"
+                  type="text"
+                  className={input}
+                  placeholder="Electrical Engineering"
+                  value={form.departmentName}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+              <Field id="programType" label="Program Type">
+                <select
+                  id="programType"
+                  name="programType"
+                  className={select}
+                  value={form.programType}
+                  onChange={handleChange}
+                  required
+                >
+                  {PROGRAM_TYPES.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field id="programLevel" label="Program Level">
+                <select
+                  id="programLevel"
+                  name="programLevel"
+                  className={select}
+                  value={form.programLevel}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select level</option>
+                  {(PROGRAM_LEVELS_BY_TYPE[form.programType] ?? []).map(
+                    (p) => (
                       <option key={p} value={p}>
                         {p}
                       </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+                    ),
+                  )}
+                </select>
+              </Field>
+              <Field
+                id="professionalRegNumber"
+                label="Professional Reg. Number"
+                optional
+              >
+                <input
+                  id="professionalRegNumber"
+                  name="professionalRegNumber"
+                  type="text"
+                  className={input}
+                  placeholder="e.g. COREN/2024/1234"
+                  value={form.professionalRegNumber}
+                  onChange={handleChange}
+                />
+              </Field>
+            </Section>
 
-              <div className="form-group">
-                <label className="form-label">Program Level</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="programLevel"
-                    className="form-input"
-                    value={form.programLevel}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select level</option>
-                    {(PROGRAM_LEVELS_BY_TYPE[form.programType] ?? []).map(
-                      (p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ),
-                    )}
-                  </select>
-                </div>
-              </div>
+            <Section icon={<HeartHandshake size={16} />} title="Next of Kin">
+              <Field id="nokName" label="Full Name">
+                <input
+                  id="nokName"
+                  name="nokName"
+                  type="text"
+                  className={input}
+                  placeholder="Mr. Johnson Senior"
+                  value={form.nokName}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+              <Field id="nokRelationship" label="Relationship">
+                <select
+                  id="nokRelationship"
+                  name="nokRelationship"
+                  className={select}
+                  value={form.nokRelationship}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select relationship</option>
+                  {NOK_RELATIONSHIPS.map((rel) => (
+                    <option key={rel} value={rel}>
+                      {rel}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field id="nokPhone" label="Phone Number">
+                <input
+                  id="nokPhone"
+                  name="nokPhone"
+                  type="tel"
+                  className={input}
+                  placeholder="08012345678"
+                  value={form.nokPhone}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+              <Field id="nokAddress" label="Address">
+                <input
+                  id="nokAddress"
+                  name="nokAddress"
+                  type="text"
+                  className={input}
+                  placeholder="123 Main Street, Owerri"
+                  value={form.nokAddress}
+                  onChange={handleChange}
+                  required
+                />
+              </Field>
+            </Section>
 
-              <div className="form-group">
-                <label className="form-label">
-                  Professional Reg. Number{" "}
-                  <span style={{ color: "#6b7280", fontWeight: 400 }}>
-                    (optional)
-                  </span>
-                </label>
-                <div className="form-input-wrap">
+            <Section icon={<KeyRound size={16} />} title="Security">
+              <Field id="password" label="Password">
+                <div className="auth-input-wrap">
                   <input
-                    name="professionalRegNumber"
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g. COREN/2024/1234"
-                    value={form.professionalRegNumber}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* ── Next of Kin ── */}
-              <div style={sectionTitleStyle}>Next of Kin</div>
-
-              <div className="form-group">
-                <label className="form-label">Full Name</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="nokName"
-                    type="text"
-                    className="form-input"
-                    placeholder="Mr. Johnson Senior"
-                    value={form.nokName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Relationship</label>
-                <div className="form-input-wrap">
-                  <select
-                    name="nokRelationship"
-                    className="form-input"
-                    value={form.nokRelationship}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select relationship</option>
-                    {NOK_RELATIONSHIPS.map((rel) => (
-                      <option key={rel} value={rel}>
-                        {rel}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Phone Number</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="nokPhone"
-                    type="tel"
-                    className="form-input"
-                    placeholder="08012345678"
-                    value={form.nokPhone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Address</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="nokAddress"
-                    type="text"
-                    className="form-input"
-                    placeholder="123 Main Street, Owerri"
-                    value={form.nokAddress}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* ── Security ── */}
-              <div style={sectionTitleStyle}>Security</div>
-
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <div className="form-input-wrap">
-                  <input
+                    id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className="form-input"
+                    className={`${input} auth-input--with-toggle`}
                     placeholder="Minimum 8 characters"
-                    style={{ paddingRight: 40 }}
                     value={form.password}
                     onChange={handleChange}
                     required
                     minLength={8}
+                    autoComplete="new-password"
                   />
-                  <span
-                    className="input-icon"
-                    style={{ cursor: "pointer" }}
+                  <button
+                    type="button"
+                    className="auth-toggle"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M1 1l22 22"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        />
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="3"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        />
-                      </svg>
-                    )}
-                  </span>
+                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                  </button>
                 </div>
-              </div>
+              </Field>
+              <Field id="confirmPassword" label="Confirm Password">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  className={input}
+                  placeholder="Repeat your password"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  autoComplete="new-password"
+                />
+              </Field>
+            </Section>
 
-              <div className="form-group">
-                <label className="form-label">Confirm Password</label>
-                <div className="form-input-wrap">
-                  <input
-                    name="confirmPassword"
-                    type={showPassword ? "text" : "password"}
-                    className="form-input"
-                    placeholder="Repeat your password"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="btn-login"
-              disabled={isPending}
-              style={{ width: "100%", display: "block", marginTop: "8px" }}
-            >
+            <button type="submit" className="auth-submit" disabled={isPending}>
               {isPending ? "Submitting…" : "Register & Proceed to Payment"}
+              {!isPending && <ArrowRight size={18} />}
             </button>
-
-            <div style={{ marginTop: 20, textAlign: "center", fontSize: 14 }}>
-              <span style={{ color: "var(--color-text-muted)" }}>
-                Already have an account?{" "}
-              </span>
-              <Link
-                to="/"
-                style={{
-                  color: "#d99b7f",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                }}
-              >
-                Sign In
-              </Link>
-            </div>
           </form>
+
+          <p className="auth-register">
+            Already have an account?{" "}
+            <Link to="/" className="auth-link">
+              Sign in
+            </Link>
+          </p>
+
+          <div className="auth-card__footer">
+            <span className="auth-secure">
+              <ShieldCheck size={15} /> Secure &amp; Confidential · Payments by
+              Credo
+            </span>
+            <Stethoscope
+              size={64}
+              strokeWidth={1.2}
+              className="auth-stethoscope"
+              aria-hidden="true"
+            />
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
