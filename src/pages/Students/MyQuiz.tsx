@@ -207,7 +207,7 @@ function ResultCard({ score, passed }: { score: number; passed: boolean }) {
   return (
     <div className="mq-center-panel">
       <div className="mq-result-card">
-        <div className={`mq-icon-wrap ${passed ? "purple" : "red"}`}>
+        <div className={`mq-icon-wrap ${passed ? "primary" : "red"}`}>
           {passed ? <Award size={32} /> : <XCircle size={32} />}
         </div>
         <h3 className="mq-result-title">

@@ -232,7 +232,7 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
                   value={qrValue}
                   size={75}
                   bgColor="transparent"
-                  fgColor="#1e3a8a"
+                  fgColor="#0f3040"
                   level="M"
                 />
                 <p className="cert-qr-label">Scan to verify</p>

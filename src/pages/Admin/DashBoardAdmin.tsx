@@ -80,7 +80,7 @@ export default function DashBoardAdmin() {
           </>
         }
         initials={initials}
-        gradient="var(--color-purple)"
+        gradient="var(--color-primary)"
       />
 
       {/* ── Students KPIs ──────────────────────────────────────────────────── */}
@@ -89,7 +89,7 @@ export default function DashBoardAdmin() {
           title="Student Overview"
           sub={`${students.total} total students · ${students.totalInternships} internships`}
           icon={<Users size={16} />}
-          color="purple"
+          color="primary"
         />
         <div
           className="db-kpi-grid db-kpi-grid--wide"
@@ -100,28 +100,28 @@ export default function DashBoardAdmin() {
             value={students.total}
             sub="All enrolments"
             icon={<Users size={18} />}
-            color="purple"
+            color="primary"
           />
           <KpiCard
             label="Internships"
             value={students.totalInternships}
             sub="Students with internship"
             icon={<Building2 size={18} />}
-            color="blue"
+            color="info"
           />
           <KpiCard
             label="Placed"
             value={students.placed}
             sub="Currently placed"
             icon={<Building2 size={18} />}
-            color="blue"
+            color="info"
           />
           <KpiCard
             label="Active IT"
             value={students.active}
             sub="Currently interning"
             icon={<TrendingUp size={18} />}
-            color="purple"
+            color="primary"
             trend={students.active > 0 ? "Active" : "None"}
             trendType={students.active > 0 ? "up" : "neutral"}
           />
@@ -130,7 +130,7 @@ export default function DashBoardAdmin() {
             value={students.completed}
             sub="IT fully completed"
             icon={<CheckCircle2 size={18} />}
-            color="violet"
+            color="secondary"
             trend={`${placementRate}% placement rate`}
             trendType={placementRate >= 60 ? "up" : "warn"}
           />
@@ -141,7 +141,7 @@ export default function DashBoardAdmin() {
             icon={<TrendingUp size={18} />}
             color={
               placementRate >= 70
-                ? "violet"
+                ? "secondary"
                 : placementRate >= 40
                   ? "amber"
                   : "rose"
@@ -152,7 +152,7 @@ export default function DashBoardAdmin() {
           <div className="db-ring-card__ring">
             <ProgressRing
               pct={logbookApprovalRate}
-              color={logbookApprovalRate >= 80 ? "#6366f1" : "#f59e0b"}
+              color={logbookApprovalRate >= 80 ? "var(--color-primary)" : "#f59e0b"}
             />
             <div className="db-ring-card__inner">
               <span className="db-ring-card__pct">{logbookApprovalRate}%</span>
@@ -166,7 +166,7 @@ export default function DashBoardAdmin() {
                 <span className="db-ring-card__row-lbl">Approved</span>
                 <span
                   className="db-ring-card__row-val"
-                  style={{ color: "#6366f1" }}
+                  style={{ color: "var(--color-primary)" }}
                 >
                   {logbooks.approved}
                 </span>
@@ -216,7 +216,7 @@ export default function DashBoardAdmin() {
           title="Supervisor Summary"
           sub="Registered supervisors"
           icon={<UserCheck size={16} />}
-          iconColor="purple"
+          iconColor="primary"
           rows={[{ label: "Total Supervisors", value: supervisors.total }]}
         />
         <InfoPanel
@@ -233,7 +233,7 @@ export default function DashBoardAdmin() {
                   style={{
                     color:
                       batches.active > 0
-                        ? "#6366f1"
+                        ? "var(--color-primary)"
                         : "var(--color-text-muted)",
                     fontWeight: 600,
                   }}
@@ -252,7 +252,7 @@ export default function DashBoardAdmin() {
           title="Logbook Summary"
           sub="Approval pipeline"
           icon={<BookOpen size={16} />}
-          iconColor="violet"
+          iconColor="secondary"
           rows={[
             {
               label: "Pending Review",
@@ -273,7 +273,7 @@ export default function DashBoardAdmin() {
             {
               label: "Approved",
               value: (
-                <span style={{ color: "#6366f1", fontWeight: 600 }}>
+                <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>
                   {logbooks.approved}
                 </span>
               ),

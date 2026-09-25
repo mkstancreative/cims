@@ -52,15 +52,15 @@ export default function NotificationTable({
             textTransform: "capitalize",
             backgroundColor:
               {
-                info: "#dbeafe",
-                success: "#e0e7ff",
+                info: "var(--color-slate-muted)",
+                success: "var(--color-primary-muted)",
                 warning: "#fef3c7",
                 error: "#fee2e2",
               }[n.type] || "#f3f4f6",
             color:
               {
-                info: "#0369a1",
-                success: "#4338ca",
+                info: "var(--color-slate)",
+                success: "var(--color-primary-hover)",
                 warning: "#b45309",
                 error: "#b91c1c",
               }[n.type] || "#374151",

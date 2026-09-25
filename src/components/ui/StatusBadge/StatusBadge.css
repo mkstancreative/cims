@@ -11,8 +11,8 @@
 
 /* Student */
 .status-badge.active {
-  background: #eef2ff;
-  color: #4f46e5;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.inactive {
@@ -31,8 +31,8 @@
 }
 
 .status-badge.present {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.absent {
@@ -41,13 +41,13 @@
 }
 
 .status-badge.seeking_placement {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.placed {
   background: #ffebee;
-  color: #4f46e5;
+  color: var(--color-primary-hover);
 }
 
 .status-badge.pending {
@@ -57,8 +57,8 @@
 
 /* Enrollment */
 .status-badge.enrolled {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.rejected {
@@ -68,13 +68,13 @@
 
 /* Academic */
 .status-badge.passed {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.successful {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.failed {
@@ -94,19 +94,19 @@
 
 /* Admission */
 .status-badge.applied {
-  background: #e8eaf6;
-  color: #3949ab;
+  background: var(--color-primary-muted);
+  color: var(--color-secondary);
 }
 
 .status-badge.admitted {
-  background: #f5f3ff;
-  color: #6d28d9;
+  background: var(--color-primary-muted);
+  color: var(--color-secondary);
 }
 
 /* Transactions / IT Status */
 .status-badge.uploaded {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: var(--color-slate-muted);
+  color: var(--color-slate);
 }
 
 .status-badge.pending_verification {
@@ -115,18 +115,18 @@
 }
 
 .status-badge.created {
-  background: #f3e5f5;
-  color: #7b1fa2;
+  background: var(--color-primary-muted);
+  color: var(--color-secondary);
 }
 
 .status-badge.completed {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.approved {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.failed {
@@ -135,14 +135,14 @@
 }
 
 .status-badge.success {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 /* Admins / Lecturers */
 .status-badge.enabled {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.disabled {
@@ -156,8 +156,8 @@
 }
 
 .status-badge.open {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 
 .status-badge.closed {
@@ -170,20 +170,20 @@
   color: #f9a825;
 }
 .status-badge.students_uploaded {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 .status-badge.verified {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 .status-badge.pending_verification {
   background: #fff8e1;
   color: #f9a825;
 }
 .status-badge.read {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 .status-badge.unread {
   background: #fff8e1;
@@ -200,8 +200,8 @@
   color: #ef6c00;
 }
 .status-badge.refunded {
-  background: #f5f3ff;
-  color: #6d28d9;
+  background: var(--color-primary-muted);
+  color: var(--color-secondary);
 }
 .status-badge.cancelled {
   background: #fdecea;

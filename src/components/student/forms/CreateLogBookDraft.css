@@ -117,8 +117,8 @@
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 20px;
-  background: rgba(99, 102, 241, 0.12);
-  color: #818cf8;
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary);
   flex-shrink: 0;
   text-transform: capitalize;
 }
@@ -145,8 +145,8 @@
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 20px;
-  background: rgba(99, 102, 241, 0.12);
-  color: #6366f1;
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary);
 }
 
 .lb-remove-btn {

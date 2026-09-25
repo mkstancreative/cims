@@ -40,8 +40,8 @@
 }
 
 .date-input-field:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+  border-color: var(--color-slate);
+  box-shadow: 0 0 0 4px rgba(var(--color-slate-rgb), 0.08);
   background: #fff;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .date-input-field:focus + .date-input-icon {
-  color: #3b82f6;
+  color: var(--color-slate);
 }
 
 /* Custom calendar picker style for modern browsers */

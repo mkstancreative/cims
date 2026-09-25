@@ -39,7 +39,7 @@ function ProgressRing({
   const circ = 2 * Math.PI * r;
   const offset = circ - (Math.min(percent, 100) / 100) * circ;
   const color =
-    percent >= 75 ? "#6366f1" : percent >= 40 ? "#f59e0b" : "#ef4444";
+    percent >= 75 ? "var(--color-primary)" : percent >= 40 ? "#f59e0b" : "#ef4444";
 
   return (
     <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
@@ -96,7 +96,10 @@ function StatCard({
 }) {
   return (
     <div className="sp-stat" style={{ borderTop: `3px solid ${color}` }}>
-      <div className="sp-stat-icon" style={{ background: `${color}18`, color }}>
+      <div className="sp-stat-icon" style={{
+          background: `color-mix(in srgb, ${color} 9%, transparent)`,
+          color,
+        }}>
         {icon}
       </div>
       <div>
@@ -258,7 +261,7 @@ export default function StudentProgress() {
           label="Weeks Completed"
           value={`${weeksCompleted} / ${totalWeeks}`}
           icon={<Clock size={18} />}
-          color="#3b82f6"
+          color="var(--color-slate)"
         />
         <StatCard
           label="Days Remaining"
@@ -270,13 +273,13 @@ export default function StudentProgress() {
           label="Start Date"
           value={safeDate(progress?.startDate)}
           icon={<CalendarDays size={18} />}
-          color="#8b5cf6"
+          color="var(--color-secondary)"
         />
         <StatCard
           label="End Date"
           value={safeDate(progress?.endDate)}
           icon={<CalendarDays size={18} />}
-          color="#ec4899"
+          color="var(--color-highlight)"
         />
       </div>
 
@@ -296,7 +299,7 @@ export default function StudentProgress() {
                     alignItems: "center",
                     gap: 5,
                     fontSize: 12,
-                    color: "#6366f1",
+                    color: "var(--color-primary)",
                     fontWeight: 600,
                   }}
                 >
@@ -371,7 +374,7 @@ export default function StudentProgress() {
         <div className="sv-section-header">
           <span
             className="sv-section-icon"
-            style={{ background: "rgba(59,130,246,0.12)", color: "#3b82f6" }}
+            style={{ background: "rgba(var(--color-slate-rgb), 0.12)", color: "var(--color-slate)" }}
           >
             <CalendarDays size={15} />
           </span>
@@ -399,7 +402,7 @@ export default function StudentProgress() {
                 display: "inline-block",
                 width: 10,
                 height: 10,
-                background: "#6366f1",
+                background: "var(--color-primary)",
                 borderRadius: 2,
                 marginRight: 4,
               }}

@@ -44,10 +44,10 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
     variant === "danger"
       ? "#ef4444"
       : variant === "success"
-        ? "#6366f1"
+        ? "var(--color-primary)"
         : variant === "info"
-          ? "#3b82f6"
-          : "#3b82f6";
+          ? "var(--color-slate)"
+          : "var(--color-slate)";
 
   return (
     <CustomModal
@@ -59,7 +59,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
       <div style={{ textAlign: "center", padding: "10px 0" }}>
         <div
           style={{
-            background: `${iconColor}15`,
+            background: `color-mix(in srgb, ${iconColor} 8%, transparent)`,
             width: "56px",
             height: "56px",
             borderRadius: "50%",
@@ -160,7 +160,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
                 transition: "border-color 0.2s",
                 resize: "vertical",
               }}
-              onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+              onFocus={(e) => (e.target.style.borderColor = "var(--color-slate)")}
               onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
             />
           </div>

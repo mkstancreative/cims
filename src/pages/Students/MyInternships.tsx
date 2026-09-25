@@ -67,13 +67,13 @@ export default function MyInternships() {
                 gap: 3,
                 fontSize: 11,
                 fontWeight: 700,
-                color: "#6366f1",
-                background: "rgba(99,102,241,.12)",
+                color: "var(--color-primary)",
+                background: "rgba(var(--color-primary-rgb), .12)",
                 padding: "2px 7px",
                 borderRadius: 20,
               }}
             >
-              <Star size={10} fill="#6366f1" /> Current
+              <Star size={10} fill="var(--color-primary)" /> Current
             </span>
           )}
         </span>

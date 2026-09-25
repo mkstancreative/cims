@@ -690,7 +690,7 @@
 .dash-btn--primary {
   background: var(--gradient-brand);
   color: var(--color-text-primary);
-  /* box-shadow: 0 4px 16px rgba(129, 140, 248, 0.3); */
+  /* box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3); */
 }
 .dash-btn--primary:hover {
   filter: brightness(1.1);

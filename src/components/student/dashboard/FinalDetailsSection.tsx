@@ -106,8 +106,8 @@ export const FinalDetailsSection: React.FC<FinalDetailsSectionProps> = ({
     <div className="db-panels">
       <Panel
         icon={<Briefcase size={16} />}
-        iconBg="rgba(59, 130, 246, 0.1)"
-        iconColor="#3b82f6"
+        iconBg="rgba(var(--color-slate-rgb), 0.1)"
+        iconColor="var(--color-slate)"
         title="Placement & Rotation Details"
         subtitle={batchLabel}
       >

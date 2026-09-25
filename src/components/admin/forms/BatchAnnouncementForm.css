@@ -48,12 +48,12 @@
 }
 
 .ba-type--info {
-  background: #dbeafe;
-  color: #0369a1;
+  background: var(--color-slate-muted);
+  color: var(--color-slate);
 }
 .ba-type--success {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: var(--color-primary-muted);
+  color: var(--color-primary-hover);
 }
 .ba-type--warning {
   background: #fef3c7;

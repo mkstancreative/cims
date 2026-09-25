@@ -27,7 +27,7 @@
 
 .section-icon {
   background: #f1f5f9;
-  color: #1a3a5f;
+  color: #0f3040;
   padding: 8px;
   border-radius: 8px;
   display: flex;
@@ -77,7 +77,7 @@
 }
 
 .doc-card:hover {
-  border-color: #1a3a5f;
+  border-color: #0f3040;
   background: #fff;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   transform: translateY(-2px);
@@ -136,12 +136,12 @@
 }
 
 .cert-action-approve {
-  background: #6366f1;
+  background: #0f3040;
   color: #fff;
 }
 
 .cert-action-approve:hover:not(:disabled) {
-  background: #4f46e5;
+  background: #0a2330;
 }
 
 .cert-action-reject {

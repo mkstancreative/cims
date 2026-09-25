@@ -10,8 +10,8 @@
   background-color: #ede8df;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse 80% 60% at 15% 0%, #e0e7ff 0%, transparent 55%),
-    radial-gradient(ellipse 70% 50% at 90% 100%, #e5dff5 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 15% 0%, #f3e6df 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 100%, #f3e6df 0%, transparent 55%),
     linear-gradient(160deg, #fdfaf6 0%, #ede8df 40%, #e5ded3 70%, #f0e9de 100%);
   font-family: "Inter", system-ui, sans-serif;
   padding: 40px 20px 80px;
@@ -40,24 +40,24 @@
   pointer-events: none;
   z-index: 0;
 }
-.vc-glow--purple {
+.vc-glow--primary {
   width: 500px;
   height: 500px;
   background: radial-gradient(
     circle,
-    rgba(99, 102, 241, 0.08) 0%,
+    rgba(15, 48, 64, 0.08) 0%,
     transparent 70%
   );
   top: -80px;
   left: -80px;
   animation: vc-drift 20s infinite alternate ease-in-out;
 }
-.vc-glow--fuchsia {
+.vc-glow--secondary {
   width: 550px;
   height: 550px;
   background: radial-gradient(
     circle,
-    rgba(192, 38, 211, 0.06) 0%,
+    rgba(165, 111, 99, 0.06) 0%,
     transparent 70%
   );
   bottom: -100px;
@@ -124,17 +124,17 @@
 
 .vc-logo-img {
   border-radius: 50%;
-  border: 2px solid rgba(99, 102, 241, 0.4);
+  border: 2px solid rgba(15, 48, 64, 0.4);
   padding: 2px;
   animation: vc-logo-pulse 4s ease-in-out infinite;
 }
 @keyframes vc-logo-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 0 rgba(15, 48, 64, 0.3);
   }
   50% {
-    box-shadow: 0 0 0 7px rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 7px rgba(15, 48, 64, 0);
   }
 }
 
@@ -176,9 +176,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  color: #4f46e5;
+  background: rgba(15, 48, 64, 0.1);
+  border: 1px solid rgba(15, 48, 64, 0.25);
+  color: #0a2330;
   padding: 8px 18px;
   border-radius: 100px;
   font-size: 13px;
@@ -236,7 +236,7 @@
   font-family: "JetBrains Mono", "Courier New", monospace;
   font-size: 17px;
   font-weight: 700;
-  color: #6366f1;
+  color: #0f3040;
   letter-spacing: 0.04em;
   word-break: break-all;
 }
@@ -258,7 +258,7 @@
   transition: color 0.2s;
 }
 .vc-hero-link:hover {
-  color: #6366f1;
+  color: #0f3040;
 }
 
 /* ── Right Card ─────────────────────────────────────────────── */
@@ -275,8 +275,8 @@
   border-radius: 30px;
   background: linear-gradient(
     135deg,
-    rgba(99, 102, 241, 0.35) 0%,
-    rgba(192, 38, 211, 0.15) 50%,
+    rgba(15, 48, 64, 0.35) 0%,
+    rgba(165, 111, 99, 0.15) 50%,
     transparent 100%
   );
   z-index: -1;
@@ -292,7 +292,7 @@
   right: 12px;
   height: 100%;
   border-radius: 28px;
-  background: linear-gradient(180deg, #e0e7ff 0%, #e0e7ff 100%);
+  background: linear-gradient(180deg, #f3e6df 0%, #f3e6df 100%);
   z-index: -2;
   opacity: 0.6;
 }
@@ -313,8 +313,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #6366f1;
-  border-bottom: 1px solid #e0e7ff;
+  background-color: #0f3040;
+  border-bottom: 1px solid #f3e6df;
   padding: 18px 28px;
   font-size: 14px;
   font-weight: 700;
@@ -351,15 +351,15 @@
   flex-shrink: 0;
   width: 34px;
   height: 34px;
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
+  background: #f3e6df;
+  border: 1px solid #f3e6df;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   margin-top: 1px;
-  background-color: #6366f1;
+  background-color: #0f3040;
 }
 
 .vc-detail-body {
@@ -401,7 +401,7 @@
   font-weight: 500;
 }
 .vc-verified-stamp svg {
-  color: #6366f1;
+  color: #0f3040;
 }
 
 /* ── Loading ─────────────────────────────────────────────────── */
@@ -426,15 +426,15 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
+  background: #f3e6df;
+  border: 1px solid #f3e6df;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .vc-spin-icon {
-  color: #6366f1;
+  color: #0f3040;
   animation: vc-spin 1s linear infinite;
 }
 @keyframes vc-spin {

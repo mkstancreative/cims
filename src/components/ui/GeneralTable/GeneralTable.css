@@ -113,7 +113,7 @@
 }
 
 .general-table tbody tr.row-selected {
-  background: rgba(99, 102, 241, 0.05);
+  background: rgba(var(--color-primary-rgb), 0.05);
 }
 
 /* ─────────────────────────────────────────

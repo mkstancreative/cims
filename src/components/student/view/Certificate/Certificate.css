@@ -11,7 +11,7 @@
     radial-gradient(
       circle at 50% 50%,
       rgba(255, 255, 255, 0.8) 0%,
-      rgba(240, 245, 255, 0.4) 100%
+      rgba(243, 230, 223, 0.4) 100%
     ),
     url("https://www.transparenttextures.com/patterns/parchment.png");
   background-size: cover;
@@ -48,7 +48,7 @@
   margin-bottom: 25px;
   padding: 15px 0;
   text-align: center;
-  color: #1e3a8a;
+  color: #0f3040;
   min-height: 140px;
 }
 
@@ -84,7 +84,7 @@
   width: 100%;
   font-size: 30px; /* Even bolder */
   font-weight: 800;
-  color: #1e3a8a;
+  color: #0f3040;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -104,8 +104,8 @@
   font-size: 19px;
   font-weight: 800;
   margin: 12px auto 0;
-  color: #1e40af;
-  border-top: 1px solid rgba(30, 58, 138, 0.2);
+  color: #464858;
+  border-top: 1px solid rgba(15, 48, 64, 0.2);
   width: fit-content;
   padding: 8px 30px 0;
 }
@@ -134,7 +134,7 @@
   text-align: center;
   font-size: 28px;
   font-weight: 900;
-  color: #1e3a8a;
+  color: #0f3040;
   margin: 10px 0 5px;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -257,12 +257,12 @@
 }
 
 .cert-sig-line {
-  border-top: 1.5px solid #1e3a8a;
+  border-top: 1.5px solid #0f3040;
   margin-bottom: 5px;
 }
 
 .cert-sig-dotted {
-  border-top: 1.5px dashed #1e3a8a;
+  border-top: 1.5px dashed #0f3040;
   margin-bottom: 8px;
 }
 
@@ -270,7 +270,7 @@
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  color: #1e3a8a;
+  color: #0f3040;
   line-height: 1.2;
 }
 

@@ -50,8 +50,8 @@ export default function ForgotPassword({
               style={{
                 width: 48,
                 height: 48,
-                background: "rgba(99,102,241,0.1)",
-                color: "#6366f1",
+                background: "rgba(var(--color-primary-rgb), 0.1)",
+                color: "var(--color-primary)",
                 borderRadius: "50%",
                 display: "flex",
                 alignItems: "center",
@@ -100,7 +100,7 @@ export default function ForgotPassword({
               type="submit"
               className="submit-button"
               disabled={isPending || !email}
-              style={{ marginTop: 24, background: "#818cf8", color: "#000"}}
+              style={{ marginTop: 24, background: "var(--color-primary)", color: "var(--color-on-primary)" }}
             >
               {isPending ? "Sending..." : "Send Reset Link"}
             </button>

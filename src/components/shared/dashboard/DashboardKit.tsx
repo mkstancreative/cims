@@ -3,19 +3,19 @@ import "./dashboard.css";
 
 // ── Colour Presets ──────────────────────────────────────────────────────────
 export type KpiColor =
-  | "purple"
-  | "violet"
+  | "primary"
+  | "secondary"
   | "amber"
-  | "blue"
+  | "info"
   | "rose"
   | "slate";
 
 const COLOR_MAP: Record<KpiColor, { bg: string; icon: string; bar: string }> = {
-  purple: { bg: "rgba(99,102,241,.12)", icon: "#6366f1", bar: "#6366f1" },
+  primary: { bg: "rgba(var(--color-primary-rgb), .12)", icon: "var(--color-primary)", bar: "var(--color-primary)" },
   amber: { bg: "rgba(245,158,11,.12)", icon: "#d97706", bar: "#f59e0b" },
-  blue: { bg: "rgba(59,130,246,.12)", icon: "#3b82f6", bar: "#3b82f6" },
+  info: { bg: "rgba(var(--color-slate-rgb), .12)", icon: "var(--color-slate)", bar: "var(--color-slate)" },
   rose: { bg: "rgba(244,63,94,.12)", icon: "#f43f5e", bar: "#f43f5e" },
-  violet: { bg: "rgba(139,92,246,.12)", icon: "#8b5cf6", bar: "#8b5cf6" },
+  secondary: { bg: "rgba(var(--color-secondary-rgb), .12)", icon: "var(--color-secondary)", bar: "var(--color-secondary)" },
   slate: { bg: "rgba(100,116,139,.12)", icon: "#64748b", bar: "#94a3b8" },
 };
 
@@ -37,13 +37,13 @@ export function KpiCard({
   value,
   sub,
   icon,
-  color = "purple",
+  color = "primary",
   trend,
   trendType = "neutral",
   progress,
   className = "",
 }: KpiCardProps) {
-  const c = COLOR_MAP[color] ?? COLOR_MAP["purple"];
+  const c = COLOR_MAP[color] ?? COLOR_MAP["primary"];
   return (
     <div className={`db-kpi ${className}`}>
       <div className="db-kpi__accent-bar" style={{ background: c.bar }} />
@@ -87,7 +87,7 @@ interface ProgressRingProps {
 
 export function ProgressRing({
   pct,
-  color = "#6366f1",
+  color = "var(--color-primary)",
   size = 108,
   stroke = 9,
 }: ProgressRingProps) {
@@ -144,7 +144,7 @@ export function InfoPanel({
   title,
   sub,
   icon,
-  iconColor = "purple",
+  iconColor = "primary",
   rows,
 }: InfoPanelProps) {
   const c = COLOR_MAP[iconColor];
@@ -195,7 +195,7 @@ export function SectionHead({
   title,
   sub,
   icon,
-  color = "purple",
+  color = "primary",
 }: SectionHeadProps) {
   const c = COLOR_MAP[color];
   return (

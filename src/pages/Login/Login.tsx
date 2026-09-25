@@ -41,7 +41,7 @@ const ApexULanding = () => {
             width="7"
             height="5"
             rx="1"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
           />
           <rect
@@ -50,7 +50,7 @@ const ApexULanding = () => {
             width="7"
             height="5"
             rx="1"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
           />
           <rect
@@ -59,12 +59,12 @@ const ApexULanding = () => {
             width="8"
             height="12"
             rx="1"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
           />
           <path
             d="M3 18h18"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinecap="round"
           />
@@ -76,11 +76,11 @@ const ApexULanding = () => {
     {
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="9" cy="7" r="3" stroke="#818cf8" strokeWidth="1.5" />
-          <circle cx="15" cy="7" r="3" stroke="#818cf8" strokeWidth="1.5" />
+          <circle cx="9" cy="7" r="3" stroke="#d99b7f" strokeWidth="1.5" />
+          <circle cx="15" cy="7" r="3" stroke="#d99b7f" strokeWidth="1.5" />
           <path
             d="M3 19c0-3.314 2.686-6 6-6h6c3.314 0 6 2.686 6 6"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinecap="round"
           />
@@ -94,7 +94,7 @@ const ApexULanding = () => {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path
             d="M12 3l2.5 5.5L21 9.5l-4.5 4.5 1 6.5L12 17.5 6.5 20.5l1-6.5L3 9.5l6.5-1L12 3z"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinejoin="round"
           />
@@ -106,10 +106,10 @@ const ApexULanding = () => {
     {
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="#818cf8" strokeWidth="1.5" />
+          <circle cx="12" cy="12" r="9" stroke="#d99b7f" strokeWidth="1.5" />
           <path
             d="M2 12h4M18 12h4M12 2v4M12 18v4"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinecap="round"
           />
@@ -123,14 +123,14 @@ const ApexULanding = () => {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path
             d="M12 2l2 4 4.5.5-3.25 3.25.75 4.5L12 12l-4 2.25.75-4.5L5.5 6.5 10 6z"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinejoin="round"
           />
-          <circle cx="17" cy="17" r="4" stroke="#818cf8" strokeWidth="1.5" />
+          <circle cx="17" cy="17" r="4" stroke="#d99b7f" strokeWidth="1.5" />
           <path
             d="M15.5 17l1 1 2-2"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -149,12 +149,12 @@ const ApexULanding = () => {
             width="14"
             height="20"
             rx="2"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
           />
           <path
             d="M9 6h6M9 10h6M9 14h4"
-            stroke="#818cf8"
+            stroke="#d99b7f"
             strokeWidth="1.5"
             strokeLinecap="round"
           />
@@ -178,7 +178,7 @@ const ApexULanding = () => {
       style={{
         fontFamily: "'Segoe UI', system-ui, sans-serif",
         background:
-          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1e1b4b 100%)",
+          "linear-gradient(135deg, #071820 0%, #0a1d26 50%, #0f3040 100%)",
         color: "#fff",
         minHeight: "100vh",
         margin: "0 auto",
@@ -187,7 +187,7 @@ const ApexULanding = () => {
       <div
         style={{
           background:
-            "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1e1b4b 100%)",
+            "linear-gradient(135deg, #071820 0%, #0a1d26 50%, #0f3040 100%)",
         }}
       >
         {/* HERO */}
@@ -228,10 +228,10 @@ const ApexULanding = () => {
             <div className="avatar-group">
               <div className="avatar-stack">
                 {[
-                  { initials: "AO", bg: "#7c3aed" },
-                  { initials: "CE", bg: "#2563eb" },
-                  { initials: "BU", bg: "#dc2626" },
-                  { initials: "FK", bg: "#4f46e5" },
+                  { initials: "AO", bg: "#a56f63" },
+                  { initials: "CE", bg: "#464858" },
+                  { initials: "BU", bg: "#0f3040" },
+                  { initials: "FK", bg: "#d99b7f" },
                 ].map((av, i) => (
                   <div
                     key={i}
@@ -425,7 +425,7 @@ const ApexULanding = () => {
                     style={{
                       background: "none",
                       border: "none",
-                      color: "var(--color-accent)",
+                      color: "#d99b7f",
                       fontWeight: 600,
                       cursor: "pointer",
                       padding: 0,
@@ -527,13 +527,13 @@ const ApexULanding = () => {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M22 11.08V12a10 10 0 11-5.93-9.14"
-                    stroke="var(--color-accent)"
+                    stroke="#d99b7f"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
                     d="M22 4L12 14.01l-3-3"
-                    stroke="var(--color-accent)"
+                    stroke="#d99b7f"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"

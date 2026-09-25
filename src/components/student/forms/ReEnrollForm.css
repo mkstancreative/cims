@@ -13,7 +13,7 @@
   gap: 14px;
   padding: 14px 16px;
   background: var(--gradient-brand-soft);
-  border: 1px solid rgba(99, 102, 241, 0.18);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.18);
   border-radius: 10px;
   margin-bottom: 22px;
 }
@@ -26,8 +26,8 @@
   height: 36px;
   min-width: 36px;
   border-radius: 8px;
-  background: rgba(99, 102, 241, 0.14);
-  color: #818cf8;
+  background: rgba(var(--color-primary-rgb), 0.14);
+  color: var(--color-primary);
 }
 
 .re-banner-text {
@@ -94,7 +94,7 @@
 
 .re-input:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
   background: var(--color-bg-primary);
 }
 
@@ -164,7 +164,7 @@
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.35);
   transition:
     transform 0.15s,
     box-shadow 0.15s,
@@ -173,7 +173,7 @@
 
 .re-btn-submit:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 4px 14px rgba(var(--color-primary-rgb), 0.45);
 }
 
 .re-btn-submit:active:not(:disabled) {

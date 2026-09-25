@@ -161,8 +161,8 @@ function CurriculumCard({ curriculum }: { curriculum: Curriculum }) {
       >
         <div
           style={{
-            background: "rgba(99,102,241,.12)",
-            color: "#6366f1",
+            background: "rgba(var(--color-primary-rgb), .12)",
+            color: "var(--color-primary)",
             padding: 10,
             borderRadius: 10,
           }}
@@ -212,7 +212,7 @@ export default function MyCurriculum() {
     <div className="page-container">
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon purple">
+          <div className="page-icon">
             <BookMarked size={20} />
           </div>
           <div>

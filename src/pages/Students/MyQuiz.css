@@ -112,7 +112,7 @@
 }
 
 .mq-intro-instr-list li svg {
-  color: #6366f1;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
@@ -172,9 +172,9 @@
   color: #f59e0b;
 }
 
-.mq-icon-wrap.purple {
-  background: rgba(99, 102, 241, 0.12);
-  color: #6366f1;
+.mq-icon-wrap.primary {
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary);
 }
 
 .mq-icon-wrap.red {
@@ -269,7 +269,7 @@
 }
 
 .mq-result-score.passed {
-  color: #6366f1;
+  color: var(--color-primary);
 }
 
 .mq-result-score.failed {
@@ -282,7 +282,7 @@
 }
 
 .mq-result-verdict.passed {
-  color: #6366f1;
+  color: var(--color-primary);
 }
 
 .mq-result-verdict.failed {

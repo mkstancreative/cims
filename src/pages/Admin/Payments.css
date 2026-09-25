@@ -59,8 +59,8 @@
 
 /* Success status */
 .payments-chip--success.is-active {
-  background: #6366f1;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
 /* Pending status */
@@ -85,8 +85,8 @@
 /* Reversed & Refunded status */
 .payments-chip--reversed.is-active,
 .payments-chip--refunded.is-active {
-  background: #3b82f6;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: var(--color-slate);
+  box-shadow: 0 4px 12px rgba(var(--color-slate-rgb), 0.3);
 }
 
 .payments-chip:focus,

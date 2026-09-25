@@ -104,7 +104,7 @@ export default function MyEvaluation() {
     <div className="page-container">
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon purple">
+          <div className="page-icon">
             <ClipboardCheck size={20} />
           </div>
           <div>
@@ -148,7 +148,7 @@ export default function MyEvaluation() {
             <StatTile
               label="Final Score"
               value={evaluation.finalScore ?? summary?.finalScore ?? "—"}
-              accent="#6366f1"
+              accent="var(--color-primary)"
             />
             <StatTile
               label="Final Grade"
@@ -165,7 +165,7 @@ export default function MyEvaluation() {
             <StatTile
               label="Quiz Score"
               value={evaluation.quizScore ?? "—"}
-              accent="#6366f1"
+              accent="var(--color-primary)"
             />
             <StatTile
               label="Status"

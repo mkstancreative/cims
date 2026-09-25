@@ -32,7 +32,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
         <div className="db-ring-card__ring">
           <ProgressRing
             pct={curriculumPercent}
-            color={curriculumPercent >= 80 ? "#6366f1" : "#3b82f6"}
+            color={curriculumPercent >= 80 ? "var(--color-primary)" : "var(--color-slate)"}
           />
           <div className="db-ring-card__inner">
             <span className="db-ring-card__pct">{curriculumPercent}%</span>
@@ -70,7 +70,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
             : "Awaiting submission"
         }
         icon={<ClipboardList size={16} />}
-        iconColor="purple"
+        iconColor="primary"
         rows={[
           {
             label: "Status",
@@ -79,7 +79,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                 style={{
                   textTransform: "capitalize",
                   color: hasEvaluation
-                    ? "#6366f1"
+                    ? "var(--color-primary)"
                     : "var(--color-text-muted)",
                   fontWeight: 600,
                 }}

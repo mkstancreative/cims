@@ -48,8 +48,8 @@ export default function ImportResult({
             borderRadius: 12,
             background: hasErrors
               ? "rgba(239,68,68,0.05)"
-              : "rgba(99,102,241,0.05)",
-            border: `1px solid ${hasErrors ? "rgba(239,68,68,0.15)" : "rgba(99,102,241,0.15)"}`,
+              : "rgba(var(--color-primary-rgb), 0.05)",
+            border: `1px solid ${hasErrors ? "rgba(239,68,68,0.15)" : "rgba(var(--color-primary-rgb), 0.15)"}`,
             display: "flex",
             alignItems: "center",
             gap: 12,
@@ -58,7 +58,7 @@ export default function ImportResult({
           {hasErrors ? (
             <AlertCircle size={24} color="#ef4444" />
           ) : (
-            <CheckCircle size={24} color="#6366f1" />
+            <CheckCircle size={24} color="var(--color-primary)" />
           )}
           <div>
             <h4 style={{ 

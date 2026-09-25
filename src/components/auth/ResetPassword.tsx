@@ -90,8 +90,8 @@ export default function ResetPassword() {
               style={{
                 width: 48,
                 height: 48,
-                background: "rgba(99,102,241,0.1)",
-                color: "#6366f1",
+                background: "rgba(var(--color-primary-rgb), 0.1)",
+                color: "var(--color-primary)",
                 borderRadius: "50%",
                 display: "flex",
                 alignItems: "center",

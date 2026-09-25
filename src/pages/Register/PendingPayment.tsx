@@ -67,7 +67,7 @@ const PendingPayment = () => {
     <div
       style={{
         background:
-          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1e1b4b 100%)",
+          "linear-gradient(135deg, #071820 0%, #0a1d26 50%, #0f3040 100%)",
         color: "#fff",
         minHeight: "100vh",
         display: "flex",

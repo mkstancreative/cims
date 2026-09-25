@@ -67,7 +67,7 @@ export default function QuizViewModal({
                         fontSize: 13,
                         marginBottom: 4,
                         color: correct
-                          ? "#6366f1"
+                          ? "var(--color-primary)"
                           : "var(--color-text-primary)",
                         fontWeight: correct ? 700 : 400,
                       }}

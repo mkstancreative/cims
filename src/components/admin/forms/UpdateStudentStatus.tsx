@@ -18,9 +18,9 @@ const STATUS_TRANSITIONS: Partial<Record<ITStatus, ITStatus[]>> = {
 // completed is terminal — no outgoing transitions
 
 const STATUS_META: Record<ITStatus, { label: string; color: string }> = {
-  placed: { label: "Placed", color: "#1976d2" },
-  active: { label: "Active (IT Ongoing)", color: "#4f46e5" },
-  completed: { label: "Completed", color: "#4338ca" },
+  placed: { label: "Placed", color: "var(--color-slate)" },
+  active: { label: "Active (IT Ongoing)", color: "var(--color-primary-hover)" },
+  completed: { label: "Completed", color: "var(--color-primary-hover)" },
 };
 
 
@@ -250,7 +250,9 @@ export default function UpdateStudentStatus({
                       border: `1.5px solid ${
                         isSelected ? color : "var(--color-border)"
                       }`,
-                      background: isSelected ? `${color}14` : "transparent",
+                      background: isSelected
+                        ? `color-mix(in srgb, ${color} 8%, transparent)`
+                        : "transparent",
                       transition: "all 0.15s",
                     }}
                   >

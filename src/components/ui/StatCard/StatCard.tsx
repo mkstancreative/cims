@@ -17,7 +17,10 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon, color }) => {
       </div>
       <div
         className="stat-icon-wrapper"
-        style={{ background: `${color}15`, color: color }}
+        style={{
+          background: `color-mix(in srgb, ${color} 8%, transparent)`,
+          color: color,
+        }}
       >
         {icon}
       </div>

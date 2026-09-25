@@ -24,7 +24,7 @@
 .self-reg-blur .no-blur {
   position: relative;
   z-index: 20;
-  box-shadow: 0 0 40px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 40px rgba(var(--color-primary-rgb), 0.25);
   border: 2px solid var(--color-accent) !important;
 }
 
@@ -178,8 +178,8 @@
   border-radius: 100px;
 }
 .db-kpi__trend--up {
-  background: rgba(99, 102, 241, 0.1);
-  color: #4f46e5;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-primary-hover);
 }
 .db-kpi__trend--neutral {
   background: rgba(100, 116, 139, 0.1);
@@ -447,12 +447,12 @@
   padding: 0 8px;
 }
 .db-grade--A {
-  background: rgba(99, 102, 241, 0.12);
-  color: #4f46e5;
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary-hover);
 }
 .db-grade--B {
-  background: rgba(99, 102, 241, 0.12);
-  color: #4f46e5;
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary-hover);
 }
 .db-grade--C {
   background: rgba(245, 158, 11, 0.12);

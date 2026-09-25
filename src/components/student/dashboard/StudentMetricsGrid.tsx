@@ -34,14 +34,14 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         value={daysRemaining}
         sub="till the end of rotation"
         icon={<CalendarCheck2 size={18} />}
-        color="purple"
+        color="primary"
       />
       <KpiCard
         label="Curriculum Progress"
         value={`${approvedSubtopics}/${totalSubtopics}`}
         sub="approved subtopics"
         icon={<BookMarked size={18} />}
-        color="blue"
+        color="info"
         trend={`${curriculumPercent}%`}
         trendType={curriculumPercent >= 80 ? "up" : "warn"}
         progress={curriculumPercent}
@@ -51,7 +51,7 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         value={logbooks.draft}
         sub="awaiting edits/submission"
         icon={<BookOpen size={18} />}
-        color="purple"
+        color="primary"
         trend={logbooks.draft > 0 ? "Pending" : "None"}
         trendType={logbooks.draft > 0 ? "warn" : "neutral"}
       />
@@ -69,7 +69,7 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         value={logbooks.approved}
         sub="successfully verified"
         icon={<CheckCircle size={18} />}
-        color="violet"
+        color="secondary"
         trend={logbooks.approved > 0 ? "Completed" : "None"}
         trendType={logbooks.approved > 0 ? "up" : "neutral"}
       />

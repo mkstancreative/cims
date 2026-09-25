@@ -152,13 +152,13 @@ export default function Payments() {
           label="Total Collected"
           value={formatAmount(summary.paidAmount)}
           icon={<DollarSign size={20} />}
-          color="#4f46e5"
+          color="var(--color-primary-hover)"
         />
         <StatCard
           label="Total Settled"
           value={formatAmount(summary.settledAmount)}
           icon={<CircleCheck size={20} />}
-          color="#1976d2"
+          color="var(--color-slate)"
         />
         <StatCard
           label="Gateway Fees"
@@ -180,13 +180,13 @@ export default function Payments() {
           label="Total Attempts"
           value={summary.totalCount}
           icon={<Activity size={20} />}
-          color="#7b1fa2"
+          color="var(--color-secondary)"
         />
         <StatCard
           label="Successful"
           value={summary.paidCount}
           icon={<CircleCheck size={20} />}
-          color="#4338ca"
+          color="var(--color-primary-hover)"
         />
         <StatCard
           label="Pending"

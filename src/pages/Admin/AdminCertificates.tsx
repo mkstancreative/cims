@@ -279,7 +279,7 @@ export default function AdminCertificates() {
           label="Total Requests"
           value={stats?.data?.total || 0}
           icon={<FileText size={20} />}
-          color="#0369a1"
+          color="var(--color-slate)"
         />
         <StatCard
           label="Pending Approval"
@@ -291,7 +291,7 @@ export default function AdminCertificates() {
           label="Approved Requests"
           value={stats?.data?.byApprovalStatus?.approved || 0}
           icon={<CheckCircle size={20} />}
-          color="#4f46e5"
+          color="var(--color-primary-hover)"
         />
         <StatCard
           label="Rejected Requests"

@@ -72,8 +72,8 @@
 }
 
 .ni-live-dot--on {
-  background: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  background: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
 }
 
 .ni-live-dot--off {

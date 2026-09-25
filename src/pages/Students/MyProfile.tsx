@@ -221,7 +221,7 @@ export default function MyProfile() {
         {/* ── Header ── */}
         <div className="page-header">
           <div className="page-header-left">
-            <div className="page-icon purple">
+            <div className="page-icon">
               <User size={20} />
             </div>
             <div>
