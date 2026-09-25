@@ -32,7 +32,7 @@
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.05em;
-  background: linear-gradient(135deg, var(--color-accent), #818cf8);
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

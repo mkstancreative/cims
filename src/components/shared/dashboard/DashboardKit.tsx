@@ -3,21 +3,19 @@ import "./dashboard.css";
 
 // ── Colour Presets ──────────────────────────────────────────────────────────
 export type KpiColor =
-  | "teal"
   | "purple"
+  | "violet"
   | "amber"
   | "blue"
   | "rose"
-  | "green"
   | "slate";
 
 const COLOR_MAP: Record<KpiColor, { bg: string; icon: string; bar: string }> = {
-  teal: { bg: "rgba(13,148,136,.12)", icon: "#0d9488", bar: "#0d9488" },
   purple: { bg: "rgba(99,102,241,.12)", icon: "#6366f1", bar: "#6366f1" },
   amber: { bg: "rgba(245,158,11,.12)", icon: "#d97706", bar: "#f59e0b" },
   blue: { bg: "rgba(59,130,246,.12)", icon: "#3b82f6", bar: "#3b82f6" },
   rose: { bg: "rgba(244,63,94,.12)", icon: "#f43f5e", bar: "#f43f5e" },
-  green: { bg: "rgba(16,185,129,.12)", icon: "#10b981", bar: "#10b981" },
+  violet: { bg: "rgba(139,92,246,.12)", icon: "#8b5cf6", bar: "#8b5cf6" },
   slate: { bg: "rgba(100,116,139,.12)", icon: "#64748b", bar: "#94a3b8" },
 };
 
@@ -39,13 +37,13 @@ export function KpiCard({
   value,
   sub,
   icon,
-  color = "teal",
+  color = "purple",
   trend,
   trendType = "neutral",
   progress,
   className = "",
 }: KpiCardProps) {
-  const c = COLOR_MAP[color] ?? COLOR_MAP["teal"];
+  const c = COLOR_MAP[color] ?? COLOR_MAP["purple"];
   return (
     <div className={`db-kpi ${className}`}>
       <div className="db-kpi__accent-bar" style={{ background: c.bar }} />
@@ -89,7 +87,7 @@ interface ProgressRingProps {
 
 export function ProgressRing({
   pct,
-  color = "#0d9488",
+  color = "#6366f1",
   size = 108,
   stroke = 9,
 }: ProgressRingProps) {
@@ -146,7 +144,7 @@ export function InfoPanel({
   title,
   sub,
   icon,
-  iconColor = "teal",
+  iconColor = "purple",
   rows,
 }: InfoPanelProps) {
   const c = COLOR_MAP[iconColor];
@@ -197,7 +195,7 @@ export function SectionHead({
   title,
   sub,
   icon,
-  color = "teal",
+  color = "purple",
 }: SectionHeadProps) {
   const c = COLOR_MAP[color];
   return (

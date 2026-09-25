@@ -66,7 +66,7 @@ export default function DashBoardStudent() {
           </>
         }
         initials={initials}
-        gradient="linear-gradient(135deg, #0d9488 100%)"
+        gradient="var(--color-purple)"
         avatarOverlay={
           <svg
             style={{
@@ -107,7 +107,7 @@ export default function DashBoardStudent() {
           title="My Progress"
           sub="Real-time training tracking"
           icon={<TrendingUp size={16} />}
-          color="teal"
+          color="purple"
         />
         <StudentMetricsGrid
           progress={progress}

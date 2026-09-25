@@ -53,14 +53,14 @@ export default function NotificationTable({
             backgroundColor:
               {
                 info: "#dbeafe",
-                success: "#dcfce7",
+                success: "#e0e7ff",
                 warning: "#fef3c7",
                 error: "#fee2e2",
               }[n.type] || "#f3f4f6",
             color:
               {
                 info: "#0369a1",
-                success: "#15803d",
+                success: "#4338ca",
                 warning: "#b45309",
                 error: "#b91c1c",
               }[n.type] || "#374151",

@@ -31,7 +31,7 @@ function RatingSlider({
   disabled,
 }: RatingSliderProps) {
   const pct = Math.round((value / RATING_MAX) * 100);
-  const color = pct >= 80 ? "#10b981" : pct >= 60 ? "#f59e0b" : "#ef4444";
+  const color = pct >= 80 ? "#6366f1" : pct >= 60 ? "#f59e0b" : "#ef4444";
 
   return (
     <div className="sef-rating-row">

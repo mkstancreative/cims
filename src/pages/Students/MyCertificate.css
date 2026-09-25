@@ -21,7 +21,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(13, 148, 136, 0.08);
+  background: rgba(99, 102, 241, 0.08);
   color: var(--color-accent);
   display: flex;
   align-items: center;
@@ -108,8 +108,8 @@
 }
 
 .cert-status-icon-wrap.approved {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
 }
 
 .cert-status-icon-wrap.rejected {
@@ -157,8 +157,8 @@
 
 /* ── Success Details box ──────────────────────────────────────────────────── */
 .cert-success-box {
-  background: rgba(16, 185, 129, 0.04);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  background: rgba(99, 102, 241, 0.04);
+  border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: 12px;
   padding: 18px 20px;
   margin-bottom: 24px;
@@ -171,7 +171,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  border-bottom: 1px solid rgba(16, 185, 129, 0.08);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.08);
   padding-bottom: 8px;
 }
 
@@ -237,12 +237,12 @@
   border-color: var(--color-accent);
   background: var(--color-accent);
   color: #fff;
-  box-shadow: 0 0 10px rgba(13, 148, 136, 0.3);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
 }
 
 .cert-step.completed .cert-step-dot {
-  border-color: #10b981;
-  background: #10b981;
+  border-color: #6366f1;
+  background: #6366f1;
   color: #fff;
 }
 
@@ -259,7 +259,7 @@
 }
 
 .cert-step.completed .cert-step-label {
-  color: #10b981;
+  color: #6366f1;
 }
 
 /* ── Action Buttons ──────────────────────────────────────────────────────── */
@@ -273,7 +273,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 32px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: var(--gradient-brand);
   color: #fff;
   font-size: 15px;
   font-weight: 700;

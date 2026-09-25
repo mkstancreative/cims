@@ -49,13 +49,13 @@ const VerifyPayment = () => {
   > = {
     loading: {
       icon: <Loader2 size={48} className="vp-spin" />,
-      color: "#2dd4bf",
+      color: "#818cf8",
       title: "Verifying your payment…",
       message: "Please wait while we confirm your transaction with Credo.",
     },
     success: {
       icon: <CheckCircle2 size={48} />,
-      color: "#10b981",
+      color: "#6366f1",
       title: "Payment Successful",
       message:
         "Your registration payment has been confirmed. Your application is now pending review by the coordinator. You will be notified once you are enrolled.",
@@ -89,7 +89,7 @@ const VerifyPayment = () => {
     <div
       style={{
         background:
-          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #0d1f2d 100%)",
+          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1e1b4b 100%)",
         color: "#fff",
         minHeight: "100vh",
         display: "flex",

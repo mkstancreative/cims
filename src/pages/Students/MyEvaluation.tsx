@@ -39,7 +39,7 @@ function RatingBar({ label, value }: { label: string; value: number }) {
           style={{
             height: "100%",
             width: `${pct}%`,
-            background: "linear-gradient(90deg,#6366f1,#8b5cf6)",
+            background: "var(--gradient-brand-h)",
             borderRadius: 5,
             transition: "width .6s ease",
           }}
@@ -148,7 +148,7 @@ export default function MyEvaluation() {
             <StatTile
               label="Final Score"
               value={evaluation.finalScore ?? summary?.finalScore ?? "—"}
-              accent="#10b981"
+              accent="#6366f1"
             />
             <StatTile
               label="Final Grade"

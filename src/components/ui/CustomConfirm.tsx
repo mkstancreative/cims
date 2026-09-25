@@ -44,7 +44,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
     variant === "danger"
       ? "#ef4444"
       : variant === "success"
-        ? "#10b981"
+        ? "#6366f1"
         : variant === "info"
           ? "#3b82f6"
           : "#3b82f6";

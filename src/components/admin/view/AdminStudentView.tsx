@@ -146,7 +146,7 @@ export default function AdminStudentView() {
       {stats && (
         <div className="sv-stats-grid">
           <StatCard label="Total Entries" value={stats.total} color="#3b82f6" />
-          <StatCard label="Approved" value={stats.approved} color="#10b981" />
+          <StatCard label="Approved" value={stats.approved} color="#6366f1" />
           <StatCard label="Submitted" value={stats.submitted} color="#f59e0b" />
           <StatCard label="Rejected" value={stats.rejected} color="#ef4444" />
         </div>
@@ -209,7 +209,7 @@ export default function AdminStudentView() {
                   style={{
                     width: `${s.curriculumProgress.percent}%`,
                     height: "100%",
-                    backgroundColor: "#10b981",
+                    backgroundColor: "#6366f1",
                     borderRadius: 4,
                     transition: "width 0.3s ease",
                   }}
@@ -217,7 +217,7 @@ export default function AdminStudentView() {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
                 <span>Completion</span>
-                <span style={{ fontWeight: 700, color: "#10b981" }}>{s.curriculumProgress.percent}%</span>
+                <span style={{ fontWeight: 700, color: "#6366f1" }}>{s.curriculumProgress.percent}%</span>
               </div>
             </div>
           </Section>
@@ -281,7 +281,7 @@ export default function AdminStudentView() {
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-secondary)" }}>
                     <span>Session: {history.session}</span>
                     {history.isCurrent && (
-                      <span style={{ color: "#10b981", fontWeight: 600 }}>Active / Current</span>
+                      <span style={{ color: "#6366f1", fontWeight: 600 }}>Active / Current</span>
                     )}
                   </div>
                 </div>

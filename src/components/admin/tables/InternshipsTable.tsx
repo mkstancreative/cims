@@ -101,7 +101,7 @@ export default function InternshipsTable({
               display: "inline-flex",
               alignItems: "center",
               gap: 4,
-              color: "#10b981",
+              color: "#6366f1",
               fontWeight: 600,
               fontSize: 12,
             }}

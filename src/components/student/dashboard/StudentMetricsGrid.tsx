@@ -34,7 +34,7 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         value={daysRemaining}
         sub="till the end of rotation"
         icon={<CalendarCheck2 size={18} />}
-        color="teal"
+        color="purple"
       />
       <KpiCard
         label="Curriculum Progress"
@@ -69,7 +69,7 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         value={logbooks.approved}
         sub="successfully verified"
         icon={<CheckCircle size={18} />}
-        color="green"
+        color="violet"
         trend={logbooks.approved > 0 ? "Completed" : "None"}
         trendType={logbooks.approved > 0 ? "up" : "neutral"}
       />

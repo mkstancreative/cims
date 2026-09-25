@@ -18,8 +18,8 @@
 }
 
 .mr-banner--success {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: #10b981;
+  background: rgba(99, 102, 241, 0.08);
+  border-color: #6366f1;
 }
 .mr-banner--error {
   background: rgba(239, 68, 68, 0.08);
@@ -38,7 +38,7 @@
 }
 
 .mr-banner-icon--success {
-  color: #10b981;
+  color: #6366f1;
 }
 .mr-banner-icon--error {
   color: #ef4444;
@@ -106,7 +106,7 @@
   color: var(--color-text-primary);
 }
 .mr-stat--ok .mr-stat-val {
-  color: #10b981;
+  color: #6366f1;
 }
 .mr-stat--fail .mr-stat-val {
   color: #ef4444;

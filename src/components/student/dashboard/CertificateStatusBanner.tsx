@@ -11,7 +11,7 @@ const STATUS_TEXT: Record<string, { label: string; color: string; sub: string }>
   {
     approved: {
       label: "Approved",
-      color: "#10b981",
+      color: "#6366f1",
       sub: "Your certificate has been approved.",
     },
     rejected: {

@@ -32,7 +32,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
         <div className="db-ring-card__ring">
           <ProgressRing
             pct={curriculumPercent}
-            color={curriculumPercent >= 80 ? "#10b981" : "#3b82f6"}
+            color={curriculumPercent >= 80 ? "#6366f1" : "#3b82f6"}
           />
           <div className="db-ring-card__inner">
             <span className="db-ring-card__pct">{curriculumPercent}%</span>
@@ -79,7 +79,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                 style={{
                   textTransform: "capitalize",
                   color: hasEvaluation
-                    ? "#10b981"
+                    ? "#6366f1"
                     : "var(--color-text-muted)",
                   fontWeight: 600,
                 }}

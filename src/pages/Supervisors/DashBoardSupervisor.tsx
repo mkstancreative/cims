@@ -64,7 +64,7 @@ export default function DashBoardSupervisor() {
           </>
         }
         initials={initials}
-        gradient="linear-gradient(135deg, #0d9488 100%)"
+        gradient="var(--color-purple)"
       />
 
       {/* ── Student KPIs ───────────────────────────────────────────────────── */}
@@ -84,7 +84,7 @@ export default function DashBoardSupervisor() {
             value={totalStudents}
             sub="Under supervision"
             icon={<Users size={18} />}
-            color="teal"
+            color="purple"
           />
           <KpiCard
             label="Active / Placed"
@@ -101,7 +101,7 @@ export default function DashBoardSupervisor() {
             value={completedStudents}
             sub="IT fully finished"
             icon={<CheckCircle2 size={18} />}
-            color="green"
+            color="violet"
             trend={completedStudents > 0 ? "✓" : "—"}
             trendType={completedStudents > 0 ? "up" : "neutral"}
           />
@@ -142,7 +142,7 @@ export default function DashBoardSupervisor() {
           <div className="db-ring-card__ring">
             <ProgressRing
               pct={activeRate}
-              color={activeRate >= 70 ? "#10b981" : "#f59e0b"}
+              color={activeRate >= 70 ? "#6366f1" : "#f59e0b"}
             />
             <div className="db-ring-card__inner">
               <span className="db-ring-card__pct">{activeRate}%</span>
@@ -169,7 +169,7 @@ export default function DashBoardSupervisor() {
                 <span className="db-ring-card__row-lbl">Active</span>
                 <span
                   className="db-ring-card__row-val"
-                  style={{ color: "#10b981" }}
+                  style={{ color: "#6366f1" }}
                 >
                   {stu?.active ?? 0}
                 </span>
@@ -178,7 +178,7 @@ export default function DashBoardSupervisor() {
                 <span className="db-ring-card__row-lbl">Completed</span>
                 <span
                   className="db-ring-card__row-val"
-                  style={{ color: "#0d9488" }}
+                  style={{ color: "#6366f1" }}
                 >
                   {completedStudents}
                 </span>
@@ -195,7 +195,7 @@ export default function DashBoardSupervisor() {
           title="Student Breakdown"
           sub="All statuses at a glance"
           icon={<Users size={16} />}
-          iconColor="teal"
+          iconColor="purple"
           rows={[
             { label: "Total Assigned", value: totalStudents },
             { label: "Placed", value: stu?.placed ?? 0 },
@@ -279,7 +279,7 @@ export default function DashBoardSupervisor() {
               title="Department Breakdown"
               sub="Students by department"
               icon={<ClipboardList size={16} />}
-              color="teal"
+              color="purple"
             />
             <div className="db-kpi-grid" style={{ marginTop: 16 }}>
               {Object.entries(stu.departmentBreakdown).map(([dept, stats]) => (
@@ -289,7 +289,7 @@ export default function DashBoardSupervisor() {
                   value={stats.total}
                   sub={`Active: ${stats.active} · Completed: ${stats.completed}`}
                   icon={<Users size={18} />}
-                  color="teal"
+                  color="purple"
                 />
               ))}
             </div>

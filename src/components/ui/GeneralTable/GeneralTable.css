@@ -113,7 +113,7 @@
 }
 
 .general-table tbody tr.row-selected {
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(99, 102, 241, 0.05);
 }
 
 /* ─────────────────────────────────────────
@@ -219,11 +219,7 @@
 }
 
 .page-btn.active {
-  background: linear-gradient(
-    135deg,
-    var(--color-accent),
-    var(--color-primary)
-  );
+  background: var(--gradient-brand);
   color: var(--color-text-primary);
   border-color: transparent;
   box-shadow: var(--shadow-glow-sm), var(--shadow-sm);

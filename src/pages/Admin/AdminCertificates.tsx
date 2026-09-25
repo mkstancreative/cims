@@ -231,7 +231,7 @@ export default function AdminCertificates() {
       {/* Header */}
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon teal">
+          <div className="page-icon">
             <FileText size={20} />
           </div>
           <div>
@@ -291,7 +291,7 @@ export default function AdminCertificates() {
           label="Approved Requests"
           value={stats?.data?.byApprovalStatus?.approved || 0}
           icon={<CheckCircle size={20} />}
-          color="#059669"
+          color="#4f46e5"
         />
         <StatCard
           label="Rejected Requests"

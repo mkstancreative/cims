@@ -44,8 +44,8 @@ html:not(.light-mode) .confirm-card {
 }
 
 .confirm-icon-success {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
+  background: rgba(99, 102, 241, 0.1);
+  color: #4f46e5;
 }
 
 .confirm-icon-warning {
@@ -138,13 +138,13 @@ html:not(.light-mode) .confirm-cancel-btn {
 }
 
 .confirm-submit-success {
-  background: linear-gradient(135deg, #4ade80, #16a34a);
+  background: var(--gradient-brand);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 14px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .confirm-submit-success:hover:not(:disabled) {
-  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
+  box-shadow: 0 6px 18px rgba(var(--color-primary-rgb), 0.4);
 }
 
 .confirm-submit-warning {

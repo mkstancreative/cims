@@ -31,8 +31,8 @@ const VerifyCertificate = () => {
   if (isLoading) {
     return (
       <div className="vc-root">
-        <div className="vc-glow vc-glow--teal" />
-        <div className="vc-glow vc-glow--blue" />
+        <div className="vc-glow vc-glow--purple" />
+        <div className="vc-glow vc-glow--fuchsia" />
         <div className="vc-loading-card">
           <div className="vc-loading-spinner">
             <Loader2 size={40} className="vc-spin-icon" />
@@ -134,8 +134,8 @@ const VerifyCertificate = () => {
   return (
     <div className="vc-root">
       {/* Ambient layers */}
-      <div className="vc-glow vc-glow--teal" />
-      <div className="vc-glow vc-glow--blue" />
+      <div className="vc-glow vc-glow--purple" />
+      <div className="vc-glow vc-glow--fuchsia" />
       <div className="vc-mesh-overlay" />
 
       <header className="vc-header">

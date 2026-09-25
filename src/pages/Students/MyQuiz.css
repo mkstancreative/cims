@@ -112,7 +112,7 @@
 }
 
 .mq-intro-instr-list li svg {
-  color: #10b981;
+  color: #6366f1;
   flex-shrink: 0;
 }
 
@@ -172,9 +172,9 @@
   color: #f59e0b;
 }
 
-.mq-icon-wrap.green {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
+.mq-icon-wrap.purple {
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
 }
 
 .mq-icon-wrap.red {
@@ -269,7 +269,7 @@
 }
 
 .mq-result-score.passed {
-  color: #10b981;
+  color: #6366f1;
 }
 
 .mq-result-score.failed {
@@ -282,7 +282,7 @@
 }
 
 .mq-result-verdict.passed {
-  color: #10b981;
+  color: #6366f1;
 }
 
 .mq-result-verdict.failed {
@@ -389,9 +389,8 @@
   color: var(--color-text-muted);
 }
 
-/* `teal` was already used by the intro card's markup but never defined — it
-   now also carries the waiting-state locks, which are not failures. */
-.mq-icon-wrap.teal {
+/* Intro card and waiting-state locks, which are not failures. */
+.mq-icon-wrap.accent {
   background: var(--color-accent-muted);
   color: var(--color-accent);
 }

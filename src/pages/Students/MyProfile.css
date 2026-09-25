@@ -54,7 +54,7 @@
   width: 110px;
   height: 110px;
   padding: 4px;
-  background: linear-gradient(135deg, var(--color-accent), #ec4899);
+  background: var(--gradient-brand);
   border-radius: 50%;
 }
 

@@ -180,7 +180,7 @@ export default function AssignedStudentView({
               <StatCard
                 label="Approved"
                 value={stats.approved}
-                color="#10b981"
+                color="#6366f1"
               />
               <StatCard
                 label="Submitted"

@@ -19,8 +19,8 @@ const STATUS_TRANSITIONS: Partial<Record<ITStatus, ITStatus[]>> = {
 
 const STATUS_META: Record<ITStatus, { label: string; color: string }> = {
   placed: { label: "Placed", color: "#1976d2" },
-  active: { label: "Active (IT Ongoing)", color: "#0f9d58" },
-  completed: { label: "Completed", color: "#388e3c" },
+  active: { label: "Active (IT Ongoing)", color: "#4f46e5" },
+  completed: { label: "Completed", color: "#4338ca" },
 };
 
 

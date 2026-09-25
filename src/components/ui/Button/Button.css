@@ -73,14 +73,14 @@
 
 /* Success */
 .btn-success {
-  background: #10b981;
+  background: #6366f1;
   color: #fff;
-  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1);
 }
 
 .btn-success:hover:not(:disabled) {
-  background: #059669;
-  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+  background: #4f46e5;
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
 }
 
 /* Outline */

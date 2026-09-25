@@ -11,8 +11,8 @@
 
 /* Student */
 .status-badge.active {
-  background: #e6f7ee;
-  color: #0f9d58;
+  background: #eef2ff;
+  color: #4f46e5;
 }
 
 .status-badge.inactive {
@@ -31,8 +31,8 @@
 }
 
 .status-badge.present {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.absent {
@@ -41,13 +41,13 @@
 }
 
 .status-badge.seeking_placement {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.placed {
   background: #ffebee;
-  color: #0f9d58;
+  color: #4f46e5;
 }
 
 .status-badge.pending {
@@ -57,8 +57,8 @@
 
 /* Enrollment */
 .status-badge.enrolled {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.rejected {
@@ -68,13 +68,13 @@
 
 /* Academic */
 .status-badge.passed {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.successful {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.failed {
@@ -99,8 +99,8 @@
 }
 
 .status-badge.admitted {
-  background: #e0f7fa;
-  color: #00838f;
+  background: #f5f3ff;
+  color: #6d28d9;
 }
 
 /* Transactions / IT Status */
@@ -120,13 +120,13 @@
 }
 
 .status-badge.completed {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.approved {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.failed {
@@ -135,14 +135,14 @@
 }
 
 .status-badge.success {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 /* Admins / Lecturers */
 .status-badge.enabled {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.disabled {
@@ -156,8 +156,8 @@
 }
 
 .status-badge.open {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .status-badge.closed {
@@ -170,20 +170,20 @@
   color: #f9a825;
 }
 .status-badge.students_uploaded {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 .status-badge.verified {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 .status-badge.pending_verification {
   background: #fff8e1;
   color: #f9a825;
 }
 .status-badge.read {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #eef2ff;
+  color: #4338ca;
 }
 .status-badge.unread {
   background: #fff8e1;
@@ -200,8 +200,8 @@
   color: #ef6c00;
 }
 .status-badge.refunded {
-  background: #e0f7fa;
-  color: #00838f;
+  background: #f5f3ff;
+  color: #6d28d9;
 }
 .status-badge.cancelled {
   background: #fdecea;

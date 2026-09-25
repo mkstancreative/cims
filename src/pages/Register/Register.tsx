@@ -185,7 +185,7 @@ const Register = () => {
     fontWeight: 700,
     letterSpacing: 0.4,
     textTransform: "uppercase",
-    color: "#2dd4bf",
+    color: "#818cf8",
     marginTop: 8,
     marginBottom: 2,
   };
@@ -194,7 +194,7 @@ const Register = () => {
     <div
       style={{
         background:
-          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #0d1f2d 100%)",
+          "linear-gradient(135deg, #0d1117 0%, #111827 50%, #1e1b4b 100%)",
         color: "#fff",
         minHeight: "100vh",
         display: "flex",
@@ -470,8 +470,8 @@ const Register = () => {
                     marginTop: 4,
                     marginBottom: 4,
                     borderRadius: 10,
-                    border: "1px solid rgba(45, 212, 191, 0.35)",
-                    background: "rgba(45, 212, 191, 0.08)",
+                    border: "1px solid rgba(129, 140, 248, 0.35)",
+                    background: "rgba(129, 140, 248, 0.08)",
                   }}
                 >
                   <span style={{ fontSize: 13, color: "#cbd5e1" }}>
@@ -485,7 +485,7 @@ const Register = () => {
                     style={{
                       fontSize: 22,
                       fontWeight: 700,
-                      color: "#2dd4bf",
+                      color: "#818cf8",
                       whiteSpace: "nowrap",
                     }}
                   >

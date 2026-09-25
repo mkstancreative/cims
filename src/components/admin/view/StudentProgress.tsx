@@ -39,7 +39,7 @@ function ProgressRing({
   const circ = 2 * Math.PI * r;
   const offset = circ - (Math.min(percent, 100) / 100) * circ;
   const color =
-    percent >= 75 ? "#10b981" : percent >= 40 ? "#f59e0b" : "#ef4444";
+    percent >= 75 ? "#6366f1" : percent >= 40 ? "#f59e0b" : "#ef4444";
 
   return (
     <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
@@ -296,7 +296,7 @@ export default function StudentProgress() {
                     alignItems: "center",
                     gap: 5,
                     fontSize: 12,
-                    color: "#10b981",
+                    color: "#6366f1",
                     fontWeight: 600,
                   }}
                 >
@@ -399,7 +399,7 @@ export default function StudentProgress() {
                 display: "inline-block",
                 width: 10,
                 height: 10,
-                background: "#10b981",
+                background: "#6366f1",
                 borderRadius: 2,
                 marginRight: 4,
               }}

@@ -136,12 +136,12 @@
 }
 
 .cert-action-approve {
-  background: #10b981;
+  background: #6366f1;
   color: #fff;
 }
 
 .cert-action-approve:hover:not(:disabled) {
-  background: #0f9f6e;
+  background: #4f46e5;
 }
 
 .cert-action-reject {

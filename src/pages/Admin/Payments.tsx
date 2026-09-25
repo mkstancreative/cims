@@ -152,7 +152,7 @@ export default function Payments() {
           label="Total Collected"
           value={formatAmount(summary.paidAmount)}
           icon={<DollarSign size={20} />}
-          color="#0f9d58"
+          color="#4f46e5"
         />
         <StatCard
           label="Total Settled"
@@ -186,7 +186,7 @@ export default function Payments() {
           label="Successful"
           value={summary.paidCount}
           icon={<CircleCheck size={20} />}
-          color="#2e7d32"
+          color="#4338ca"
         />
         <StatCard
           label="Pending"

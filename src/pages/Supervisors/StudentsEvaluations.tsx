@@ -329,8 +329,8 @@ export default function StudentsEvaluations() {
         .eval-summary-item{display:inline-flex;align-items:center;gap:5px}
         .eval-submit-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1.5px solid var(--color-accent);background:var(--color-accent-muted);color:var(--color-accent);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s,background .15s}
         .eval-submit-btn:hover{background:var(--color-accent);color:#fff}
-        .eval-export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid #16a34a;background:rgba(22,163,74,.1);color:#16a34a;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
-        .eval-export-btn:hover:not(:disabled){background:#16a34a;color:#fff}
+        .eval-export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid #4f46e5;background:rgba(79,70,229,.1);color:#4f46e5;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
+        .eval-export-btn:hover:not(:disabled){background:#4f46e5;color:#fff}
         .eval-export-btn:disabled{opacity:.45;cursor:not-allowed}
       `}</style>
     </div>

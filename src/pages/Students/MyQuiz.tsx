@@ -33,7 +33,7 @@ const LOCK_STATES: Record<
   QuizLockCode,
   {
     icon: React.ReactNode;
-    tone: "amber" | "teal";
+    tone: "amber" | "accent";
     title: string;
     body: string;
     showProgress: boolean;
@@ -48,14 +48,14 @@ const LOCK_STATES: Record<
   },
   NO_SESSION: {
     icon: <Clock size={30} />,
-    tone: "teal",
+    tone: "accent",
     title: "Waiting for Your Sitting",
     body: "Your quiz sitting hasn't been opened yet. There is nothing for you to do — your supervisor will open it and take attendance when it is time.",
     showProgress: false,
   },
   SESSION_NOT_UNLOCKED: {
     icon: <ClipboardCheck size={30} />,
-    tone: "teal",
+    tone: "accent",
     title: "Attendance Is Being Taken",
     body: "Your sitting is open and attendance is being taken. The quiz will appear here as soon as it is unlocked.",
     showProgress: false,
@@ -69,7 +69,7 @@ const LOCK_STATES: Record<
   },
   ALREADY_SUBMITTED: {
     icon: <Award size={30} />,
-    tone: "teal",
+    tone: "accent",
     title: "Already Submitted",
     body: "You have already taken this quiz. There is one attempt per student.",
     showProgress: false,
@@ -142,7 +142,7 @@ function QuizIntroCard({
     <div className="mq-center-panel">
       <div className="mq-intro-card">
         {/* Icon */}
-        <div className="mq-icon-wrap teal" style={{ marginBottom: 20 }}>
+        <div className="mq-icon-wrap accent" style={{ marginBottom: 20 }}>
           <FileQuestion size={32} />
         </div>
 
@@ -207,7 +207,7 @@ function ResultCard({ score, passed }: { score: number; passed: boolean }) {
   return (
     <div className="mq-center-panel">
       <div className="mq-result-card">
-        <div className={`mq-icon-wrap ${passed ? "green" : "red"}`}>
+        <div className={`mq-icon-wrap ${passed ? "purple" : "red"}`}>
           {passed ? <Award size={32} /> : <XCircle size={32} />}
         </div>
         <h3 className="mq-result-title">

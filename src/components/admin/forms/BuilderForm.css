@@ -33,7 +33,7 @@
 }
 
 .builder-add-btn:hover {
-  background: var(--color-accent-muted, rgba(13, 148, 136, 0.08));
+  background: var(--color-accent-muted, rgba(99, 102, 241, 0.08));
   border-color: var(--color-accent);
 }
 
