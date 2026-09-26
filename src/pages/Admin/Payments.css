@@ -133,3 +133,74 @@
   color: var(--color-text-secondary);
   font-size: 13px;
 }
+
+/* ── Collapsible "Transaction Statuses" ── */
+.payments-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 18px;
+  margin-bottom: 0;
+  padding: 0 0 4px;
+  border: none;
+  border-bottom: 1px solid var(--color-divider);
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.payments-section-toggle:hover {
+  color: var(--color-text-primary);
+}
+
+.payments-section-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.payments-section-toggle__icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
+
+.payments-section-toggle[aria-expanded="true"] .payments-section-toggle__icon {
+  transform: rotate(0deg);
+}
+
+/* Animates height via grid rows: 0fr (closed) → 1fr (open) */
+.payments-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-bottom: 18px;
+  transition: grid-template-rows 0.25s ease;
+}
+
+/* The collapse owns the spacing below, so it holds when closed too */
+.payments-collapse .payments-summary-grid {
+  margin-bottom: 0;
+}
+
+.payments-collapse.is-open {
+  grid-template-rows: 1fr;
+}
+
+.payments-collapse__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.payments-collapse.is-open .payments-collapse__inner {
+  padding-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .payments-section-toggle__icon,
+  .payments-collapse {
+    transition: none;
+  }
+}

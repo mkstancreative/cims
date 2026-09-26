@@ -44,14 +44,6 @@ export default function PaymentsTable({
 
   const columns: Column<Payment>[] = [
     {
-      header: "Reference",
-      render: (row) => (
-        <span style={{ fontFamily: "monospace", fontSize: 12 }}>
-          {row.reference}
-        </span>
-      ),
-    },
-    {
       header: "Payer",
       render: (row) => (
         <div style={{ display: "flex", flexDirection: "column" }}>

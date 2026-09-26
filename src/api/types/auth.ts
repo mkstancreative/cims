@@ -64,6 +64,11 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface GoogleLoginPayload {
+  /** The ID token (JWT) Google Identity Services hands back. */
+  idToken: string;
+}
+
 export interface ChangePasswordPayload {
   currentPassword: string;
   newPassword: string;

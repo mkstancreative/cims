@@ -2,6 +2,7 @@ import { api } from "./api";
 import type {
   LoginPayload,
   LoginResponse,
+  GoogleLoginPayload,
   ChangePasswordPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
@@ -14,6 +15,17 @@ export const loginUser = async (
   payload: LoginPayload,
 ): Promise<LoginResponse> => {
   const response = await api.post<LoginResponse>("/auth/login", payload);
+  return response.data;
+};
+
+/**
+ * Signs in with a Google ID token (from Google Identity Services). The server
+ * verifies the token and answers exactly like `/auth/login`.
+ */
+export const googleLogin = async (
+  payload: GoogleLoginPayload,
+): Promise<LoginResponse> => {
+  const response = await api.post<LoginResponse>("/auth/google", payload);
   return response.data;
 };
 

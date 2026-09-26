@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   loginUser,
+  googleLogin,
   logoutUser,
   changePassword,
   forgotPassword,
@@ -18,6 +19,8 @@ import {
 } from "../helpers/pendingRegistration";
 import type {
   LoginPayload,
+  LoginResponse,
+  GoogleLoginPayload,
   ChangePasswordPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
@@ -39,50 +42,74 @@ function getErrorMessage(error: unknown, fallback: string): string {
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
-export const useLoginUser = () => {
+/** What happens after any successful sign-in — password or Google. */
+const useLoginSuccess = () => {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
 
+  return (response: LoginResponse) => {
+    const { accessToken, refreshToken, user, pendingRegistration } =
+      response.data;
+
+    // The payment-gated branch issues an access token but NO refresh token.
+    // storeTokens handles the missing one; the session simply cannot renew.
+    storeTokens(accessToken, refreshToken);
+    setAuth(user);
+
+    if (isPaymentRequired(response)) {
+      storePendingRegistration(pendingRegistration ?? null);
+      navigate("/registrations/pending", { replace: true });
+      toast.info("Your registration payment is still outstanding.");
+      return;
+    }
+
+    // ── If the user needs to change their password, a global modal will catch them.
+    // We navigate to their respective dashboards normally.
+
+    switch (user.role) {
+      case "admin":
+      case "coordinator":
+        navigate("/admin/dashboard", { replace: true });
+        break;
+      case "supervisor":
+        navigate("/supervisor/dashboard", { replace: true });
+        break;
+      case "student":
+      default:
+        navigate("/student/dashboard", { replace: true });
+    }
+
+    // Toast fires after navigate — it will render on the new route
+    toast.success(`Welcome back, ${user.firstName}! 👋`);
+  };
+};
+
+export const useLoginUser = () => {
+  const onLoginSuccess = useLoginSuccess();
+
   return useMutation({
     mutationFn: (payload: LoginPayload) => loginUser(payload),
-    onSuccess: (response) => {
-      const { accessToken, refreshToken, user, pendingRegistration } =
-        response.data;
-
-      // The payment-gated branch issues an access token but NO refresh token.
-      // storeTokens handles the missing one; the session simply cannot renew.
-      storeTokens(accessToken, refreshToken);
-      setAuth(user);
-
-      if (isPaymentRequired(response)) {
-        storePendingRegistration(pendingRegistration ?? null);
-        navigate("/registrations/pending", { replace: true });
-        toast.info("Your registration payment is still outstanding.");
-        return;
-      }
-
-      // ── If the user needs to change their password, a global modal will catch them.
-      // We navigate to their respective dashboards normally.
-
-      switch (user.role) {
-        case "admin":
-        case "coordinator":
-          navigate("/admin/dashboard", { replace: true });
-          break;
-        case "supervisor":
-          navigate("/supervisor/dashboard", { replace: true });
-          break;
-        case "student":
-        default:
-          navigate("/student/dashboard", { replace: true });
-      }
-
-      // Toast fires after navigate — it will render on the new route
-      toast.success(`Welcome back, ${user.firstName}! 👋`);
-    },
+    onSuccess: onLoginSuccess,
     onError: (error: unknown) => {
       toast.error(
         getErrorMessage(error, "Login failed. Please check your credentials."),
+      );
+    },
+  });
+};
+
+export const useGoogleLogin = () => {
+  const onLoginSuccess = useLoginSuccess();
+
+  return useMutation({
+    mutationFn: (payload: GoogleLoginPayload) => googleLogin(payload),
+    onSuccess: onLoginSuccess,
+    onError: (error: unknown) => {
+      toast.error(
+        getErrorMessage(
+          error,
+          "Google sign-in failed. Use your email and password instead.",
+        ),
       );
     },
   });

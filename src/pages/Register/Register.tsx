@@ -24,6 +24,9 @@ import {
 import AuthBrandPanel, {
   type AuthFeature,
 } from "../../components/auth/AuthBrandPanel";
+import GoogleButton, {
+  readGoogleProfile,
+} from "../../components/auth/GoogleButton";
 import "./RegisterPage.css";
 import { useRegisterStudent } from "../../hooks/useRegistrations";
 import { usePublicInstitutions } from "../../hooks/useInstitutions";
@@ -186,6 +189,24 @@ const Register = () => {
     if (error) setError("");
   };
 
+  // Google only supplies who the applicant is — the rest of the form, and the
+  // payment, still happen here.
+  const handleGoogleCredential = (idToken: string) => {
+    const profile = readGoogleProfile(idToken);
+    if (!profile) {
+      toast.error("Couldn't read your Google account. Please fill in the form.");
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      firstName: profile.firstName || prev.firstName,
+      lastName: profile.lastName || prev.lastName,
+      email: profile.email || prev.email,
+    }));
+    setError("");
+    toast.info("Name and email filled from Google. Complete the rest below.");
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -294,6 +315,14 @@ const Register = () => {
               {error}
             </div>
           )}
+
+          <GoogleButton
+            divider="after"
+            dividerLabel="or fill in your details"
+            unavailableMessage="Google sign-up is coming soon. Please fill in the form below."
+            disabled={isPending}
+            onCredential={handleGoogleCredential}
+          />
 
           <form onSubmit={handleSubmit} className="auth-form">
             <Section icon={<User size={16} />} title="Personal Details">

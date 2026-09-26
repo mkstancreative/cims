@@ -79,7 +79,9 @@ api.interceptors.response.use(
 
     const url = originalRequest.url || "";
     const isLoginOrRefresh =
-      url.includes("/auth/login") || url.includes("/auth/refresh-token");
+      url.includes("/auth/login") ||
+      url.includes("/auth/google") ||
+      url.includes("/auth/refresh-token");
 
     if (
       error.response?.status === 401 &&

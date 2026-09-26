@@ -116,14 +116,6 @@ export default function PaymentViewModal({
           {/* ── Transaction ── */}
           <div className="payment-section">
             <div className="payment-section-title">Transaction</div>
-            <Row
-              label="Reference"
-              value={
-                <span style={{ fontFamily: "monospace" }}>
-                  {payment.reference}
-                </span>
-              }
-            />
             {payment.credoReference && (
               <Row
                 label="Credo Ref."

@@ -15,10 +15,11 @@ import {
 import AuthBrandPanel, {
   type AuthFeature,
 } from "../../components/auth/AuthBrandPanel";
-import { useLoginUser } from "../../hooks/useAuth";
+import { useGoogleLogin, useLoginUser } from "../../hooks/useAuth";
 import { useAuth } from "../../context/useAuth";
 import type { UserRole } from "../../api/types/auth";
 import ForgotPassword from "../../components/auth/ForgotPassword";
+import GoogleButton from "../../components/auth/GoogleButton";
 
 const features: AuthFeature[] = [
   {
@@ -49,6 +50,7 @@ const Login = () => {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
 
   const { mutate: login, isPending } = useLoginUser();
+  const { mutate: googleLogin, isPending: googlePending } = useGoogleLogin();
   const { isAuthenticated, user, isLoading } = useAuth();
 
   if (!isLoading && isAuthenticated && user) {
@@ -147,11 +149,21 @@ const Login = () => {
               </div>
             </div>
 
-            <button type="submit" className="auth-submit" disabled={isPending}>
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={isPending || googlePending}
+            >
               {isPending ? "Logging in…" : "Log In"}
               {!isPending && <ArrowRight size={18} />}
             </button>
           </form>
+
+          <GoogleButton
+            divider="before"
+            disabled={isPending || googlePending}
+            onCredential={(idToken) => googleLogin({ idToken })}
+          />
 
           <p className="auth-register">
             Don't have an account?{" "}

@@ -8,6 +8,7 @@ import {
   CreditCard,
   DollarSign,
   Activity,
+  ChevronDown,
 } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
@@ -36,6 +37,17 @@ const STATUS_OPTIONS = [
   "cancelled",
 ];
 
+// Remembers whether the admin collapsed "Transaction Statuses".
+const STATUSES_OPEN_KEY = "payments.statusesOpen";
+
+const readStatusesOpen = () => {
+  try {
+    return localStorage.getItem(STATUSES_OPEN_KEY) !== "false";
+  } catch {
+    return true;
+  }
+};
+
 const DATE_FIELD_OPTIONS = [
   { value: "createdAt", label: "Date Created" },
   { value: "paidAt", label: "Date Paid" },
@@ -45,7 +57,6 @@ const DATE_FIELD_OPTIONS = [
 
 interface FilterState {
   search: string;
-  reference: string;
   /** Held as a list, sent to the API as a comma-separated string. */
   statuses: string[];
   channel: string;
@@ -60,7 +71,6 @@ interface FilterState {
 
 const INITIAL_FILTERS: FilterState = {
   search: "",
-  reference: "",
   statuses: [],
   channel: "",
   dateField: "createdAt",
@@ -75,6 +85,7 @@ const INITIAL_FILTERS: FilterState = {
 export default function Payments() {
   const { openModal, closeModal } = useModal();
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+  const [statusesOpen, setStatusesOpen] = useState(readStatusesOpen);
 
   const setField = <K extends keyof FilterState>(
     field: K,
@@ -99,7 +110,6 @@ export default function Payments() {
     page: filters.page,
     limit: filters.limit,
     ...(filters.search ? { search: filters.search } : {}),
-    ...(filters.reference ? { reference: filters.reference } : {}),
     ...(filters.statuses.length
       ? { status: filters.statuses.join(",") }
       : {}),
@@ -118,6 +128,16 @@ export default function Payments() {
 
   const { data: summaryResponse } = usePaymentSummary(summaryParams);
   const summary = normalizeSummary(summaryResponse);
+
+  const toggleStatuses = () =>
+    setStatusesOpen((open) => {
+      try {
+        localStorage.setItem(STATUSES_OPEN_KEY, String(!open));
+      } catch {
+        // Storage blocked — the toggle still works for this visit.
+      }
+      return !open;
+    });
 
   const openView = (payment: Payment) =>
     openModal(
@@ -174,32 +194,49 @@ export default function Payments() {
         />
       </div>
 
-      <div className="section-title-divider" style={{ marginTop: 18, marginBottom: 12 }}>Transaction Statuses</div>
-      <div className="payments-summary-grid">
-        <StatCard
-          label="Total Attempts"
-          value={summary.totalCount}
-          icon={<Activity size={20} />}
-          color="var(--color-secondary)"
-        />
-        <StatCard
-          label="Successful"
-          value={summary.paidCount}
-          icon={<CircleCheck size={20} />}
-          color="var(--color-primary-hover)"
-        />
-        <StatCard
-          label="Pending"
-          value={summary.pendingCount}
-          icon={<Clock size={20} />}
-          color="#f9a825"
-        />
-        <StatCard
-          label="Failed / Abandoned"
-          value={`${summary.failedCount} / ${summary.abandonedCount}`}
-          icon={<XCircle size={20} />}
-          color="#c62828"
-        />
+      <button
+        type="button"
+        className="section-title-divider payments-section-toggle"
+        onClick={toggleStatuses}
+        aria-expanded={statusesOpen}
+        aria-controls="payments-statuses"
+      >
+        Transaction Statuses
+        <ChevronDown size={16} className="payments-section-toggle__icon" />
+      </button>
+      <div
+        id="payments-statuses"
+        className={`payments-collapse${statusesOpen ? " is-open" : ""}`}
+        inert={!statusesOpen}
+      >
+        <div className="payments-collapse__inner">
+          <div className="payments-summary-grid">
+            <StatCard
+              label="Total Attempts"
+              value={summary.totalCount}
+              icon={<Activity size={20} />}
+              color="var(--color-secondary)"
+            />
+            <StatCard
+              label="Successful"
+              value={summary.paidCount}
+              icon={<CircleCheck size={20} />}
+              color="var(--color-primary-hover)"
+            />
+            <StatCard
+              label="Pending"
+              value={summary.pendingCount}
+              icon={<Clock size={20} />}
+              color="#f9a825"
+            />
+            <StatCard
+              label="Failed / Abandoned"
+              value={`${summary.failedCount} / ${summary.abandonedCount}`}
+              icon={<XCircle size={20} />}
+              color="#c62828"
+            />
+          </div>
+        </div>
       </div>
 
       {/* ── Search ── */}
@@ -289,16 +326,6 @@ export default function Payments() {
           </div>
         </div>
         <ResetButton onClick={handleReset} />
-      </div>
-
-      {/* ── Reference (partial match) ── */}
-      <div className="filter-wrapper">
-        <SearchInput
-          value={filters.reference}
-          onChange={(val) => setField("reference", val)}
-          placeholder="Filter by reference (partial match)…"
-          onClear={() => setField("reference", "")}
-        />
       </div>
 
       <div className="table-wrapper">
