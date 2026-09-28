@@ -135,9 +135,27 @@ function CurriculumFormInner({
     ];
   });
 
-  // Drag state — one cursor for topics, one per topic for its subtopics.
+  // Drag state — one cursor for topics, one for subtopics.
   const [dragTopic, setDragTopic] = useState<number | null>(null);
   const [overTopic, setOverTopic] = useState<number | null>(null);
+  /** A subtopic being dragged — only ever within its own topic. */
+  const [dragSub, setDragSub] = useState<{ ti: number; si: number } | null>(
+    null,
+  );
+  const [overSub, setOverSub] = useState<{ ti: number; si: number } | null>(
+    null,
+  );
+  /**
+   * The subtopic whose grip is held. A row is draggable only then, so the
+   * mouse can still select text in its inputs.
+   */
+  const [subGrip, setSubGrip] = useState<string | null>(null);
+
+  const endSubDrag = () => {
+    setDragSub(null);
+    setOverSub(null);
+    setSubGrip(null);
+  };
 
   const { mutate: create, isPending: creating } = useCreateCurriculum();
   const { mutate: update, isPending: updating } = useUpdateCurriculum();
@@ -354,6 +372,7 @@ function CurriculumFormInner({
               e.dataTransfer.setData("text/plain", String(ti));
             }}
             onDragOver={(e: DragEvent<HTMLDivElement>) => {
+              if (dragTopic === null) return; // a subtopic drag, not ours
               e.preventDefault();
               e.dataTransfer.dropEffect = "move";
               setOverTopic(ti);
@@ -363,7 +382,8 @@ function CurriculumFormInner({
             }
             onDrop={(e: DragEvent<HTMLDivElement>) => {
               e.preventDefault();
-              if (dragTopic !== null && dragTopic !== ti) moveTopic(dragTopic, ti);
+              if (dragTopic !== null && dragTopic !== ti)
+                moveTopic(dragTopic, ti);
               setDragTopic(null);
               setOverTopic(null);
             }}
@@ -434,8 +454,61 @@ function CurriculumFormInner({
               {topic.subtopics.length > 0 && (
                 <span className="builder-hint">Subtopics</span>
               )}
-              {topic.subtopics.map((sub, si) => (
-                <div key={sub._id ?? si} className="builder-subrow">
+              {topic.subtopics.map((sub, si) => {
+                const gripKey = `${ti}-${si}`;
+                const isDragging = dragSub?.ti === ti && dragSub.si === si;
+                const isOver =
+                  overSub?.ti === ti && overSub.si === si && !isDragging;
+                return (
+                <div
+                  key={sub._id ?? si}
+                  className={`builder-subrow${
+                    isDragging ? " builder-subrow--dragging" : ""
+                  }${isOver ? " builder-subrow--over" : ""}`}
+                  draggable={subGrip === gripKey}
+                  // Every handler stops propagation: the topic card around
+                  // this row is draggable too, and must not react.
+                  onDragStart={(e: DragEvent<HTMLDivElement>) => {
+                    e.stopPropagation();
+                    setDragSub({ ti, si });
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", gripKey);
+                  }}
+                  onDragOver={(e: DragEvent<HTMLDivElement>) => {
+                    e.stopPropagation();
+                    // Only within the same topic — moving a subtopic to
+                    // another topic would re-file its logbook entries.
+                    if (!dragSub || dragSub.ti !== ti) return;
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                    setOverSub({ ti, si });
+                  }}
+                  onDragLeave={() =>
+                    setOverSub((prev) =>
+                      prev?.ti === ti && prev.si === si ? null : prev,
+                    )
+                  }
+                  onDrop={(e: DragEvent<HTMLDivElement>) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (dragSub && dragSub.ti === ti && dragSub.si !== si)
+                      moveSubtopic(ti, dragSub.si, si);
+                    endSubDrag();
+                  }}
+                  onDragEnd={(e: DragEvent<HTMLDivElement>) => {
+                    e.stopPropagation();
+                    endSubDrag();
+                  }}
+                >
+                  <span
+                    className="builder-grip"
+                    title="Drag to reorder"
+                    aria-hidden="true"
+                    onMouseDown={() => setSubGrip(gripKey)}
+                    onMouseUp={() => setSubGrip(null)}
+                  >
+                    <GripVertical size={13} />
+                  </span>
                   <span className="builder-subnum">
                     {ti + 1}.{si + 1}
                   </span>
@@ -461,7 +534,7 @@ function CurriculumFormInner({
                       className="builder-move-btn"
                       onClick={() => moveSubtopic(ti, si, si - 1)}
                       disabled={si === 0}
-                      aria-label="Move subtopic up"
+                      aria-label={`Move subtopic ${ti + 1}.${si + 1} up`}
                       title="Move up"
                     >
                       <ChevronUp size={12} />
@@ -471,7 +544,7 @@ function CurriculumFormInner({
                       className="builder-move-btn"
                       onClick={() => moveSubtopic(ti, si, si + 1)}
                       disabled={si === topic.subtopics.length - 1}
-                      aria-label="Move subtopic down"
+                      aria-label={`Move subtopic ${ti + 1}.${si + 1} down`}
                       title="Move down"
                     >
                       <ChevronDown size={12} />
@@ -487,7 +560,8 @@ function CurriculumFormInner({
                     <Trash2 size={13} />
                   </button>
                 </div>
-              ))}
+                );
+              })}
               <button
                 type="button"
                 className="builder-add-btn builder-add-btn--sub"

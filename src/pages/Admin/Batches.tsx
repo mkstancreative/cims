@@ -3,15 +3,15 @@ import { useModal } from "../../context/ModalContext";
 import {
   useDeleteBatch,
   useAssignBatchSupervisor,
-  useAssignBatchQuiz,
 } from "../../hooks/useBatches";
 import { useSupervisors } from "../../hooks/useSupervisors";
-import { useQuizzes } from "../../hooks/useQuizzes";
 import type { Batch, BatchStatus } from "../../api/types/batch";
 import BatchForm from "../../components/admin/forms/BatchForm";
 import BatchAnnouncementForm from "../../components/admin/forms/BatchAnnouncementForm";
 import ManageBatchCurriculaModal from "../../components/admin/forms/ManageBatchCurriculaModal";
-import { Layers, UserPlus, HelpCircle } from "lucide-react";
+import BatchQuizModal from "../../components/admin/forms/BatchQuizModal";
+import BatchViewModal from "../../components/admin/view/BatchViewModal";
+import { Layers, UserPlus } from "lucide-react";
 import AddButton from "../../components/ui/AddButton/AddButton";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
@@ -104,87 +104,13 @@ function AssignSupervisorModal({
   );
 }
 
-// ── Assign quiz modal ─────────────────────────────────────────────────────────
-function AssignQuizModal({
-  batch,
-  onClose,
-}: {
-  batch: Batch;
-  onClose: () => void;
-}) {
-  const [quizId, setQuizId] = useState("");
-  const { data, isLoading } = useQuizzes({ limit: 100, isActive: true });
-  const { mutate: assign, isPending } = useAssignBatchQuiz();
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!quizId) return;
-    assign({ id: batch._id, quizId }, { onSuccess: onClose });
-  };
-
-  return (
-    <CustomModal
-      isOpen
-      onClose={onClose}
-      title="Assign Quiz"
-      subtitle={`Assign a quiz to ${batch.name}`}
-      icon={<HelpCircle size={16} />}
-      size="medium"
-      footer={
-        <>
-          <button
-            type="button"
-            className="modal-cancel"
-            onClick={onClose}
-            disabled={isPending}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            form="assign-quiz-form"
-            className="modal-submit"
-            disabled={isPending || !quizId}
-          >
-            {isPending ? <Spinner size={14} color="#fff" text="" /> : "Assign"}
-          </button>
-        </>
-      }
-    >
-      <form id="assign-quiz-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="modal-label">
-            Quiz <span>*</span>
-          </label>
-          <select
-            className="modal-input"
-            value={quizId}
-            onChange={(e) => setQuizId(e.target.value)}
-            required
-            disabled={isLoading}
-          >
-            <option value="">
-              {isLoading ? "Loading…" : "Select a quiz"}
-            </option>
-            {data?.data.map((q) => (
-              <option key={q._id} value={q._id}>
-                {q.title}
-              </option>
-            ))}
-          </select>
-        </div>
-      </form>
-    </CustomModal>
-  );
-}
-
 export default function Batches() {
   const { openModal, closeModal } = useModal();
 
   const [filter, setFilter] = useState<FilterState>({
     search: "",
     page: 1,
-    limit: 1000,
+    limit: 10,
     status: "",
     session: "",
   });
@@ -209,7 +135,22 @@ export default function Batches() {
     openModal(<BatchForm key="new" isOpen onClose={closeModal} />);
   const openEdit = (batch: Batch) =>
     openModal(
-      <BatchForm key={batch._id} isOpen onClose={closeModal} editing={batch} />,
+      <BatchForm
+        key={batch._id}
+        isOpen
+        onClose={closeModal}
+        editingId={batch._id}
+      />,
+    );
+
+  const openView = (batch: Batch) =>
+    openModal(
+      <BatchViewModal
+        key={batch._id}
+        id={batch._id}
+        onClose={closeModal}
+        onEdit={openEdit}
+      />,
     );
 
   const handleReset = () => {
@@ -297,6 +238,7 @@ export default function Batches() {
             limit={filter.limit}
             onPageChange={(p) => setFilter((prev) => ({ ...prev, page: p }))}
             onLimitChange={(l) => setField("limit", l)}
+            onView={openView}
             onEdit={openEdit}
             onAssignSupervisor={(batch) =>
               openModal(
@@ -313,7 +255,7 @@ export default function Batches() {
               )
             }
             onAssignQuiz={(batch) =>
-              openModal(<AssignQuizModal batch={batch} onClose={closeModal} />)
+              openModal(<BatchQuizModal batch={batch} onClose={closeModal} />)
             }
             onAnnounce={(batch) =>
               openModal(

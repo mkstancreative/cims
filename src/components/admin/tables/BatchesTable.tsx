@@ -1,4 +1,5 @@
 import {
+  Eye,
   Edit2,
   Zap,
   Archive,
@@ -21,6 +22,8 @@ import {
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import { durationLabel, formatPrice } from "../../../helpers/duration";
 import { fmt } from "../../../helpers/utilities";
+import { useQuizzes } from "../../../hooks/useQuizzes";
+import { batchQuizTitle } from "../../../helpers/batchQuiz";
 
 interface BatchesTableProps {
   search?: string;
@@ -30,6 +33,7 @@ interface BatchesTableProps {
   limit: number;
   onPageChange: (p: number) => void;
   onLimitChange: (l: number) => void;
+  onView: (batch: Batch) => void;
   onEdit: (batch: Batch) => void;
   onAssignSupervisor: (batch: Batch) => void;
   onManageCurricula: (batch: Batch) => void;
@@ -52,6 +56,7 @@ export default function BatchesTable({
   limit,
   onPageChange,
   onLimitChange,
+  onView,
   onEdit,
   onAssignSupervisor,
   onManageCurricula,
@@ -66,6 +71,12 @@ export default function BatchesTable({
     status,
     session,
   });
+
+  // Names quizzes that batches carry as a bare id.
+  const { data: quizzesResp } = useQuizzes({ limit: 100 });
+  const quizNames = new Map(
+    (quizzesResp?.data ?? []).map((q) => [q._id, q.title]),
+  );
 
   const { mutate: activate } = useActivateBatch();
   const { mutate: archive } = useArchiveBatch();
@@ -84,7 +95,19 @@ export default function BatchesTable({
     : null;
 
   const columns: Column<Batch>[] = [
-    { header: "Batch Name", accessor: "name" },
+    {
+      header: "Batch Name",
+      render: (row) => (
+        <button
+          type="button"
+          className="bt-name"
+          onClick={() => onView(row)}
+          title="View batch"
+        >
+          {row.name}
+        </button>
+      ),
+    },
     { header: "Session", accessor: "session" },
     {
       header: "Status",
@@ -139,10 +162,32 @@ export default function BatchesTable({
       render: (row) => supervisorLabel(row),
     },
     {
+      header: "Quiz",
+      render: (row) => {
+        const title = batchQuizTitle(row, quizNames);
+        return (
+          <button
+            type="button"
+            className={`bt-quiz${title ? "" : " bt-quiz--none"}`}
+            onClick={() => onAssignQuiz(row)}
+            disabled={row.status === "archived"}
+            title={title ? "Change or reuse this quiz" : "Assign a quiz"}
+          >
+            {title ?? "Not assigned"}
+          </button>
+        );
+      },
+    },
+    {
       header: "Actions",
       render: (row) => (
         <ActionDropdown
           actions={[
+            {
+              label: "View",
+              icon: <Eye size={13} />,
+              onClick: () => onView(row),
+            },
             {
               label: "Edit",
               icon: <Edit2 size={13} />,
@@ -162,7 +207,7 @@ export default function BatchesTable({
               disabled: row.status === "archived",
             },
             {
-              label: "Assign Quiz",
+              label: "Manage Quiz",
               icon: <HelpCircle size={13} />,
               onClick: () => onAssignQuiz(row),
               disabled: row.status === "archived",

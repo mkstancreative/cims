@@ -1,0 +1,79 @@
+/* ─── Batch quiz modal ─────────────────────────────────────────────────── */
+.bq {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bq-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.bq-empty {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+.bq-current {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+}
+
+.bq-current__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.bq-tag {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.bq-tag--muted {
+  background: var(--color-surface-overlay-hover);
+  color: var(--color-text-muted);
+}
+
+.bq-unassign {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: var(--color-bg-secondary);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.bq-unassign:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.07);
+}
+
+.bq-unassign:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

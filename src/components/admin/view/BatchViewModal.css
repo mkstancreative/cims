@@ -1,0 +1,137 @@
+/* ─── Batch view modal ─────────────────────────────────────────────────── */
+.bv {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.bv-status {
+  margin-top: -6px;
+}
+
+.bv-heading {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.bv-heading span {
+  font-weight: 500;
+}
+
+.bv-muted {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+/* Student counts */
+.bv-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bv-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+}
+
+.bv-stat strong {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.bv-stat span {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+
+/* Details */
+.bv-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+}
+
+.bv-details > div {
+  min-width: 0;
+}
+
+.bv-details dt {
+  margin-bottom: 3px;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+
+.bv-details dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.bv-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+/* Curricula */
+.bv-curricula {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bv-curricula li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--color-border);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.bv-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+@media (max-width: 560px) {
+  .bv-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bv-details {
+    grid-template-columns: 1fr;
+  }
+}

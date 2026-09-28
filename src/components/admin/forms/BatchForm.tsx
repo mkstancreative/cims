@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from "react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import Spinner from "../../ui/Spinner/Spinner";
-import { useCreateBatch, useUpdateBatch } from "../../../hooks/useBatches";
+import {
+  useBatchById,
+  useCreateBatch,
+  useUpdateBatch,
+} from "../../../hooks/useBatches";
 import { useDurations } from "../../../hooks/useDurations";
 import type { Batch, BatchPayload } from "../../../api/types/batch";
 import type { Duration } from "../../../api/types/duration";
@@ -17,6 +21,13 @@ import { AlertTriangle, Layers } from "lucide-react";
 import "./BatchForm.css";
 
 interface BatchFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  /** Edit this batch (loaded fresh by id); omit to create one. */
+  editingId?: string;
+}
+
+interface BatchFormInnerProps {
   isOpen: boolean;
   onClose: () => void;
   editing?: Batch | null;
@@ -56,7 +67,43 @@ function buildInitial(editing?: Batch | null): FormState {
   };
 }
 
-export default function BatchForm({ isOpen, onClose, editing }: BatchFormProps) {
+/**
+ * When editing, loads the batch with `useBatchById` so the form starts from
+ * the server's current copy — not a table row that may be out of date.
+ */
+export default function BatchForm({ isOpen, onClose, editingId }: BatchFormProps) {
+  const { data, isLoading, isError } = useBatchById(editingId ?? "");
+
+  if (editingId && !data?.data?.batch) {
+    return (
+      <CustomModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Edit Batch"
+        icon={<Layers size={16} />}
+        size="large"
+        isLoading={isLoading}
+      >
+        {isError && (
+          <p style={{ margin: 0, color: "var(--color-text-muted)" }}>
+            This batch couldn't be loaded. Close and try again.
+          </p>
+        )}
+      </CustomModal>
+    );
+  }
+
+  return (
+    <BatchFormInner
+      key={editingId ?? "new"}
+      isOpen={isOpen}
+      onClose={onClose}
+      editing={editingId ? data?.data.batch : null}
+    />
+  );
+}
+
+function BatchFormInner({ isOpen, onClose, editing }: BatchFormInnerProps) {
   const [form, setForm] = useState<FormState>(() => buildInitial(editing));
   const { mutate: create, isPending: creating } = useCreateBatch();
   const { mutate: update, isPending: updating } = useUpdateBatch();

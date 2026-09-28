@@ -261,3 +261,17 @@
     order: 3;
   }
 }
+
+/* Subtopic rows — dragged by their grip, within their own topic */
+.builder-subrow .builder-grip {
+  cursor: grab;
+}
+
+.builder-subrow--dragging {
+  opacity: 0.45;
+}
+
+.builder-subrow--over {
+  border-radius: 8px;
+  box-shadow: inset 0 2px 0 0 var(--color-accent);
+}

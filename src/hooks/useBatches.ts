@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import {
   getBatches,
@@ -20,7 +25,7 @@ import {
   unassignBatchQuiz,
   getDepartments,
 } from "../api/services/batch";
-import type { BatchParams } from "../api/types/batch";
+import type { Batch, BatchParams } from "../api/types/batch";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -225,7 +230,8 @@ export const useAssignBatchQuiz = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: assignBatchQuiz,
-    onSuccess: () => {
+    onSuccess: (_res, { id, quizId }) => {
+      patchBatchQuizInCache(queryClient, [id], quizId);
       queryClient.invalidateQueries({ queryKey: ["batches"] });
       toast.success("Quiz assigned to batch.");
     },
@@ -234,11 +240,37 @@ export const useAssignBatchQuiz = () => {
   });
 };
 
+/**
+ * Writes a batch's new quiz straight into every cached batch list, so the
+ * table and any open dialog show it at once instead of after the refetch.
+ * `quizId: null` = unassigned (the API then omits the field).
+ */
+function patchBatchQuizInCache(
+  queryClient: QueryClient,
+  batchIds: string[],
+  quizId: string | null,
+) {
+  const ids = new Set(batchIds);
+  queryClient.setQueriesData<{ data?: unknown }>(
+    { queryKey: ["batches"] },
+    (old) => {
+      if (!old || !Array.isArray(old.data)) return old; // lists only
+      return {
+        ...old,
+        data: (old.data as Batch[]).map((b) =>
+          ids.has(b._id) ? { ...b, quiz: quizId } : b,
+        ),
+      };
+    },
+  );
+}
+
 export const useUnassignBatchQuiz = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: unassignBatchQuiz,
-    onSuccess: () => {
+    onSuccess: (_res, id: string) => {
+      patchBatchQuizInCache(queryClient, [id], null);
       queryClient.invalidateQueries({ queryKey: ["batches"] });
       toast.success("Quiz unassigned.");
     },
