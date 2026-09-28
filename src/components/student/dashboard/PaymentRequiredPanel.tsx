@@ -13,6 +13,7 @@ import { useLogoutUser } from "../../../hooks/useAuth";
 import {
   apiErrorMessage,
   findUnpaidRegistration,
+  isPaymentRequiredError,
   paymentOutcome,
 } from "../../../helpers/registration";
 import {
@@ -89,6 +90,15 @@ export function PaymentRequiredPanel({ message }: PaymentRequiredPanelProps) {
     queryClient.invalidateQueries({ queryKey: ["registrations"] });
   };
 
+  /** Re-asks the server; true once the dashboard is no longer payment-gated
+   *  (the payment may have been confirmed without us, e.g. by Credo's webhook). */
+  const gateLifted = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["registrations", "my"] });
+    await queryClient.invalidateQueries({ queryKey: ["student-dashboard"] });
+    const error = queryClient.getQueryState(["student-dashboard"])?.error;
+    return !isPaymentRequiredError(error);
+  };
+
   /** Asks the server to verify `reference` with Credo; `quiet` skips toasts
    *  unless the payment went through. */
   const verify = async (reference: string, quiet = false) => {
@@ -96,6 +106,8 @@ export function PaymentRequiredPanel({ message }: PaymentRequiredPanelProps) {
     const outcome = paymentOutcome(res.data?.status);
     if (outcome === "success") return unlockDashboard();
     if (quiet) return;
+    // This attempt isn't confirmed, but another one may have been.
+    if (await gateLifted()) return unlockDashboard();
     if (outcome === "pending")
       toast.info(
         "Your payment is still processing. Please check again in a few minutes.",
@@ -156,14 +168,18 @@ export function PaymentRequiredPanel({ message }: PaymentRequiredPanelProps) {
         reference = res.data?.reference ?? null;
         if (reference) rememberReference(reference);
       }
-      if (!reference) {
-        toast.info(
-          "We couldn't find a payment to verify yet. If you just paid, please try again in a few minutes.",
-        );
+      if (reference) {
+        stage = "verify";
+        await verify(reference);
         return;
       }
-      stage = "verify";
-      await verify(reference);
+      // Nothing to verify with (no saved attempt, and the registration list is
+      // gated too) — but the payment may already be confirmed server-side.
+      if (await gateLifted()) return unlockDashboard();
+      toast.info(
+        "We couldn't confirm your payment yet. If you've just paid, give it a few minutes and try again, or sign out and back in to reload your registration.",
+        { toastId: "payment-not-found" },
+      );
     } catch (err) {
       // The pay hook already reports its own failures.
       if (stage === "verify")
