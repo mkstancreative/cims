@@ -12,6 +12,7 @@ import {
   cancelRegistration,
 } from "../api/services/registration";
 import type { ReviewQueueParams } from "../api/types/registration";
+import { isPaymentRequiredError } from "../helpers/registration";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -40,6 +41,9 @@ export const useMyRegistrations = () => {
   return useQuery({
     queryKey: ["registrations", "my"],
     queryFn: getMyRegistrations,
+    // Also behind the payment gate while the fee is unpaid — don't retry that.
+    retry: (failureCount, error) =>
+      !isPaymentRequiredError(error) && failureCount < 3,
   });
 };
 

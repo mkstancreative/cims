@@ -19,6 +19,26 @@
   border: 1px solid var(--color-border);
 }
 
+/* Search and status chips share one card; the chips sit under a divider */
+.payments-search-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.payments-search-card .search-box {
+  margin-bottom: 0;
+}
+
+.payments-search-card .payments-chip-row {
+  margin-bottom: 0;
+  padding: 14px 0 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  background: none;
+}
+
 .payments-chip-label {
   font-size: 11px;
   font-weight: 700;

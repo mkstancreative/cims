@@ -16,8 +16,11 @@ export interface AuthUser {
  * but has a registration still awaiting payment.
  */
 export interface PendingRegistration {
+  /** The login response names the id `id`; other payloads use the two below. */
+  id?: string;
   registrationId?: string;
   _id?: string;
+  type?: string;
   reference?: string;
   amount?: number;
   /** A live provider link, when the previous attempt is still resumable. */

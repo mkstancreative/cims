@@ -67,16 +67,17 @@ export default function Registrations() {
         </div>
       </div>
 
-      <div className="filter-wrapper">
-        <SearchInput
-          value={filters.search}
-          onChange={(val) => setField("search", val)}
-          placeholder="Search by name, reg. number…"
-          onClear={handleReset}
-        />
-      </div>
-
-      <div className="filter-selects-block">
+      {/* ── Search + filters ── */}
+      <div className="filter-selects-block filter-selects-block--with-search">
+        <div className="filter-search-field">
+          <span className="filter-label">Search</span>
+          <SearchInput
+            value={filters.search}
+            onChange={(val) => setField("search", val)}
+            placeholder="Search by name, reg. number…"
+            onClear={() => setField("search", "")}
+          />
+        </div>
         <SelectFilter
           label="Status"
           options={[

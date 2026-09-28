@@ -51,16 +51,17 @@ export default function SupervisorPage() {
         </div>
       </div>
 
-      <div className="filter-wrapper">
-        <SearchInput
-          value={filter.search}
-          onChange={(val) => setField("search", val)}
-          placeholder="Search by name, staff ID…"
-          onClear={handleReset}
-        />
-      </div>
-
-      <div className="filter-selects-block">
+      {/* ── Search + reset ── */}
+      <div className="filter-selects-block filter-selects-block--with-search">
+        <div className="filter-search-field">
+          <span className="filter-label">Search</span>
+          <SearchInput
+            value={filter.search}
+            onChange={(val) => setField("search", val)}
+            placeholder="Search by name, staff ID…"
+            onClear={() => setField("search", "")}
+          />
+        </div>
         <ResetButton onClick={handleReset} />
       </div>
 

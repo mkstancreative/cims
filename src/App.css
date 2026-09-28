@@ -83,6 +83,24 @@ html:not(.light-mode) .page-title {
   align-self: flex-end;
 }
 
+/* Search sharing the filter card: bottoms line up, search gets more room */
+.filter-selects-block--with-search {
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.filter-selects-block > .filter-search-field {
+  flex: 2 1 280px;
+}
+
+.filter-search-field .search-box {
+  margin-bottom: 0;
+}
+
+.filter-search-field .search-input {
+  height: 42px;
+}
+
 /* ── Shared layout blocks ────────────────────────────────────────────────── */
 .filter-wrapper {
   display: flex;

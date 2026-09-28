@@ -30,9 +30,9 @@ export function clearPendingRegistration(): void {
   localStorage.removeItem(PENDING_KEY);
 }
 
-/** The API uses `registrationId` in some payloads and `_id` in others. */
+/** The API names the id `id`, `registrationId` or `_id` depending on payload. */
 export function pendingRegistrationId(
   pending: PendingRegistration | null,
 ): string | null {
-  return pending?.registrationId ?? pending?._id ?? null;
+  return pending?.id ?? pending?.registrationId ?? pending?._id ?? null;
 }

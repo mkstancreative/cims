@@ -12,19 +12,33 @@ import { QuizAttendanceChip } from "../../components/student/dashboard/QuizAtten
 import { ProgressSection } from "../../components/student/dashboard/ProgressSection";
 import { FinalDetailsSection } from "../../components/student/dashboard/FinalDetailsSection";
 import { NotificationsSection } from "../../components/student/dashboard/NotificationsSection";
+import { PaymentRequiredPanel } from "../../components/student/dashboard/PaymentRequiredPanel";
 import { fmt, ago } from "../../helpers/utilities";
+import {
+  apiErrorMessage,
+  isPaymentRequiredError,
+} from "../../helpers/registration";
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function DashBoardStudent() {
-  const { data: dashResp, isLoading } = useStudentDashboard();
+  const { data: dashResp, isLoading, error } = useStudentDashboard();
 
   if (isLoading) return <DashboardSkeleton cards={6} wide />;
+
+  // Unpaid registration fee: the API refuses dashboard data, so offer payment.
+  if (isPaymentRequiredError(error))
+    return (
+      <PaymentRequiredPanel message={apiErrorMessage(error, "")} />
+    );
+
   if (!dashResp?.data)
     return (
       <DashboardError
         message={
-          (dashResp as { message?: string } | undefined)?.message ??
-          "Unable to load dashboard."
+          error
+            ? apiErrorMessage(error, "Unable to load dashboard.")
+            : ((dashResp as { message?: string } | undefined)?.message ??
+              "Unable to load dashboard.")
         }
       />
     );

@@ -239,32 +239,30 @@ export default function Payments() {
         </div>
       </div>
 
-      {/* ── Search ── */}
-      <div className="filter-wrapper">
+      {/* ── Search + status chips (chips → comma-separated `status`) ── */}
+      <div className="filter-wrapper payments-search-card">
         <SearchInput
           value={filters.search}
           onChange={(val) => setField("search", val)}
           placeholder="Search by payer name or email…"
-          onClear={handleReset}
+          onClear={() => setField("search", "")}
         />
-      </div>
-
-      {/* ── Status chips → comma-separated `status` ── */}
-      <div className="payments-chip-row">
-        <span className="payments-chip-label">Status</span>
-        {STATUS_OPTIONS.map((status) => (
-          <button
-            key={status}
-            type="button"
-            className={`payments-chip payments-chip--${status}${
-              filters.statuses.includes(status) ? " is-active" : ""
-            }`}
-            onClick={() => toggleStatus(status)}
-            aria-pressed={filters.statuses.includes(status)}
-          >
-            {status}
-          </button>
-        ))}
+        <div className="payments-chip-row">
+          <span className="payments-chip-label">Status</span>
+          {STATUS_OPTIONS.map((status) => (
+            <button
+              key={status}
+              type="button"
+              className={`payments-chip payments-chip--${status}${
+                filters.statuses.includes(status) ? " is-active" : ""
+              }`}
+              onClick={() => toggleStatus(status)}
+              aria-pressed={filters.statuses.includes(status)}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── Filters ── */}
