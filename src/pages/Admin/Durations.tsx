@@ -3,14 +3,12 @@ import { Clock, Info } from "lucide-react";
 import AddButton from "../../components/ui/AddButton/AddButton";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
-import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
+import StatusChangeDialog from "../../components/ui/Lifecycle/StatusChangeDialog";
+import DeleteDialog from "../../components/ui/Lifecycle/DeleteDialog";
+import type { LifecycleTarget } from "../../helpers/lifecycle";
 import DurationForm from "../../components/admin/forms/DurationForm";
 import DurationsTable from "../../components/admin/tables/DurationsTable";
 import { useModal } from "../../context/ModalContext";
-import {
-  useDeleteDuration,
-  useUpdateDuration,
-} from "../../hooks/useDurations";
 import type { Duration } from "../../api/types/duration";
 import { durationLabel } from "../../helpers/duration";
 import "../../components/admin/forms/BatchForm.css";
@@ -35,11 +33,16 @@ export default function Durations() {
     value: FilterState[K],
   ) => setFilters((prev) => ({ ...prev, [field]: value, page: 1 }));
 
-  // Deactivation is the soft delete; reactivation is an update, because
-  // bringing a retired tier back is deliberate.
-  const { mutate: deactivate, isPending: deactivating } = useDeleteDuration();
-  const { mutate: update, isPending: reactivating } = useUpdateDuration();
-  const [toggleTarget, setToggleTarget] = useState<Duration | null>(null);
+  // Status is the everyday, reversible control (PATCH …/status); deleting is
+  // permanent and preflighted. `isActive` is optional on legacy rows — absent
+  // means active.
+  const [statusTarget, setStatusTarget] = useState<LifecycleTarget | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<LifecycleTarget | null>(null);
+  const asTarget = (d: Duration): LifecycleTarget => ({
+    _id: d._id,
+    name: durationLabel(d),
+    isActive: d.isActive !== false,
+  });
 
   const openCreate = () =>
     openModal(<DurationForm key="new" isOpen onClose={closeModal} />);
@@ -55,22 +58,6 @@ export default function Durations() {
 
   const handleReset = () =>
     setFilters({ isActive: "", page: 1, limit: 10 });
-
-  const targetActive = toggleTarget?.isActive !== false;
-
-  const confirmToggle = () => {
-    if (!toggleTarget) return;
-    if (targetActive) {
-      deactivate(toggleTarget._id, {
-        onSuccess: () => setToggleTarget(null),
-      });
-    } else {
-      update(
-        { id: toggleTarget._id, data: { isActive: true } },
-        { onSuccess: () => setToggleTarget(null) },
-      );
-    }
-  };
 
   return (
     <div className="page-container">
@@ -134,26 +121,21 @@ export default function Durations() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onEdit={openEdit}
-          onToggleStatusRequest={setToggleTarget}
+          onToggleStatusRequest={(d) => setStatusTarget(asTarget(d))}
+          onDeleteRequest={(d) => setDeleteTarget(asTarget(d))}
         />
       </div>
 
-      <ConfirmModal
-        isOpen={Boolean(toggleTarget)}
-        variant={targetActive ? "danger" : "success"}
-        title={targetActive ? "Deactivate Duration" : "Activate Duration"}
-        message={
-          toggleTarget
-            ? targetActive
-              ? `Deactivate "${durationLabel(toggleTarget)}"? It will be refused if the tier is still attached to live batches or open registrations.`
-              : `Activate "${durationLabel(toggleTarget)}"? Students will be able to choose it again.`
-            : ""
-        }
-        confirmText={targetActive ? "Yes, Deactivate" : "Yes, Activate"}
-        cancelText="Cancel"
-        isPending={deactivating || reactivating}
-        onConfirm={confirmToggle}
-        onCancel={() => setToggleTarget(null)}
+      <StatusChangeDialog
+        resource="duration"
+        target={statusTarget}
+        onClose={() => setStatusTarget(null)}
+      />
+      <DeleteDialog
+        key={deleteTarget?._id ?? "none"}
+        resource="duration"
+        target={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   );

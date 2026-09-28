@@ -2,13 +2,23 @@ import { useState } from "react";
 import { ClipboardCheck, CheckCircle2, X } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
 import RegistrationsTable from "../../components/admin/tables/RegistrationsTable";
 import EnrollRegistrationForm from "../../components/admin/forms/EnrollRegistrationForm";
 import RejectRegistrationForm from "../../components/admin/forms/RejectRegistrationForm";
 import { useModal } from "../../context/ModalContext";
 import { toast } from "react-toastify";
 import { useDurations } from "../../hooks/useDurations";
+import { useInstitutions } from "../../hooks/useInstitutions";
+import { useDepartments } from "../../hooks/useBatches";
+import {
+  PROGRAM_TYPES,
+  PROGRAM_LEVELS_BY_TYPE,
+} from "../../helpers/programConstants";
 import { durationKey } from "../../helpers/registration";
 import { durationLabel } from "../../helpers/duration";
 import {
@@ -19,6 +29,13 @@ import "./Registrations.css";
 
 interface FilterState {
   status: string;
+  type: string;
+  /** Institution `_id`. */
+  institution: string;
+  programType: string;
+  programLevel: string;
+  /** Department name. */
+  department: string;
   /** Duration `_id`; filter by the target batch's tier before selecting. */
   duration: string;
   search: string;
@@ -28,11 +45,30 @@ interface FilterState {
 
 const INITIAL_FILTERS: FilterState = {
   status: "new",
+  type: "",
+  institution: "",
+  programType: "",
+  programLevel: "",
+  department: "",
   duration: "",
   search: "",
   page: 1,
   limit: 10,
 };
+
+const TYPE_OPTIONS = [
+  { value: "", label: "All Types" },
+  { value: "new", label: "New registration" },
+  { value: "re-enroll", label: "Re-enrolment" },
+];
+
+const PROGRAM_TYPE_OPTIONS = [
+  { value: "", label: "All Programs" },
+  ...PROGRAM_TYPES.map((p) => ({ value: p, label: p })),
+];
+
+// Every level across programmes, for when no programme type is chosen.
+const ALL_LEVELS = [...new Set(Object.values(PROGRAM_LEVELS_BY_TYPE).flat())];
 
 export default function Registrations() {
   const { openModal, closeModal } = useModal();
@@ -45,17 +81,104 @@ export default function Registrations() {
   );
 
   const { data: durationsResp } = useDurations({ limit: 100 });
+  const { data: institutionsResp } = useInstitutions({ limit: 100 });
+  const { data: departmentsResp } = useDepartments();
+
   const durationOptions = [
     { value: "", label: "All Durations" },
     ...(durationsResp?.data ?? []).map((d) => ({ value: d._id, label: d.label })),
+  ];
+  const institutionOptions = [
+    { value: "", label: "All Institutions" },
+    ...(institutionsResp?.data ?? []).map((i) => ({
+      value: i._id,
+      label: i.name,
+    })),
+  ];
+  const departmentOptions = [
+    { value: "", label: "All Departments" },
+    ...(departmentsResp?.data ?? []).map((d) => ({ value: d, label: d })),
+  ];
+  const levelOptions = [
+    { value: "", label: "All Levels" },
+    ...(filters.programType
+      ? (PROGRAM_LEVELS_BY_TYPE[filters.programType] ?? [])
+      : ALL_LEVELS
+    ).map((l) => ({ value: l, label: l })),
   ];
 
   const setField = <K extends keyof FilterState>(
     field: K,
     value: FilterState[K],
-  ) => setFilters((prev) => ({ ...prev, [field]: value, page: 1 }));
+  ) =>
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value,
+      // Levels belong to a programme type, so a type change clears the level.
+      ...(field === "programType" ? { programLevel: "" } : {}),
+      page: 1,
+    }));
 
-  const handleReset = () => setFilters(INITIAL_FILTERS);
+  // Clears the filters but keeps whatever is typed in the search box.
+  const clearFilters = () =>
+    setFilters((prev) => ({ ...INITIAL_FILTERS, search: prev.search }));
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "status",
+      label: "Status",
+      options: [
+        { value: "new", label: "New" },
+        { value: "enrolled", label: "Enrolled" },
+        { value: "rejected", label: "Rejected" },
+      ],
+      value: filters.status,
+      defaultValue: INITIAL_FILTERS.status,
+      onChange: (v) => setField("status", v),
+    },
+    {
+      key: "duration",
+      label: "Duration",
+      options: durationOptions,
+      value: filters.duration,
+      onChange: (v) => setField("duration", v),
+    },
+    {
+      key: "type",
+      label: "Type",
+      options: TYPE_OPTIONS,
+      value: filters.type,
+      onChange: (v) => setField("type", v),
+    },
+    {
+      key: "institution",
+      label: "Institution",
+      options: institutionOptions,
+      value: filters.institution,
+      onChange: (v) => setField("institution", v),
+    },
+    {
+      key: "department",
+      label: "Department",
+      options: departmentOptions,
+      value: filters.department,
+      onChange: (v) => setField("department", v),
+    },
+    {
+      key: "programType",
+      label: "Program type",
+      options: PROGRAM_TYPE_OPTIONS,
+      value: filters.programType,
+      onChange: (v) => setField("programType", v),
+    },
+    {
+      key: "programLevel",
+      label: "Program level",
+      options: levelOptions,
+      value: filters.programLevel,
+      onChange: (v) => setField("programLevel", v),
+    },
+  ];
 
   // ── Selection ──────────────────────────────────────────────────────────────
   // A bulk enrolment never mixes durations: the first pick locks the group,
@@ -164,36 +287,22 @@ export default function Registrations() {
         </div>
       </div>
 
-      {/* ── Search + filters ── */}
-      <div className="filter-selects-block filter-selects-block--with-search">
-        <div className="filter-search-field">
-          <span className="filter-label">Search</span>
-          <SearchInput
-            value={filters.search}
-            onChange={(val) => setField("search", val)}
-            placeholder="Search by name, reg. number…"
-            onClear={() => setField("search", "")}
-          />
+      {/* ── Filters + search ── */}
+      <div className="filter-wrapper fp-toolbar">
+        <div className="fp-toolbar__row">
+          <div className="fp-toolbar__search">
+            <SearchInput
+              value={filters.search}
+              onChange={(val) => setField("search", val)}
+              placeholder="Search by name, reg. number…"
+              onClear={() => setField("search", "")}
+            />
+          </div>
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+
+          <ResetButton onClick={() => setFilters(INITIAL_FILTERS)} />
         </div>
-        <SelectFilter
-          label="Status"
-          options={[
-            { value: "new", label: "New" },
-            { value: "enrolled", label: "Enrolled" },
-            { value: "rejected", label: "Rejected" },
-          ]}
-          value={filters.status}
-          onChange={(value) => setField("status", value)}
-          name="status"
-        />
-        <SelectFilter
-          label="Duration"
-          options={durationOptions}
-          value={filters.duration}
-          onChange={(value) => setField("duration", value)}
-          name="duration"
-        />
-        <ResetButton onClick={handleReset} />
+        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
       </div>
 
       {/* ── Bulk enrol bar ── */}
@@ -233,11 +342,7 @@ export default function Registrations() {
 
       <div className="table-wrapper">
         <RegistrationsTable
-          search={filters.search}
-          status={filters.status}
-          duration={filters.duration}
-          page={filters.page}
-          limit={filters.limit}
+          params={filters}
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onEnroll={(registration) => openEnroll([registration])}

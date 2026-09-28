@@ -4,12 +4,10 @@ import {
   createInstitution,
   getInstitutions,
   updateInstitution,
-  toggleInstitutionStatus,
   getPublicInstitutions,
 } from "../api/services/institution";
 import type {
   InstitutionParams,
-  ToggleInstitutionStatusPayload,
 } from "../api/types/institution";
 
 function getErrMsg(err: unknown, fallback: string) {
@@ -57,26 +55,3 @@ export const useUpdateInstitution = () => {
   });
 };
 
-export const useToggleInstitutionStatus = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: toggleInstitutionStatus,
-    onSuccess: (_data, variables: ToggleInstitutionStatusPayload) => {
-      queryClient.invalidateQueries({ queryKey: ["institutions"] });
-      toast.success(
-        variables.isActive
-          ? "Institution activated."
-          : "Institution deactivated.",
-      );
-    },
-    onError: (err: unknown, variables: ToggleInstitutionStatusPayload) =>
-      toast.error(
-        getErrMsg(
-          err,
-          variables.isActive
-            ? "Failed to activate institution."
-            : "Failed to deactivate institution.",
-        ),
-      ),
-  });
-};

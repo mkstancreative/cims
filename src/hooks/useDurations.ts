@@ -5,25 +5,14 @@ import {
   getDurations,
   createDuration,
   updateDuration,
-  deleteDuration,
 } from "../api/services/duration";
 import type {
   DurationParams,
-  DurationInUse,
 } from "../api/types/duration";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
   return e?.response?.data?.message ?? fallback;
-}
-
-/** Reads the in-use counts off a refused (409) deactivation. */
-export function durationInUseCounts(err: unknown): DurationInUse | null {
-  const e = err as {
-    response?: { status?: number; data?: { data?: DurationInUse } };
-  };
-  if (e?.response?.status !== 409) return null;
-  return e.response?.data?.data ?? null;
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -100,27 +89,3 @@ export const useReorderDurations = () => {
   });
 };
 
-export const useDeleteDuration = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteDuration,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["durations"] });
-      toast.success("Duration deactivated.");
-    },
-    onError: (err: unknown) => {
-      // A 409 means the tier is still attached to live batches or open
-      // registrations — name the counts so the admin knows what to clear.
-      const counts = durationInUseCounts(err);
-      if (counts) {
-        toast.error(
-          `${getErrMsg(err, "This duration is still in use.")} ` +
-            `(${counts.liveBatches} live batch(es), ` +
-            `${counts.openRegistrations} open registration(s))`,
-        );
-        return;
-      }
-      toast.error(getErrMsg(err, "Failed to deactivate duration."));
-    },
-  });
-};

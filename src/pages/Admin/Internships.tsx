@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Briefcase } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
 import InternshipsTable from "../../components/admin/tables/InternshipsTable";
 import InternshipStatusForm from "../../components/admin/forms/InternshipStatusForm";
 import { useModal } from "../../context/ModalContext";
@@ -62,6 +66,74 @@ export default function Internships() {
     }));
   };
 
+  // Clears the filters but keeps whatever is typed in the search box.
+  const clearFilters = () =>
+    setFilters((prev) => ({ ...INITIAL_FILTERS, search: prev.search }));
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "itStatus",
+      label: "Status",
+      options: [
+        { value: "", label: "All Status" },
+        { value: "placed", label: "Placed" },
+        { value: "active", label: "Active" },
+        { value: "completed", label: "Completed" },
+      ],
+      value: filters.itStatus,
+      onChange: (v) => setField("itStatus", v as InternshipStatus | ""),
+    },
+    {
+      key: "batchId",
+      label: "Batch",
+      options: [
+        { value: "", label: "All Batches" },
+        ...(batches?.data.map((b) => ({ value: b._id, label: b.name })) ?? []),
+      ],
+      value: filters.batchId,
+      onChange: (v) => setField("batchId", v),
+    },
+    {
+      key: "program",
+      label: "Program",
+      options: [
+        { value: "", label: "All Programs" },
+        ...PROGRAM_TYPES.map((pt) => ({ value: pt, label: pt })),
+      ],
+      value: filters.program,
+      onChange: handleProgramChange,
+    },
+    {
+      key: "level",
+      label: "Level",
+      options: [
+        { value: "", label: "All Levels" },
+        ...(PROGRAM_LEVELS_BY_TYPE[filters.program] ?? []).map((pl) => ({
+          value: pl,
+          label: pl,
+        })),
+      ],
+      value: filters.level,
+      onChange: (v) => setField("level", v),
+      // Levels belong to a programme, so there's nothing to pick until one is.
+      hint: filters.program ? undefined : "Choose a program first to filter by level.",
+    },
+    {
+      key: "session",
+      label: "Session",
+      input: { placeholder: "e.g. 2023/2024" },
+      value: filters.session,
+      onChange: (v) => setField("session", v),
+    },
+    {
+      key: "studentId",
+      label: "Student ID",
+      input: { placeholder: "e.g. 6088e…" },
+      value: filters.studentId,
+      onChange: (v) => setField("studentId", v),
+    },
+  ];
+
   const openChangeStatus = (internship: Internship) =>
     openModal(
       <InternshipStatusForm
@@ -86,119 +158,20 @@ export default function Internships() {
         </div>
       </div>
 
-      <div className="filter-wrapper">
-        <SearchInput
-          value={filters.search}
-          onChange={(val) => setField("search", val)}
-          placeholder="Search by student name…"
-          onClear={handleReset}
-        />
-      </div>
-
-      <div
-        className="filter-selects-block"
-        style={{ flexWrap: "wrap", gap: "12px 14px" }}
-      >
-        <SelectFilter
-          label="Status"
-          options={[
-            { value: "", label: "All Status" },
-            { value: "placed", label: "Placed" },
-            { value: "active", label: "Active" },
-            { value: "completed", label: "Completed" },
-          ]}
-          value={filters.itStatus}
-          onChange={(value) =>
-            setField("itStatus", value as InternshipStatus | "")
-          }
-          name="itStatus"
-        />
-
-        <SelectFilter
-          label="Batch"
-          options={[
-            { value: "", label: "All Batches" },
-            ...(batches?.data.map((b) => ({
-              value: b._id,
-              label: b.name,
-            })) || []),
-          ]}
-          value={filters.batchId}
-          onChange={(value) => setField("batchId", value)}
-          name="batchId"
-        />
-
-        <SelectFilter
-          label="Program"
-          options={[
-            { value: "", label: "All Programs" },
-            ...PROGRAM_TYPES.map((pt) => ({ value: pt, label: pt })),
-          ]}
-          value={filters.program}
-          onChange={handleProgramChange}
-          name="program"
-        />
-
-        <SelectFilter
-          label="Level"
-          options={[
-            { value: "", label: "All Levels" },
-            ...(filters.program
-              ? (PROGRAM_LEVELS_BY_TYPE[filters.program] || []).map((pl) => ({
-                  value: pl,
-                  label: pl,
-                }))
-              : []),
-          ]}
-          value={filters.level}
-          onChange={(value) => setField("level", value)}
-          name="level"
-          key={filters.program}
-        />
-
-        <div className="filter-container">
-          <label className="filter-label">Session</label>
-          <input
-            className="modal-input"
-            placeholder="e.g. 2023/2024"
-            value={filters.session}
-            onChange={(e) => setField("session", e.target.value)}
-            style={{
-              height: 38,
-              padding: "0 12px",
-              borderRadius: 8,
-              border: "1px solid var(--color-accent-border)",
-              background: "var(--color-bg-primary)",
-              color: "var(--color-text-primary)",
-              fontSize: 13,
-              outline: "none",
-              width: 140,
-            }}
-          />
+      <div className="filter-wrapper fp-toolbar">
+        <div className="fp-toolbar__row">
+          <div className="fp-toolbar__search">
+            <SearchInput
+              value={filters.search}
+              onChange={(val) => setField("search", val)}
+              placeholder="Search by student name…"
+              onClear={() => setField("search", "")}
+            />
+          </div>
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+          <ResetButton onClick={handleReset} />
         </div>
-
-        <div className="filter-container">
-          <label className="filter-label">Student ID</label>
-          <input
-            className="modal-input"
-            placeholder="e.g. 6088e…"
-            value={filters.studentId}
-            onChange={(e) => setField("studentId", e.target.value)}
-            style={{
-              height: 38,
-              padding: "0 12px",
-              borderRadius: 8,
-              border: "1px solid var(--color-accent-border)",
-              background: "var(--color-bg-primary)",
-              color: "var(--color-text-primary)",
-              fontSize: 13,
-              outline: "none",
-              width: 150,
-            }}
-          />
-        </div>
-
-        <ResetButton onClick={handleReset} />
+        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
       </div>
 
       <div className="table-wrapper">

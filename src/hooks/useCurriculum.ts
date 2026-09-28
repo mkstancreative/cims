@@ -5,7 +5,6 @@ import {
   getCurricula,
   getCurriculum,
   updateCurriculum,
-  deactivateCurriculum,
   getMyCurriculum,
 } from "../api/services/curriculum";
 import type { CurriculumParams } from "../api/types/curriculum";
@@ -63,15 +62,3 @@ export const useUpdateCurriculum = () => {
   });
 };
 
-export const useDeactivateCurriculum = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deactivateCurriculum,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["curricula"] });
-      toast.success("Curriculum deactivated.");
-    },
-    onError: (err: unknown) =>
-      toast.error(getErrMsg(err, "Failed to deactivate curriculum.")),
-  });
-};

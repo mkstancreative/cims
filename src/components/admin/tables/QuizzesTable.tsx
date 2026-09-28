@@ -1,4 +1,4 @@
-import { Eye, Ban } from "lucide-react";
+import { Eye, Ban, Pencil, CheckCircle, Trash2 } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
@@ -14,7 +14,11 @@ interface QuizzesTableProps {
   onPageChange: (p: number) => void;
   onLimitChange: (l: number) => void;
   onView: (quiz: QuizListItem) => void;
-  onDeactivateRequest: (quiz: QuizListItem) => void;
+  onEdit: (quiz: QuizListItem) => void;
+  /** Activate / deactivate — the everyday, reversible control. */
+  onToggleStatusRequest: (quiz: QuizListItem) => void;
+  /** Permanent delete (preflighted by the dialog). */
+  onDeleteRequest: (quiz: QuizListItem) => void;
 }
 
 export default function QuizzesTable({
@@ -25,7 +29,9 @@ export default function QuizzesTable({
   onPageChange,
   onLimitChange,
   onView,
-  onDeactivateRequest,
+  onEdit,
+  onToggleStatusRequest,
+  onDeleteRequest,
 }: QuizzesTableProps) {
   const params: QuizParams = {
     page,
@@ -75,11 +81,20 @@ export default function QuizzesTable({
               onClick: () => onView(row),
             },
             {
-              label: "Deactivate",
-              icon: <Ban size={13} />,
-              onClick: () => onDeactivateRequest(row),
+              label: "Edit Quiz",
+              icon: <Pencil size={13} />,
+              onClick: () => onEdit(row),
+            },
+            {
+              label: row.isActive ? "Deactivate" : "Activate",
+              icon: row.isActive ? <Ban size={13} /> : <CheckCircle size={13} />,
+              onClick: () => onToggleStatusRequest(row),
+            },
+            {
+              label: "Delete permanently",
+              icon: <Trash2 size={13} />,
+              onClick: () => onDeleteRequest(row),
               danger: true,
-              disabled: !row.isActive,
             },
           ]}
         />

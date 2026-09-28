@@ -92,9 +92,14 @@
   outline: none;
 }
 
+/* Always one line — long labels end in "…" instead of wrapping. Block, not
+   flex: text-overflow doesn't apply to a flex container's text. */
 .custom-select-display {
-  display: flex;
-  align-items: center;
+  display: block;
+  line-height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   user-select: none;
 }
 

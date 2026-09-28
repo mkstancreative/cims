@@ -4,11 +4,12 @@ import AddButton from "../../components/ui/AddButton/AddButton";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
-import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
+import StatusChangeDialog from "../../components/ui/Lifecycle/StatusChangeDialog";
+import DeleteDialog from "../../components/ui/Lifecycle/DeleteDialog";
+import type { LifecycleTarget } from "../../helpers/lifecycle";
 import InstitutionForm from "../../components/admin/forms/InstitutionForm";
 import InstitutionsTable from "../../components/admin/tables/InstitutionsTable";
 import { useModal } from "../../context/ModalContext";
-import { useToggleInstitutionStatus } from "../../hooks/useInstitutions";
 import type { Institution } from "../../api/types/institution";
 
 interface FilterState {
@@ -33,10 +34,13 @@ export default function Institutions() {
     value: FilterState[K],
   ) => setFilters((prev) => ({ ...prev, [field]: value, page: 1 }));
 
-  const { mutate: toggleStatus, isPending: toggling } =
-    useToggleInstitutionStatus();
-
-  const [toggleTarget, setToggleTarget] = useState<Institution | null>(null);
+  const [statusTarget, setStatusTarget] = useState<LifecycleTarget | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<LifecycleTarget | null>(null);
+  const asTarget = (i: Institution): LifecycleTarget => ({
+    _id: i._id,
+    name: i.name,
+    isActive: i.isActive,
+  });
 
   const openCreate = () =>
     openModal(<InstitutionForm key="new" isOpen onClose={closeModal} />);
@@ -106,38 +110,21 @@ export default function Institutions() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onEdit={openEdit}
-          onToggleStatusRequest={setToggleTarget}
+          onToggleStatusRequest={(i) => setStatusTarget(asTarget(i))}
+          onDeleteRequest={(i) => setDeleteTarget(asTarget(i))}
         />
       </div>
 
-      <ConfirmModal
-        isOpen={Boolean(toggleTarget)}
-        variant={toggleTarget?.isActive ? "danger" : "success"}
-        title={
-          toggleTarget?.isActive
-            ? "Deactivate Institution"
-            : "Activate Institution"
-        }
-        message={
-          toggleTarget
-            ? `Are you sure you want to ${
-                toggleTarget.isActive ? "deactivate" : "activate"
-              } "${toggleTarget.name}"?`
-            : ""
-        }
-        confirmText={
-          toggleTarget?.isActive ? "Yes, Deactivate" : "Yes, Activate"
-        }
-        cancelText="Cancel"
-        isPending={toggling}
-        onConfirm={() => {
-          if (toggleTarget)
-            toggleStatus(
-              { id: toggleTarget._id, isActive: !toggleTarget.isActive },
-              { onSuccess: () => setToggleTarget(null) },
-            );
-        }}
-        onCancel={() => setToggleTarget(null)}
+      <StatusChangeDialog
+        resource="institution"
+        target={statusTarget}
+        onClose={() => setStatusTarget(null)}
+      />
+      <DeleteDialog
+        key={deleteTarget?._id ?? "none"}
+        resource="institution"
+        target={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   );

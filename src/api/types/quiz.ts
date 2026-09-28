@@ -20,6 +20,12 @@ export interface Quiz {
   updatedAt?: string;
 }
 
+/** `GET /quizzes/:id` — the full quiz, answers included (admin only). */
+export interface QuizResponse {
+  success: boolean;
+  data: Quiz;
+}
+
 export interface QuizListItem {
   _id: string;
   title: string;
@@ -43,6 +49,12 @@ export interface CreateQuizPayload {
   description?: string;
   passMark: number;
   questions: Array<{
+    /**
+     * Echo it back on every question you're keeping. `PUT /quizzes/:id`
+     * replaces the array wholesale, and a question sent without its `_id` is
+     * recreated as a brand-new one with a new id.
+     */
+    _id?: string;
     text: string;
     options: string[];
     correctOptionIndex: number;
@@ -53,6 +65,33 @@ export interface CreateQuizPayload {
 export interface UpdateQuizPayload {
   id: string;
   data: Partial<CreateQuizPayload>;
+}
+
+/**
+ * `PUT /quizzes/:id/questions/reorder`. Send EVERY question id, each exactly
+ * once — array position is the new order. It only reorders; add, edit and
+ * remove go through `PUT /quizzes/:id`. Ids come from the staff endpoint
+ * (`GET /quizzes/:id`) — the student view strips them.
+ */
+export interface ReorderQuizQuestionsPayload {
+  id: string;
+  questionIds: string[];
+}
+
+export interface ReorderQuizQuestionsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    quizId: string;
+    /** Full question objects, in the new order — set state straight from it. */
+    questions: QuizQuestion[];
+  };
+  /**
+   * Present when students have already submitted: past attempts record
+   * answers by position, so their per-question breakdown now describes the
+   * wrong questions. Stored scores are unaffected. Always surface it.
+   */
+  warning?: string;
 }
 
 export interface QuizParams {

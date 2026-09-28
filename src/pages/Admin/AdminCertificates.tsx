@@ -17,12 +17,29 @@ import {
   useCertFinancialStats,
 } from "../../hooks/useCertificate";
 
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
 import CertificateView from "../../components/admin/view/CertificateView/CertificateView";
 import StatCard from "../../components/ui/StatCard/StatCard";
-import DateFilter from "../../components/ui/DateFilter/DateFilter";
 import Button from "../../components/ui/Button/Button";
 import CustomConfirm from "../../components/ui/CustomConfirm";
+
+// The page opens on this date window; it's the baseline, not an extra filter.
+const DEFAULT_START = "2025-01-01";
+const DEFAULT_END = "2026-12-31";
+
+/** "2025-01-01" → "1 Jan 2025" (parsed as a local date, not UTC midnight). */
+const formatDay = (value: string) =>
+  value
+    ? new Date(`${value}T00:00:00`).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : value;
 
 interface FilterStates {
   startDate: string;
@@ -45,8 +62,8 @@ interface BulkResult {
 export default function AdminCertificates() {
   const { openModal, closeModal } = useModal();
   const [filters, setFilters] = useState<FilterStates>({
-    startDate: "2025-01-01",
-    endDate: "2026-12-31",
+    startDate: DEFAULT_START,
+    endDate: DEFAULT_END,
     search: "",
     status: "",
     page: 1,
@@ -63,8 +80,8 @@ export default function AdminCertificates() {
 
   const handleReset = () => {
     setFilters({
-      startDate: "2025-01-01",
-      endDate: "2026-12-31",
+      startDate: DEFAULT_START,
+      endDate: DEFAULT_END,
       search: "",
       status: "",
       page: 1,
@@ -72,6 +89,52 @@ export default function AdminCertificates() {
     });
     setSelectedIds(new Set());
   };
+
+  // Clears the filters (dates back to the default window) but keeps whatever
+  // is typed in the search box.
+  const clearFilters = () => {
+    setFilters((prev) => ({
+      ...prev,
+      status: "",
+      startDate: DEFAULT_START,
+      endDate: DEFAULT_END,
+      page: 1,
+    }));
+    setSelectedIds(new Set());
+  };
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "status",
+      label: "Approval Status",
+      options: [
+        { value: "", label: "All Status" },
+        { value: "pending", label: "Pending" },
+        { value: "approved", label: "Approved" },
+        { value: "rejected", label: "Rejected" },
+      ],
+      value: filters.status,
+      onChange: (v) => setField("status", v),
+    },
+    {
+      key: "startDate",
+      label: "Start date",
+      input: { type: "date" },
+      value: filters.startDate,
+      defaultValue: DEFAULT_START,
+      formatValue: formatDay,
+      onChange: (v) => setField("startDate", v),
+    },
+    {
+      key: "endDate",
+      label: "End date",
+      input: { type: "date" },
+      value: filters.endDate,
+      defaultValue: DEFAULT_END,
+      formatValue: formatDay,
+      onChange: (v) => setField("endDate", v),
+    },
+  ];
 
   const handleBulkApprove = () => {
     if (selectedIds.size === 0) return;
@@ -301,50 +364,20 @@ export default function AdminCertificates() {
         />
       </div>
 
-      <div className="filter-wrapper">
-        <SearchInput
-          value={filters.search}
-          onChange={(val) => setField("search", val)}
-          placeholder="Search requests..."
-          onClear={handleReset}
-        />
-      </div>
-
-      <div
-        className="filter-selects-block"
-        style={{
-          marginTop: "15px",
-          display: "flex",
-          gap: "10px",
-          alignItems: "flex-end",
-          flexWrap: "wrap",
-        }}
-      >
-        <SelectFilter
-          label="Approval Status"
-          options={[
-            { value: "", label: "All Status" },
-            { value: "pending", label: "Pending" },
-            { value: "approved", label: "Approved" },
-            { value: "rejected", label: "Rejected" },
-          ]}
-          value={filters.status}
-          onChange={(v) => setField("status", v)}
-          name="status"
-        />
-        <DateFilter
-          label="Start Date"
-          value={filters.startDate}
-          onChange={(v) => setField("startDate", v)}
-        />
-
-        <DateFilter
-          label="End Date"
-          value={filters.endDate}
-          onChange={(v) => setField("endDate", v)}
-        />
-
-        <ResetButton onClick={handleReset} />
+      <div className="filter-wrapper fp-toolbar">
+        <div className="fp-toolbar__row">
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+          <div className="fp-toolbar__search">
+            <SearchInput
+              value={filters.search}
+              onChange={(val) => setField("search", val)}
+              placeholder="Search requests..."
+              onClear={() => setField("search", "")}
+            />
+          </div>
+          <ResetButton onClick={handleReset} />
+        </div>
+        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
       </div>
 
       <div className="table-wrapper" style={{ marginTop: "24px" }}>

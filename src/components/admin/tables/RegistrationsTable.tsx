@@ -17,12 +17,8 @@ import type {
 } from "../../../api/types/registration";
 
 interface RegistrationsTableProps {
-  search?: string;
-  status?: string;
-  /** Duration `_id` — narrows the queue to one priced tier. */
-  duration?: string;
-  page: number;
-  limit: number;
+  /** The queue query — filters plus `page` / `limit`. Empty values are dropped. */
+  params: ReviewQueueParams;
   onPageChange: (p: number) => void;
   onLimitChange: (l: number) => void;
   onEnroll: (registration: Registration) => void;
@@ -44,11 +40,7 @@ interface RegistrationsTableProps {
 const isSelectable = (r: Registration) => r.status === "new";
 
 export default function RegistrationsTable({
-  search,
-  status,
-  duration,
-  page,
-  limit,
+  params: rawParams,
   onPageChange,
   onLimitChange,
   onEnroll,
@@ -58,13 +50,13 @@ export default function RegistrationsTable({
   onTogglePage,
   lockedDuration,
 }: RegistrationsTableProps) {
-  const params: ReviewQueueParams = {
-    page,
-    limit,
-    ...(status ? { status } : {}),
-    ...(duration ? { duration } : {}),
-    ...(search?.trim() ? { search: search.trim() } : {}),
-  };
+  // Only send filters that are set, and trim the search box.
+  const params = Object.fromEntries(
+    Object.entries({ ...rawParams, search: rawParams.search?.trim() }).filter(
+      ([, v]) => v !== undefined && v !== "",
+    ),
+  ) as ReviewQueueParams;
+  const limit = params.limit ?? 10;
 
   const { data, isLoading } = useReviewQueue(params);
 

@@ -42,11 +42,6 @@ export interface UpdateInstitutionPayload {
   data: Partial<CreateInstitutionPayload> & { isActive?: boolean };
 }
 
-export interface ToggleInstitutionStatusPayload {
-  id: string;
-  isActive: boolean;
-}
-
 export interface InstitutionParams {
   search?: string;
   isActive?: boolean;

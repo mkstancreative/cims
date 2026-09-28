@@ -162,9 +162,24 @@ export interface LinkBatchCurriculumPayload {
   order?: number;
 }
 
+/**
+ * `PUT /batches/:id/curriculum/reorder`. Send EVERY curriculum on the batch,
+ * each exactly once — array position is the new order. It only reorders; add
+ * and remove have their own endpoints.
+ */
 export interface ReorderBatchCurriculaPayload {
   id: string;
   curriculumIds: string[];
+}
+
+/** The authoritative new order — ids only, not populated. */
+export interface ReorderBatchCurriculaResponse {
+  success: boolean;
+  message: string;
+  data: {
+    batchId: string;
+    curricula: { curriculum: string; order: number }[];
+  };
 }
 
 export interface AssignBatchQuizPayload {

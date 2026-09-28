@@ -93,6 +93,16 @@ html:not(.light-mode) .page-title {
   flex: 2 1 280px;
 }
 
+/* Wide enough for "All Departments" on one line; wrap rather than squeeze */
+.filter-selects-block--with-search {
+  flex-wrap: wrap;
+}
+
+.filter-selects-block--with-search > .filter-container {
+  flex: 1 1 180px;
+  min-width: 180px;
+}
+
 .filter-search-field .search-box {
   margin-bottom: 0;
 }

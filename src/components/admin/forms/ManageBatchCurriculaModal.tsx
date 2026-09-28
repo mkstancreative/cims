@@ -1,16 +1,10 @@
-import { useState, type DragEvent, type FormEvent } from "react";
-import {
-  BookOpen,
-  ChevronDown,
-  ChevronUp,
-  GripVertical,
-  Info,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { BookOpen, Info, Plus, Trash2 } from "lucide-react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import Spinner from "../../ui/Spinner/Spinner";
 import ConfirmModal from "../../ui/ConfirmModal/ConfirmModal";
+import { ReorderableList } from "../../ui/ReorderableList/ReorderableList";
 import {
   useBatchById,
   useLinkBatchCurriculum,
@@ -18,7 +12,11 @@ import {
   useUnlinkBatchCurriculum,
 } from "../../../hooks/useBatches";
 import { useCurricula } from "../../../hooks/useCurriculum";
-import type { Batch, BatchCurriculumLink } from "../../../api/types/batch";
+import type {
+  Batch,
+  BatchCurriculumLink,
+  BatchDetailResponse,
+} from "../../../api/types/batch";
 import "./BuilderForm.css";
 
 interface ManageBatchCurriculaModalProps {
@@ -42,14 +40,6 @@ function refName(
   return lookup.get(ref) ?? "Curriculum";
 }
 
-function moveItem<T>(list: T[], from: number, to: number): T[] {
-  if (to < 0 || to >= list.length) return list;
-  const next = [...list];
-  const [item] = next.splice(from, 1);
-  next.splice(to, 0, item);
-  return next;
-}
-
 /**
  * Order decides which curriculum a student is shown first, so it is worth a
  * surface of its own rather than a fire-and-forget "link" action.
@@ -58,6 +48,7 @@ export default function ManageBatchCurriculaModal({
   batch,
   onClose,
 }: ManageBatchCurriculaModalProps) {
+  const queryClient = useQueryClient();
   const { data: detail, isLoading } = useBatchById(batch._id);
   const { data: available, isLoading: loadingCurricula } = useCurricula({
     limit: 100,
@@ -66,7 +57,7 @@ export default function ManageBatchCurriculaModal({
 
   const { mutate: link, isPending: linking } = useLinkBatchCurriculum();
   const { mutate: unlink, isPending: unlinking } = useUnlinkBatchCurriculum();
-  const { mutate: reorder, isPending: reordering } =
+  const { mutateAsync: reorder, isPending: reordering } =
     useReorderBatchCurricula();
 
   const [curriculumId, setCurriculumId] = useState("");
@@ -75,33 +66,45 @@ export default function ManageBatchCurriculaModal({
   const [removeTarget, setRemoveTarget] = useState<BatchCurriculumLink | null>(
     null,
   );
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [overIndex, setOverIndex] = useState<number | null>(null);
-  /** Held until the server confirms the new order. */
-  const [pending, setPending] = useState<BatchCurriculumLink[] | null>(null);
-
   // Every add / reorder / remove response is already sorted and gap-free, so
   // the array arrives in display order — no client-side sort.
-  const server: BatchCurriculumLink[] = detail?.data?.batch?.curricula ?? [];
-  const links = pending ?? server;
+  const links: BatchCurriculumLink[] = detail?.data?.batch?.curricula ?? [];
 
   const linkedIds = new Set(links.map((l) => refId(l.curriculum)));
   const options = (available?.data ?? []).filter((c) => !linkedIds.has(c._id));
   const names = new Map((available?.data ?? []).map((c) => [c._id, c.name]));
 
+  // Add / remove / reorder never overlap: each one changes the list the
+  // others are computed from.
   const busy = linking || unlinking || reordering;
 
-  const persist = (next: BatchCurriculumLink[]) => {
-    setPending(next);
-    reorder(
-      { id: batch._id, curriculumIds: next.map((l) => refId(l.curriculum)) },
-      { onSettled: () => setPending(null) },
+  /**
+   * Saves the new order, then rewrites the cache from the server's
+   * `data.curricula` (ids only — reconciled against the rows we hold), so the
+   * list lands on the confirmed order with no flicker. A rejection makes the
+   * list roll the drop back.
+   */
+  const saveOrder = async (next: BatchCurriculumLink[]) => {
+    const res = await reorder({
+      id: batch._id,
+      curriculumIds: next.map((l) => refId(l.curriculum)),
+    });
+    const byId = new Map(next.map((l) => [refId(l.curriculum), l]));
+    const confirmed = res.data.curricula
+      .map((row) => byId.get(row.curriculum))
+      .filter((l): l is BatchCurriculumLink => Boolean(l))
+      .map((l, order) => ({ ...l, order }));
+    queryClient.setQueryData<BatchDetailResponse>(["batches", batch._id], (old) =>
+      old
+        ? {
+            ...old,
+            data: {
+              ...old.data,
+              batch: { ...old.data.batch, curricula: confirmed },
+            },
+          }
+        : old,
     );
-  };
-
-  const move = (from: number, to: number) => {
-    if (to < 0 || to >= links.length || from === to) return;
-    persist(moveItem(links, from, to));
   };
 
   const handleAdd = (e: FormEvent) => {
@@ -166,88 +169,31 @@ export default function ManageBatchCurriculaModal({
               No curriculum is linked to this batch yet.
             </p>
           ) : (
-            <div className="builder-form" style={{ gap: 8 }}>
-              {links.map((linkRow, i) => (
-                <div
-                  key={linkRow._id}
-                  className={`builder-card${
-                    dragIndex === i ? " builder-card--dragging" : ""
-                  }${
-                    overIndex === i && dragIndex !== i
-                      ? " builder-card--over"
-                      : ""
-                  }`}
-                  style={{ padding: "10px 12px" }}
-                  draggable={links.length > 1 && !busy}
-                  onDragStart={(e: DragEvent<HTMLDivElement>) => {
-                    setDragIndex(i);
-                    e.dataTransfer.effectAllowed = "move";
-                    e.dataTransfer.setData("text/plain", String(i));
-                  }}
-                  onDragOver={(e: DragEvent<HTMLDivElement>) => {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = "move";
-                    setOverIndex(i);
-                  }}
-                  onDragLeave={() =>
-                    setOverIndex((prev) => (prev === i ? null : prev))
-                  }
-                  onDrop={(e: DragEvent<HTMLDivElement>) => {
-                    e.preventDefault();
-                    if (dragIndex !== null) move(dragIndex, i);
-                    setDragIndex(null);
-                    setOverIndex(null);
-                  }}
-                  onDragEnd={() => {
-                    setDragIndex(null);
-                    setOverIndex(null);
-                  }}
+            <ReorderableList<BatchCurriculumLink>
+              items={links}
+              getId={(l) => l._id}
+              getLabel={(l) => refName(l.curriculum, names)}
+              // The list locks itself during its own save.
+              disabled={linking || unlinking}
+              onReorder={saveOrder}
+              renderItem={(l) => (
+                <span style={{ fontSize: 13.5, fontWeight: 600 }}>
+                  {refName(l.curriculum, names)}
+                </span>
+              )}
+              renderActions={(l) => (
+                <button
+                  type="button"
+                  className="builder-remove-btn"
+                  onClick={() => setRemoveTarget(l)}
+                  disabled={busy}
+                  aria-label={`Unlink ${refName(l.curriculum, names)}`}
+                  title="Unlink curriculum"
                 >
-                  <div className="builder-card-head">
-                    <span className="builder-grip" aria-hidden="true">
-                      <GripVertical size={14} />
-                    </span>
-                    {/* Numbered off the index — `order` is zero-based. */}
-                    <span className="builder-subnum">{i + 1}.</span>
-                    <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600 }}>
-                      {refName(linkRow.curriculum, names)}
-                    </span>
-                    <span className="builder-move">
-                      <button
-                        type="button"
-                        className="builder-move-btn"
-                        onClick={() => move(i, i - 1)}
-                        disabled={busy || i === 0}
-                        aria-label="Move up"
-                        title="Move up"
-                      >
-                        <ChevronUp size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        className="builder-move-btn"
-                        onClick={() => move(i, i + 1)}
-                        disabled={busy || i === links.length - 1}
-                        aria-label="Move down"
-                        title="Move down"
-                      >
-                        <ChevronDown size={13} />
-                      </button>
-                    </span>
-                    <button
-                      type="button"
-                      className="builder-remove-btn"
-                      onClick={() => setRemoveTarget(linkRow)}
-                      disabled={busy}
-                      aria-label="Unlink curriculum"
-                      title="Unlink curriculum"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  <Trash2 size={13} />
+                </button>
+              )}
+            />
           )}
 
           {/* ── Add ── */}

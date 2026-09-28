@@ -40,8 +40,3 @@ export const updateDuration = async ({
   return response.data;
 };
 
-/** Soft delete. Refused with 409 while the tier is in use. */
-export const deleteDuration = async (id: string) => {
-  const response = await api.delete(`/admin/durations/${id}`);
-  return response.data;
-};

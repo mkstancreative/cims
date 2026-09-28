@@ -217,11 +217,13 @@
     opacity 0.15s;
 }
 
-.builder-move-btn:hover:not(:disabled) {
+.builder-move-btn:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--color-accent-muted);
 }
 
-.builder-move-btn:disabled {
+/* aria-disabled too: move buttons stay focusable while a reorder saves */
+.builder-move-btn:disabled,
+.builder-move-btn[aria-disabled="true"] {
   opacity: 0.3;
   cursor: not-allowed;
 }

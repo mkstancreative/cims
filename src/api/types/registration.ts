@@ -139,6 +139,14 @@ export interface RegistrationListResponse {
 
 export interface ReviewQueueParams {
   status?: string;
+  /** Registration type — a first registration or a re-enrolment. */
+  type?: string;
+  /** Institution `_id`. */
+  institution?: string;
+  programType?: string;
+  programLevel?: string;
+  /** Department name. */
+  department?: string;
   /** Duration `_id` — filter the queue to one priced tier before selecting. */
   duration?: string;
   search?: string;

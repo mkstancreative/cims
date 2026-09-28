@@ -35,11 +35,6 @@ export const updateCurriculum = async ({
   return response.data;
 };
 
-export const deactivateCurriculum = async (id: string) => {
-  const response = await api.delete(`/curriculum/${id}`);
-  return response.data;
-};
-
 export const getMyCurriculum = async (): Promise<MyCurriculumResponse> => {
   const response = await api.get("/curriculum/my");
   return response.data;

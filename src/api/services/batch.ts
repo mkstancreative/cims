@@ -8,6 +8,7 @@ import type {
   AssignBatchSupervisorPayload,
   LinkBatchCurriculumPayload,
   ReorderBatchCurriculaPayload,
+  ReorderBatchCurriculaResponse,
   AssignBatchQuizPayload,
   DepartmentsResponse,
   ActivateBatchResponse,
@@ -122,10 +123,11 @@ export const linkBatchCurriculum = async ({
 export const reorderBatchCurricula = async ({
   id,
   curriculumIds,
-}: ReorderBatchCurriculaPayload) => {
-  const response = await api.put(`/batches/${id}/curriculum/reorder`, {
-    curriculumIds,
-  });
+}: ReorderBatchCurriculaPayload): Promise<ReorderBatchCurriculaResponse> => {
+  const response = await api.put<ReorderBatchCurriculaResponse>(
+    `/batches/${id}/curriculum/reorder`,
+    { curriculumIds },
+  );
   return response.data;
 };
 

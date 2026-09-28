@@ -1,12 +1,5 @@
 import { useState, type DragEvent } from "react";
-import {
-  ArrowDown,
-  ArrowUp,
-  Ban,
-  CheckCircle,
-  GripVertical,
-  Pencil,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Ban, CheckCircle, GripVertical, Pencil, Trash2 } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
@@ -24,6 +17,8 @@ interface DurationsTableProps {
   onLimitChange: (l: number) => void;
   onEdit: (duration: Duration) => void;
   onToggleStatusRequest: (duration: Duration) => void;
+  /** Permanent delete (preflighted by the dialog). */
+  onDeleteRequest: (duration: Duration) => void;
 }
 
 function moveItem<T>(list: T[], from: number, to: number): T[] {
@@ -41,6 +36,7 @@ export default function DurationsTable({
   onLimitChange,
   onEdit,
   onToggleStatusRequest,
+  onDeleteRequest,
 }: DurationsTableProps) {
   const params: DurationParams = {
     page,
@@ -190,7 +186,12 @@ export default function DurationsTable({
                 label: active ? "Deactivate" : "Activate",
                 icon: active ? <Ban size={13} /> : <CheckCircle size={13} />,
                 onClick: () => onToggleStatusRequest(row),
-                danger: active,
+              },
+              {
+                label: "Delete permanently",
+                icon: <Trash2 size={13} />,
+                onClick: () => onDeleteRequest(row),
+                danger: true,
               },
             ]}
           />

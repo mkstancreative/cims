@@ -4,12 +4,13 @@ import AddButton from "../../components/ui/AddButton/AddButton";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
-import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
+import StatusChangeDialog from "../../components/ui/Lifecycle/StatusChangeDialog";
+import DeleteDialog from "../../components/ui/Lifecycle/DeleteDialog";
+import type { LifecycleTarget } from "../../helpers/lifecycle";
 import QuizForm from "../../components/admin/forms/QuizForm";
 import QuizzesTable from "../../components/admin/tables/QuizzesTable";
 import QuizViewModal from "../../components/admin/view/QuizViewModal";
 import { useModal } from "../../context/ModalContext";
-import { useDeactivateQuiz } from "../../hooks/useQuizzes";
 import type { QuizListItem } from "../../api/types/quiz";
 
 interface FilterState {
@@ -34,17 +35,28 @@ export default function Quizzes() {
     value: FilterState[K],
   ) => setFilters((prev) => ({ ...prev, [field]: value, page: 1 }));
 
-  const { mutate: deactivate, isPending: deactivating } = useDeactivateQuiz();
-
-  const [deactivateTarget, setDeactivateTarget] = useState<QuizListItem | null>(
-    null,
-  );
+  const [statusTarget, setStatusTarget] = useState<LifecycleTarget | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<LifecycleTarget | null>(null);
+  const asTarget = (q: QuizListItem): LifecycleTarget => ({
+    _id: q._id,
+    name: q.title,
+    isActive: q.isActive,
+  });
 
   const handleReset = () =>
     setFilters({ search: "", isActive: "", page: 1, limit: 10 });
 
   const openCreate = () =>
     openModal(<QuizForm key="new" isOpen onClose={closeModal} />);
+  const openEdit = (quiz: QuizListItem) =>
+    openModal(
+      <QuizForm
+        key={quiz._id}
+        isOpen
+        onClose={closeModal}
+        editingId={quiz._id}
+      />,
+    );
   const openView = (quiz: QuizListItem) =>
     openModal(
       <QuizViewModal key={quiz._id} isOpen onClose={closeModal} id={quiz._id} />,
@@ -103,29 +115,22 @@ export default function Quizzes() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onView={openView}
-          onDeactivateRequest={setDeactivateTarget}
+          onEdit={openEdit}
+          onToggleStatusRequest={(q) => setStatusTarget(asTarget(q))}
+          onDeleteRequest={(q) => setDeleteTarget(asTarget(q))}
         />
       </div>
 
-      <ConfirmModal
-        isOpen={Boolean(deactivateTarget)}
-        variant="danger"
-        title="Deactivate Quiz"
-        message={
-          deactivateTarget
-            ? `Are you sure you want to deactivate "${deactivateTarget.title}"?`
-            : ""
-        }
-        confirmText="Yes, Deactivate"
-        cancelText="Cancel"
-        isPending={deactivating}
-        onConfirm={() => {
-          if (deactivateTarget)
-            deactivate(deactivateTarget._id, {
-              onSuccess: () => setDeactivateTarget(null),
-            });
-        }}
-        onCancel={() => setDeactivateTarget(null)}
+      <StatusChangeDialog
+        resource="quiz"
+        target={statusTarget}
+        onClose={() => setStatusTarget(null)}
+      />
+      <DeleteDialog
+        key={deleteTarget?._id ?? "none"}
+        resource="quiz"
+        target={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   );

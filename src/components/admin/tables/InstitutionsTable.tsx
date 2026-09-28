@@ -1,4 +1,4 @@
-import { Pencil, Ban, CheckCircle } from "lucide-react";
+import { Pencil, Ban, CheckCircle, Trash2 } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
@@ -18,6 +18,8 @@ interface InstitutionsTableProps {
   onLimitChange: (l: number) => void;
   onEdit: (institution: Institution) => void;
   onToggleStatusRequest: (institution: Institution) => void;
+  /** Permanent delete (preflighted by the dialog). */
+  onDeleteRequest: (institution: Institution) => void;
 }
 
 export default function InstitutionsTable({
@@ -29,6 +31,7 @@ export default function InstitutionsTable({
   onLimitChange,
   onEdit,
   onToggleStatusRequest,
+  onDeleteRequest,
 }: InstitutionsTableProps) {
   const params: InstitutionParams = {
     page,
@@ -80,7 +83,12 @@ export default function InstitutionsTable({
                 <CheckCircle size={13} />
               ),
               onClick: () => onToggleStatusRequest(row),
-              danger: row.isActive,
+            },
+            {
+              label: "Delete permanently",
+              icon: <Trash2 size={13} />,
+              onClick: () => onDeleteRequest(row),
+              danger: true,
             },
           ]}
         />

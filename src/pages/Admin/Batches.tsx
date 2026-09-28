@@ -236,16 +236,17 @@ export default function Batches() {
           </div>
         </div>
 
-        <div className="filter-wrapper">
-          <SearchInput
-            value={filter.search}
-            onChange={(val) => setField("search", val)}
-            placeholder="Search by name, session…"
-            onClear={handleReset}
-          />
-        </div>
-
-        <div className="filter-selects-block" style={{ flexWrap: "wrap", gap: "12px 14px" }}>
+        {/* ── Search + filters ── */}
+        <div className="filter-selects-block filter-selects-block--with-search">
+          <div className="filter-search-field">
+            <span className="filter-label">Search</span>
+            <SearchInput
+              value={filter.search}
+              onChange={(val) => setField("search", val)}
+              placeholder="Search by name, session…"
+              onClear={() => setField("search", "")}
+            />
+          </div>
           <SelectFilter
             label="Status"
             options={[
@@ -261,22 +262,25 @@ export default function Batches() {
           />
 
           <div className="filter-container">
-            <label className="filter-label">Session</label>
+            <label className="filter-label" htmlFor="batch-session-filter">
+              Session
+            </label>
             <input
+              id="batch-session-filter"
               className="modal-input"
               placeholder="e.g. 2023/2024"
               value={filter.session}
               onChange={(e) => setField("session", e.target.value)}
               style={{
-                height: 38,
+                width: "100%",
+                height: 42,
                 padding: "0 12px",
                 borderRadius: 8,
-                border: "1px solid var(--color-accent-border)",
-                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-bg-secondary)",
                 color: "var(--color-text-primary)",
-                fontSize: 13,
+                fontSize: 14,
                 outline: "none",
-                width: 140,
               }}
             />
           </div>

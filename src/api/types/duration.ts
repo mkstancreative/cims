@@ -86,8 +86,3 @@ export interface DurationMutationResponse {
   data: Duration;
 }
 
-/** `409` body when a soft delete is refused because the tier is in use. */
-export interface DurationInUse {
-  liveBatches: number;
-  openRegistrations: number;
-}

@@ -4,7 +4,6 @@ import type {
   PublicInstitutionListResponse,
   CreateInstitutionPayload,
   UpdateInstitutionPayload,
-  ToggleInstitutionStatusPayload,
   InstitutionParams,
 } from "../types/institution";
 
@@ -25,14 +24,6 @@ export const updateInstitution = async ({
   data,
 }: UpdateInstitutionPayload) => {
   const response = await api.put(`/admin/institutions/${id}`, data);
-  return response.data;
-};
-
-export const toggleInstitutionStatus = async ({
-  id,
-  isActive,
-}: ToggleInstitutionStatusPayload) => {
-  const response = await api.put(`/admin/institutions/${id}`, { isActive });
   return response.data;
 };
 

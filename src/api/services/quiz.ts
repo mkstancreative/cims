@@ -1,8 +1,11 @@
 import { api } from "./api";
 import type {
   QuizListResponse,
+  QuizResponse,
   CreateQuizPayload,
   UpdateQuizPayload,
+  ReorderQuizQuestionsPayload,
+  ReorderQuizQuestionsResponse,
   QuizParams,
   MyQuizResponse,
   SubmitQuizPayload,
@@ -21,8 +24,8 @@ export const getQuizzes = async (
   return response.data;
 };
 
-export const getQuiz = async (id: string) => {
-  const response = await api.get(`/quizzes/${id}`);
+export const getQuiz = async (id: string): Promise<QuizResponse> => {
+  const response = await api.get<QuizResponse>(`/quizzes/${id}`);
   return response.data;
 };
 
@@ -31,8 +34,14 @@ export const updateQuiz = async ({ id, data }: UpdateQuizPayload) => {
   return response.data;
 };
 
-export const deactivateQuiz = async (id: string) => {
-  const response = await api.delete(`/quizzes/${id}`);
+export const reorderQuizQuestions = async ({
+  id,
+  questionIds,
+}: ReorderQuizQuestionsPayload): Promise<ReorderQuizQuestionsResponse> => {
+  const response = await api.put<ReorderQuizQuestionsResponse>(
+    `/quizzes/${id}/questions/reorder`,
+    { questionIds },
+  );
   return response.data;
 };
 

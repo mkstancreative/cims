@@ -4,12 +4,13 @@ import AddButton from "../../components/ui/AddButton/AddButton";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
-import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
+import StatusChangeDialog from "../../components/ui/Lifecycle/StatusChangeDialog";
+import DeleteDialog from "../../components/ui/Lifecycle/DeleteDialog";
+import type { LifecycleTarget } from "../../helpers/lifecycle";
 import CurriculumForm from "../../components/admin/forms/CurriculumForm";
 import CurriculumTable from "../../components/admin/tables/CurriculumTable";
 import CurriculumViewModal from "../../components/admin/view/CurriculumViewModal";
 import { useModal } from "../../context/ModalContext";
-import { useDeactivateCurriculum } from "../../hooks/useCurriculum";
 import type { CurriculumListItem } from "../../api/types/curriculum";
 
 interface FilterState {
@@ -34,11 +35,13 @@ export default function Curriculum() {
     value: FilterState[K],
   ) => setFilters((prev) => ({ ...prev, [field]: value, page: 1 }));
 
-  const { mutate: deactivate, isPending: deactivating } =
-    useDeactivateCurriculum();
-
-  const [deactivateTarget, setDeactivateTarget] =
-    useState<CurriculumListItem | null>(null);
+  const [statusTarget, setStatusTarget] = useState<LifecycleTarget | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<LifecycleTarget | null>(null);
+  const asTarget = (c: CurriculumListItem): LifecycleTarget => ({
+    _id: c._id,
+    name: c.name,
+    isActive: c.isActive,
+  });
 
   const handleReset = () =>
     setFilters({ search: "", isActive: "", page: 1, limit: 10 });
@@ -118,29 +121,21 @@ export default function Curriculum() {
           onLimitChange={(l) => setField("limit", l)}
           onView={openView}
           onEdit={openEdit}
-          onDeactivateRequest={setDeactivateTarget}
+          onToggleStatusRequest={(c) => setStatusTarget(asTarget(c))}
+          onDeleteRequest={(c) => setDeleteTarget(asTarget(c))}
         />
       </div>
 
-      <ConfirmModal
-        isOpen={Boolean(deactivateTarget)}
-        variant="danger"
-        title="Deactivate Curriculum"
-        message={
-          deactivateTarget
-            ? `Are you sure you want to deactivate "${deactivateTarget.name}"?`
-            : ""
-        }
-        confirmText="Yes, Deactivate"
-        cancelText="Cancel"
-        isPending={deactivating}
-        onConfirm={() => {
-          if (deactivateTarget)
-            deactivate(deactivateTarget._id, {
-              onSuccess: () => setDeactivateTarget(null),
-            });
-        }}
-        onCancel={() => setDeactivateTarget(null)}
+      <StatusChangeDialog
+        resource="curriculum"
+        target={statusTarget}
+        onClose={() => setStatusTarget(null)}
+      />
+      <DeleteDialog
+        key={deleteTarget?._id ?? "none"}
+        resource="curriculum"
+        target={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   );

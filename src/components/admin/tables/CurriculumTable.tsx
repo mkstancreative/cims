@@ -1,4 +1,4 @@
-import { Eye, Ban, Pencil } from "lucide-react";
+import { Eye, Ban, Pencil, CheckCircle, Trash2 } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
@@ -18,7 +18,10 @@ interface CurriculumTableProps {
   onLimitChange: (l: number) => void;
   onView: (curriculum: CurriculumListItem) => void;
   onEdit: (curriculum: CurriculumListItem) => void;
-  onDeactivateRequest: (curriculum: CurriculumListItem) => void;
+  /** Activate / deactivate — the everyday, reversible control. */
+  onToggleStatusRequest: (curriculum: CurriculumListItem) => void;
+  /** Permanent delete (preflighted by the dialog). */
+  onDeleteRequest: (curriculum: CurriculumListItem) => void;
 }
 
 export default function CurriculumTable({
@@ -30,7 +33,8 @@ export default function CurriculumTable({
   onLimitChange,
   onView,
   onEdit,
-  onDeactivateRequest,
+  onToggleStatusRequest,
+  onDeleteRequest,
 }: CurriculumTableProps) {
   const params: CurriculumParams = {
     page,
@@ -91,11 +95,15 @@ export default function CurriculumTable({
               onClick: () => onEdit(row),
             },
             {
-              label: "Deactivate",
-              icon: <Ban size={13} />,
-              onClick: () => onDeactivateRequest(row),
+              label: row.isActive ? "Deactivate" : "Activate",
+              icon: row.isActive ? <Ban size={13} /> : <CheckCircle size={13} />,
+              onClick: () => onToggleStatusRequest(row),
+            },
+            {
+              label: "Delete permanently",
+              icon: <Trash2 size={13} />,
+              onClick: () => onDeleteRequest(row),
               danger: true,
-              disabled: !row.isActive,
             },
           ]}
         />

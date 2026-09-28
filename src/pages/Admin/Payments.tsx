@@ -12,9 +12,12 @@ import {
 } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
-import DateFilter from "../../components/ui/DateFilter/DateFilter";
 import StatCard from "../../components/ui/StatCard/StatCard";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
 import PaymentsTable from "../../components/admin/tables/PaymentsTable";
 import PaymentViewModal from "../../components/admin/view/PaymentViewModal";
 import { useModal } from "../../context/ModalContext";
@@ -92,16 +95,80 @@ export default function Payments() {
     value: FilterState[K],
   ) => setFilters((prev) => ({ ...prev, [field]: value, page: 1 }));
 
-  const toggleStatus = (status: string) =>
-    setFilters((prev) => ({
-      ...prev,
-      statuses: prev.statuses.includes(status)
-        ? prev.statuses.filter((s) => s !== status)
-        : [...prev.statuses, status],
-      page: 1,
-    }));
-
   const handleReset = () => setFilters(INITIAL_FILTERS);
+
+  // Clears the filters but keeps whatever is typed in the search box.
+  const clearFilters = () =>
+    setFilters((prev) => ({ ...INITIAL_FILTERS, search: prev.search }));
+
+  const naira = (v: string) => `₦${Number(v).toLocaleString()}`;
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "status",
+      label: "Status",
+      multiple: true,
+      options: STATUS_OPTIONS.map((st) => ({
+        value: st,
+        label: st.charAt(0).toUpperCase() + st.slice(1),
+      })),
+      // Several at once — sent to the API comma-separated.
+      value: filters.statuses.join(","),
+      onChange: (v) => setField("statuses", v.split(",").filter(Boolean)),
+    },
+    {
+      key: "channel",
+      label: "Channel",
+      options: [
+        { value: "", label: "All Channels" },
+        { value: "card", label: "Card" },
+        { value: "bank", label: "Bank" },
+        { value: "transfer", label: "Transfer" },
+        { value: "ussd", label: "USSD" },
+      ],
+      value: filters.channel,
+      onChange: (v) => setField("channel", v),
+    },
+    {
+      key: "dateField",
+      label: "Date field",
+      options: DATE_FIELD_OPTIONS,
+      value: filters.dateField,
+      defaultValue: INITIAL_FILTERS.dateField,
+      hint: "Which date the From / To range applies to.",
+      onChange: (v) => setField("dateField", v as PaymentDateField),
+    },
+    {
+      key: "startDate",
+      label: "From",
+      input: { type: "date" },
+      value: filters.startDate,
+      onChange: (v) => setField("startDate", v),
+    },
+    {
+      key: "endDate",
+      label: "To",
+      input: { type: "date" },
+      value: filters.endDate,
+      onChange: (v) => setField("endDate", v),
+    },
+    {
+      key: "minAmount",
+      label: "Min amount (₦)",
+      input: { type: "number", min: 0, placeholder: "e.g. 5000" },
+      value: filters.minAmount,
+      formatValue: naira,
+      onChange: (v) => setField("minAmount", v),
+    },
+    {
+      key: "maxAmount",
+      label: "Max amount (₦)",
+      input: { type: "number", min: 0, placeholder: "e.g. 50000" },
+      value: filters.maxAmount,
+      formatValue: naira,
+      onChange: (v) => setField("maxAmount", v),
+    },
+  ];
 
   // Only send a date range once a bound is set — `dateField` alone filters nothing.
   const hasDateRange = Boolean(filters.startDate || filters.endDate);
@@ -239,91 +306,21 @@ export default function Payments() {
         </div>
       </div>
 
-      {/* ── Search + status chips (chips → comma-separated `status`) ── */}
-      <div className="filter-wrapper payments-search-card">
-        <SearchInput
-          value={filters.search}
-          onChange={(val) => setField("search", val)}
-          placeholder="Search by payer name or email…"
-          onClear={() => setField("search", "")}
-        />
-        <div className="payments-chip-row">
-          <span className="payments-chip-label">Status</span>
-          {STATUS_OPTIONS.map((status) => (
-            <button
-              key={status}
-              type="button"
-              className={`payments-chip payments-chip--${status}${
-                filters.statuses.includes(status) ? " is-active" : ""
-              }`}
-              onClick={() => toggleStatus(status)}
-              aria-pressed={filters.statuses.includes(status)}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Filters ── */}
-      <div className="filter-selects-block">
-        <SelectFilter
-          label="Channel"
-          options={[
-            { value: "", label: "All Channels" },
-            { value: "card", label: "Card" },
-            { value: "bank", label: "Bank" },
-            { value: "transfer", label: "Transfer" },
-            { value: "ussd", label: "USSD" },
-          ]}
-          value={filters.channel}
-          onChange={(value) => setField("channel", value)}
-          name="channel"
-        />
-        <SelectFilter
-          label="Date Field"
-          options={DATE_FIELD_OPTIONS}
-          value={filters.dateField}
-          onChange={(value) =>
-            setField("dateField", value as PaymentDateField)
-          }
-          name="dateField"
-        />
-        <DateFilter
-          label="From"
-          value={filters.startDate}
-          onChange={(value) => setField("startDate", value)}
-          name="startDate"
-        />
-        <DateFilter
-          label="To"
-          value={filters.endDate}
-          onChange={(value) => setField("endDate", value)}
-          name="endDate"
-        />
-        <div className="payments-amount-range">
-          <span className="payments-amount-range-label">Amount (₦)</span>
-          <div className="payments-amount-inputs">
-            <input
-              type="number"
-              min={0}
-              className="payments-amount-input"
-              placeholder="Min"
-              value={filters.minAmount}
-              onChange={(e) => setField("minAmount", e.target.value)}
-            />
-            <span className="payments-amount-sep">–</span>
-            <input
-              type="number"
-              min={0}
-              className="payments-amount-input"
-              placeholder="Max"
-              value={filters.maxAmount}
-              onChange={(e) => setField("maxAmount", e.target.value)}
+      {/* ── Filters + search ── */}
+      <div className="filter-wrapper fp-toolbar">
+        <div className="fp-toolbar__row">
+          <div className="fp-toolbar__search">
+            <SearchInput
+              value={filters.search}
+              onChange={(val) => setField("search", val)}
+              placeholder="Search by payer name or email…"
+              onClear={() => setField("search", "")}
             />
           </div>
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+          <ResetButton onClick={handleReset} />
         </div>
-        <ResetButton onClick={handleReset} />
+        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
       </div>
 
       <div className="table-wrapper">

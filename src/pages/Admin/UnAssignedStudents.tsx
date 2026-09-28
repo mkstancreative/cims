@@ -8,7 +8,11 @@ import type { TableMeta } from "../../components/ui/GeneralTable/GeneralTable";
 import { useNavigate } from "react-router-dom";
 import { useUnassignedStudents } from "../../hooks/useStudents";
 import { useBatches, useDepartments } from "../../hooks/useBatches";
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
 
 interface FilterStates {
   batchId: string;
@@ -70,6 +74,51 @@ export default function UnAssignedStudents() {
     });
   };
 
+  // Clears the filters but keeps whatever is typed in the search box.
+  const clearFilters = () =>
+    setFilters((prev) => ({
+      ...prev,
+      batchId: "",
+      department: "",
+      itStatus: "",
+      page: 1,
+    }));
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "batchId",
+      label: "Batch",
+      options: [
+        { value: "", label: "All Batches" },
+        ...(batches?.data.map((b) => ({ value: b._id, label: b.name })) ?? []),
+      ],
+      value: filters.batchId,
+      onChange: (v) => setField("batchId", v),
+    },
+    {
+      key: "department",
+      label: "Department",
+      options: [
+        { value: "", label: "All Departments" },
+        ...(departments?.data.map((d) => ({ value: d, label: d })) ?? []),
+      ],
+      value: filters.department,
+      onChange: (v) => setField("department", v),
+    },
+    {
+      key: "itStatus",
+      label: "IT Status",
+      options: [
+        { value: "", label: "All IT Status" },
+        { value: "placed", label: "Placed" },
+        { value: "active", label: "Active" },
+        { value: "completed", label: "Completed" },
+      ],
+      value: filters.itStatus,
+      onChange: (v) => setField("itStatus", v as ITStatus | ""),
+    },
+  ];
+
   return (
     <div className="page-container">
       {/* ── Header ── */}
@@ -86,50 +135,20 @@ export default function UnAssignedStudents() {
       </div>
 
       {/* ── Filters ── */}
-      <div className="filter-wrapper">
-        <SearchInput
-          value={filters.search}
-          onChange={(val) => setField("search", val)}
-          placeholder="Search by name, reg. number…"
-          onClear={handleReset}
-        />
-      </div>
-
-      <div className="filter-selects-block">
-        <SelectFilter
-          label="Batch"
-          options={[
-            { value: "", label: "All Batches" },
-            ...(batches?.data.map((b) => ({ value: b._id, label: b.name })) ||
-              []),
-          ]}
-          value={filters.batchId}
-          onChange={(value) => setField("batchId", value)}
-          name="batchId"
-        />
-        <SelectFilter
-          label="Department"
-          options={[
-            { value: "", label: "All Departments" },
-            ...(departments?.data.map((d) => ({ value: d, label: d })) || []),
-          ]}
-          value={filters.department}
-          onChange={(value) => setField("department", value)}
-          name="department"
-        />
-        <SelectFilter
-          label="IT Status"
-          options={[
-            { value: "", label: "All IT Status" },
-            { value: "placed", label: "Placed" },
-            { value: "active", label: "Active" },
-            { value: "completed", label: "Completed" },
-          ]}
-          value={filters.itStatus}
-          onChange={(value) => setField("itStatus", value as ITStatus | "")}
-          name="itStatus"
-        />
-        <ResetButton onClick={handleReset} />
+      <div className="filter-wrapper fp-toolbar">
+        <div className="fp-toolbar__row">
+          <div className="fp-toolbar__search">
+            <SearchInput
+              value={filters.search}
+              onChange={(val) => setField("search", val)}
+              placeholder="Search by name, reg. number…"
+              onClear={() => setField("search", "")}
+            />
+          </div>
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+          <ResetButton onClick={handleReset} />
+        </div>
+        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
       </div>
 
       {/* ── Table (read-only) ── */}

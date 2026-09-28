@@ -5,11 +5,15 @@ import {
   getQuizzes,
   getQuiz,
   updateQuiz,
-  deactivateQuiz,
+  reorderQuizQuestions,
   getMyQuiz,
   submitQuiz,
 } from "../api/services/quiz";
-import type { QuizParams, SubmitQuizPayload } from "../api/types/quiz";
+import type {
+  QuizParams,
+  QuizResponse,
+  SubmitQuizPayload,
+} from "../api/types/quiz";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -64,16 +68,22 @@ export const useUpdateQuiz = () => {
   });
 };
 
-export const useDeactivateQuiz = () => {
+/**
+ * Writes the server's new order straight into the quiz cache (the response
+ * carries full question objects), and surfaces the past-attempts `warning`.
+ */
+export const useReorderQuizQuestions = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deactivateQuiz,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-      toast.success("Quiz deactivated.");
+    mutationFn: reorderQuizQuestions,
+    onSuccess: (res, { id }) => {
+      queryClient.setQueryData<QuizResponse>(["quizzes", id], (old) =>
+        old ? { ...old, data: { ...old.data, questions: res.data.questions } } : old,
+      );
+      if (res.warning) toast.warn(res.warning, { autoClose: 10000 });
     },
     onError: (err: unknown) =>
-      toast.error(getErrMsg(err, "Failed to deactivate quiz.")),
+      toast.error(getErrMsg(err, "Failed to reorder questions.")),
   });
 };
 
