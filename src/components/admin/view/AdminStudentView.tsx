@@ -1,11 +1,12 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, BookOpen, Phone, Mail, Calendar, Award, History } from "lucide-react";
+import { ArrowLeft, User, BookOpen, Phone, Mail } from "lucide-react";
 import { useStudentById } from "../../../hooks/useStudents";
 import type { StudentDetail } from "../../../api/types/student";
 import "./AdminStudentView.css";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import { formatDate } from "../../../helpers/utilities";
+import StudentInternships from "./StudentInternships";
 
 function InfoRow({
   label,
@@ -103,7 +104,8 @@ export default function AdminStudentView() {
     "??";
   const batchName =
     s.batch && typeof s.batch === "object" ? s.batch.name : (s.batch ?? "—");
-  const school = s.supervisors?.school;
+  // Current API sends `supervisor`; older responses nested it.
+  const school = s.supervisor ?? s.supervisors?.school;
 
   return (
     <div className="page-container">
@@ -164,7 +166,7 @@ export default function AdminStudentView() {
             value={`${s.program.type} — ${s.program.level}`}
           />
           <InfoRow label="Session" value={s.session} />
-          <InfoRow label="Batch" value={batchName as string} />
+          <InfoRow label="Current batch" value={batchName as string} />
           {s.professionalRegNumber && (
             <InfoRow label="Professional Reg No." value={s.professionalRegNumber} />
           )}
@@ -179,59 +181,21 @@ export default function AdminStudentView() {
           <InfoRow label="Address" value={s.address} />
         </Section>
 
-        {/* ── IT Period ── */}
-        {s.itPeriod && (
-          <Section title="IT Period" icon={<Calendar size={15} />}>
-            <InfoRow
-              label="Start Date"
-              value={formatDate(s.itPeriod.startDate)}
-            />
-            <InfoRow label="End Date" value={formatDate(s.itPeriod.endDate)} />
-            <InfoRow
-              label="Duration (weeks)"
-              value={s.itPeriod.expectedDuration}
-            />
-          </Section>
-        )}
-
-        {/* ── Curriculum Progress ── */}
-        {s.curriculumProgress && (
-          <Section title="Curriculum Progress" icon={<Award size={15} />}>
-            <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600 }}>
-                <span style={{ color: "var(--color-text-secondary)" }}>Approved Subtopics</span>
-                <span style={{ color: "var(--color-text-primary)" }}>
-                  {s.curriculumProgress.approvedSubtopics} / {s.curriculumProgress.totalSubtopics}
-                </span>
-              </div>
-              <div style={{ width: "100%", height: 8, backgroundColor: "var(--color-bg-secondary)", borderRadius: 4, overflow: "hidden", position: "relative" }}>
-                <div
-                  style={{
-                    width: `${s.curriculumProgress.percent}%`,
-                    height: "100%",
-                    backgroundColor: "var(--color-primary)",
-                    borderRadius: 4,
-                    transition: "width 0.3s ease",
-                  }}
-                />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                <span>Completion</span>
-                <span style={{ fontWeight: 700, color: "var(--color-primary)" }}>{s.curriculumProgress.percent}%</span>
-              </div>
-            </div>
-          </Section>
-        )}
-
         {/* ── School Supervisor ── */}
         {school && (
-          <Section title="Clinical Supervisor" icon={<User size={15} />}>
+          <Section title="Current Supervisor" icon={<User size={15} />}>
             <InfoRow
               label="Name"
-              value={`${school.user.firstName} ${school.user.lastName}`}
+              value={`${school.user.firstName} ${school.user.lastName}${
+                s.supervisor?.isActive === false ? " (deactivated)" : ""
+              }`}
             />
             <InfoRow label="Email" value={school.user.email} />
-            <InfoRow label="Phone" value={school.user.phone} />
+            {/* Work number on the staff record first, then the account's. */}
+            <InfoRow
+              label="Phone"
+              value={s.supervisor?.phone || school.user.phone}
+            />
             <InfoRow label="Staff ID" value={school.staffId} />
             <InfoRow label="Specialization" value={school.specialization} />
           </Section>
@@ -257,39 +221,10 @@ export default function AdminStudentView() {
           </Section>
         )}
 
-        {/* ── Internship History ── */}
-        {s.internships && s.internships.length > 0 && (
-          <Section title="Internship History" icon={<History size={15} />}>
-            <div style={{ padding: "4px 0" }}>
-              {s.internships.map((history, idx) => (
-                <div
-                  key={history._id}
-                  style={{
-                    padding: "12px 18px",
-                    borderBottom: idx === (s.internships?.length ?? 0) - 1 ? "none" : "1px solid var(--color-border)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}>
-                      {history.batch.name}
-                    </span>
-                    <StatusBadge status={history.itStatus} />
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-secondary)" }}>
-                    <span>Session: {history.session}</span>
-                    {history.isCurrent && (
-                      <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>Active / Current</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Section>
-        )}
       </div>
+
+      {/* ── Internships, each with its own progress ── */}
+      <StudentInternships studentId={id} />
     </div>
   );
 }

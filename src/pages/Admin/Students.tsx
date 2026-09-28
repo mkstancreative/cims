@@ -90,8 +90,6 @@ export default function Students() {
 
   const handleView = (student: Student) =>
     navigate(`/admin/students/${student._id}`);
-  const handleProgress = (student: Student) =>
-    navigate(`/admin/students/${student._id}/progress`);
 
   const handleReset = () => {
     setFilters({
@@ -212,7 +210,6 @@ export default function Students() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onView={handleView}
-          onProgress={handleProgress}
           // onUpdateStatus={openUpdateStatusSingle}
           selectedIds={selectedIds}
           onSelectionChange={setSelectedIds}

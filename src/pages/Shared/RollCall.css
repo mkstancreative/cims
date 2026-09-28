@@ -1,27 +1,56 @@
 /* ══════════════════════════════════════════════════════════════════════════
    Roll call — used standing up in a room, so the toggles are large and the
-   save is unmissable.
+   save is unmissable. Present = primary, absent = red, never a guess.
    ══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Summary ────────────────────────────────────────────────────────────── */
 .rc-summary {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .rc-stat {
-  flex: 1 1 140px;
-  padding: 12px 16px;
+  --rc-tone: var(--color-slate);
+  --rc-tone-rgb: var(--color-slate-rgb);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
   border: 1px solid var(--color-border);
+  border-left: 4px solid var(--rc-tone);
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-xs);
+}
+
+.rc-stat--present {
+  --rc-tone: var(--color-primary);
+  --rc-tone-rgb: var(--color-primary-rgb);
+}
+
+.rc-stat--absent {
+  --rc-tone: #ef4444;
+  --rc-tone-rgb: 239, 68, 68;
+}
+
+.rc-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
-  background: var(--color-bg-secondary, var(--color-bg-primary));
+  background: rgba(var(--rc-tone-rgb), 0.12);
+  color: var(--rc-tone);
 }
 
 .rc-stat-label {
   display: block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -29,18 +58,47 @@
 
 .rc-stat-value {
   display: block;
-  margin-top: 4px;
-  font-size: 24px;
+  margin-top: 2px;
+  font-size: 26px;
   font-weight: 700;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
+  color: var(--rc-tone);
 }
 
-.rc-stat-value.present {
-  color: var(--color-primary);
+.rc-stat--total .rc-stat-value {
+  color: var(--color-text-primary);
 }
-.rc-stat-value.absent {
-  color: #ef4444;
+
+/* Present share of the roll */
+.rc-meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.rc-meter__track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.15);
+  overflow: hidden;
+}
+
+.rc-meter__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+.rc-meter__text {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Action bar ─────────────────────────────────────────────────────────── */
@@ -50,6 +108,11 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-xs);
 }
 
 .rc-btn {
@@ -60,17 +123,27 @@
   padding: 0 18px;
   border: 1px solid var(--color-border);
   border-radius: 9px;
-  background: transparent;
+  background: var(--color-bg-secondary);
   color: var(--color-text-primary);
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    opacity 0.15s;
 }
 
 .rc-btn:hover:not(:disabled) {
   border-color: var(--color-accent);
   color: var(--color-accent);
+  background: var(--color-accent-muted);
+}
+
+.rc-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .rc-btn:disabled {
@@ -78,27 +151,70 @@
   cursor: not-allowed;
 }
 
+/* Bulk marks — outlined in the colour of what they set */
+.rc-btn--present {
+  border-color: var(--color-primary-border);
+  color: var(--color-primary);
+}
+
+.rc-btn--present:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+.rc-btn--absent {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #dc2626;
+}
+
+.rc-btn--absent:hover:not(:disabled) {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+[data-theme="dark"] .rc-btn--absent,
+[data-theme="dark"] .rc-btn--absent:hover:not(:disabled) {
+  color: #f87171;
+}
+
+/* Save — the one action that must not be missed */
 .rc-btn--primary {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-glow-sm);
 }
 
 .rc-btn--primary:hover:not(:disabled) {
   background: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
+  color: var(--color-on-primary);
+}
+
+/* Unlock — a different decision from saving, so a different colour */
+.rc-btn--unlock {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: #fff;
+}
+
+.rc-btn--unlock:hover:not(:disabled) {
+  background: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
   color: #fff;
 }
 
 .rc-btn--danger {
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #dc2626;
 }
 
 .rc-btn--danger:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.08);
   border-color: #ef4444;
-  color: #ef4444;
+  color: #dc2626;
 }
 
 .rc-spacer {
@@ -106,9 +222,12 @@
 }
 
 .rc-dirty {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.14);
   font-size: 12.5px;
-  font-weight: 600;
-  color: #d97706;
+  font-weight: 700;
+  color: var(--color-amber);
 }
 
 /* ── Roll list ──────────────────────────────────────────────────────────── */
@@ -124,14 +243,49 @@
   gap: 14px;
   padding: 12px 16px;
   border: 1px solid var(--color-border);
+  border-left: 4px solid rgba(239, 68, 68, 0.45);
   border-radius: 10px;
-  background: var(--color-bg-secondary, var(--color-bg-primary));
-  transition: border-color 0.15s, background 0.15s;
+  background: var(--color-bg-secondary);
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
+/* Present stays bright — the edge, avatar and toggle carry the state. */
 .rc-row.present {
-  border-color: rgba(var(--color-primary-rgb), 0.5);
-  background: rgba(var(--color-primary-rgb), 0.06);
+  border-color: rgba(var(--color-primary-rgb), 0.3);
+  border-left-color: var(--color-primary);
+  /* A faint tint laid over the card colour — on its own the tint is see-
+     through and picks up the page, making present rows look greyer than
+     absent ones. */
+  background:
+    linear-gradient(
+      rgba(var(--color-primary-rgb), 0.04),
+      rgba(var(--color-primary-rgb), 0.04)
+    ),
+    var(--color-bg-secondary);
+}
+
+.rc-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-slate-muted);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.rc-row.present .rc-avatar {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .rc-row-body {
@@ -142,6 +296,7 @@
 .rc-name {
   font-size: 14.5px;
   font-weight: 600;
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -157,25 +312,42 @@
 .rc-toggle {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   flex: 0 0 auto;
-  min-width: 116px;
+  min-width: 124px;
   height: 44px;
   padding: 0 16px;
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
   border-radius: 10px;
-  background: transparent;
-  color: var(--color-text-muted);
+  background: var(--color-bg-secondary);
+  color: #dc2626;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s;
 }
 
+.rc-toggle:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .rc-toggle.on {
   border-color: var(--color-primary);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
+}
+
+.rc-toggle.on:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
+
+.rc-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .rc-toggle:disabled {
@@ -185,31 +357,56 @@
 
 .rc-empty {
   padding: 48px 20px;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
   text-align: center;
   color: var(--color-text-muted);
 }
 
+/* ── Status banners — one tone per state ────────────────────────────────── */
 .rc-banner {
   display: flex;
   align-items: flex-start;
   gap: 9px;
   padding: 11px 14px;
   margin-bottom: 16px;
-  border-radius: 9px;
-  font-size: 12.5px;
+  border: 1px solid var(--color-slate-muted);
+  border-left: 4px solid var(--color-slate);
+  border-radius: 10px;
+  font-size: 13px;
   line-height: 1.5;
-  background: var(--color-accent-muted);
+  background: var(--color-slate-muted);
   color: var(--color-text-secondary);
 }
 
 .rc-banner svg {
   flex-shrink: 0;
-  margin-top: 1px;
+  margin-top: 2px;
+  color: var(--color-slate);
 }
 
+/* Quiz is live */
+.rc-banner--live {
+  border-color: var(--color-primary-border);
+  border-left-color: var(--color-primary);
+  background: var(--color-primary-muted);
+}
+
+.rc-banner--live svg {
+  color: var(--color-primary);
+}
+
+/* Closed for good */
 .rc-banner--warn {
-  background: rgba(245, 158, 11, 0.12);
-  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.3);
+  border-left-color: var(--color-amber);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-text-primary);
+}
+
+.rc-banner--warn svg {
+  color: var(--color-amber);
 }
 
 @media (max-width: 560px) {
@@ -218,5 +415,9 @@
   }
   .rc-toggle {
     width: 100%;
+  }
+  .rc-actions .rc-btn {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 }

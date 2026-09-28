@@ -60,8 +60,6 @@ export default function UnAssignedStudents() {
 
   const handleView = (student: Student) =>
     navigate(`/admin/students/${student._id}`);
-  const handleProgress = (student: Student) =>
-    navigate(`/admin/students/${student._id}/progress`);
 
   const handleReset = () => {
     setFilters({
@@ -160,7 +158,6 @@ export default function UnAssignedStudents() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
           onLimitChange={(l) => setField("limit", l)}
           onView={handleView}
-          onProgress={handleProgress}
           hideSelection
           hideSession
           hideDeptCode

@@ -21,8 +21,11 @@ export const getStudentById = async (
   return response.data;
 };
 
-export const getStudentProgress = async (id: string) => {
-  const response = await api.get(`/admin/students/${id}/progress`);
+/** Progress for one internship — the current one unless `internshipId` is given. */
+export const getStudentProgress = async (id: string, internshipId?: string) => {
+  const response = await api.get(`/admin/students/${id}/progress`, {
+    params: internshipId ? { internshipId } : undefined,
+  });
   return response.data;
 };
 

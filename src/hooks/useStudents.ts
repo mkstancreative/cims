@@ -41,12 +41,19 @@ export const useStudentById = (id: string) => {
   });
 };
 
-export const useStudentProgress = (id: string) => {
+/** One internship's progress; omit `internshipId` for the current one. */
+export const useStudentProgress = (
+  id: string,
+  internshipId?: string,
+  enabled = true,
+) => {
   return useQuery({
-    queryKey: ["students", id, "progress"],
-    queryFn: (): Promise<StudentProgressResponse> => getStudentProgress(id),
-    enabled: !!id,
+    queryKey: ["students", id, "progress", internshipId ?? "current"],
+    queryFn: (): Promise<StudentProgressResponse> =>
+      getStudentProgress(id, internshipId),
+    enabled: !!id && enabled,
     select: (data) => data.data,
+    retry: false,
   });
 };
 

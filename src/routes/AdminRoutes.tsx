@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import Spinner from "../components/ui/Spinner/Spinner";
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 import DashBoardAdmin from "../pages/Admin/DashBoardAdmin";
@@ -23,10 +23,13 @@ const Settings = lazy(() => import("../pages/Admin/Settings"));
 const AdminStudentView = lazy(
   () => import("../components/admin/view/AdminStudentView"),
 );
-const StudentProgress = lazy(
-  () => import("../components/admin/view/StudentProgress"),
-);
 const AdminCertificates = lazy(() => import("../pages/Admin/AdminCertificates"));
+
+/** Old progress links land on the one student page. */
+function StudentProgressRedirect() {
+  const { id = "" } = useParams<{ id: string }>();
+  return <Navigate to={`/admin/students/${id}`} replace />;
+}
 
 export default function AdminRoutes() {
   return (
@@ -70,7 +73,8 @@ export default function AdminRoutes() {
         {/* ── People ── */}
         <Route path="students" element={<Students />} />
         <Route path="students/:id" element={<AdminStudentView />} />
-        <Route path="students/:id/progress" element={<StudentProgress />} />
+        {/* Progress now lives on the profile, per internship. */}
+        <Route path="students/:id/progress" element={<StudentProgressRedirect />} />
         <Route path="unassigned-students" element={<UnAssignedStudents />} />
         <Route path="supervisors" element={<Supervisor />} />
 

@@ -119,6 +119,9 @@ export interface StudentDetail extends Student {
   batch: StudentBatchRef;
   itPeriod: { startDate: string; endDate: string; expectedDuration: number };
   placement?: StudentPlacement;
+  /** The assigned supervisor — `null` when none. (Current API shape.) */
+  supervisor?: (Supervisor & { isActive?: boolean; phone?: string }) | null;
+  /** Older API shape. */
   supervisors?: {
     industrial?: IndustrialSupervisor;
     school?: Supervisor;
@@ -207,13 +210,29 @@ export interface UpdateStatusApiResult {
 }
 
 // ── Progress ─────────────────────────────────────────────────────────────────
+//
+// `GET /admin/students/:id/progress[?internshipId=]` — scoped to ONE
+// internship: the current one by default, or `internshipId` (404 if it isn't
+// this student's). Fields marked "older API" are no longer sent but are still
+// rendered when present.
+
+export interface ProgressCurriculum {
+  totalSubtopics: number;
+  approvedSubtopics: number;
+  percent: number;
+}
+
 export interface ProgressInfo {
-  weeksCompleted: number;
-  daysRemaining: number;
-  totalWeeks: number;
-  progressPercent: number;
   startDate: string;
   endDate: string;
+  daysRemaining: number;
+  curriculum?: ProgressCurriculum;
+  /** Older API. */
+  weeksCompleted?: number;
+  /** Older API. */
+  totalWeeks?: number;
+  /** Older API. */
+  progressPercent?: number;
 }
 
 export interface ProgressLogbookStats {
@@ -221,21 +240,19 @@ export interface ProgressLogbookStats {
   submitted: number;
   approved: number;
   rejected: number;
-  missedWeeks: number[];
-  averageRating: number;
-  minimumRequired: number;
-  meetsRequirement: boolean;
-}
-
-export interface ProgressPlacement {
-  company: string;
-  position: string;
-  startDate: string;
-}
-
-export interface ProgressSupervisors {
-  school?: string;
-  industrial?: string;
+  /**
+   * Per-week submission states, when the API provides them — drives the
+   * heat map. (Not sent today; `missedWeeks` is the older equivalent.)
+   */
+  weeks?: { weekNumber: number; status: string }[];
+  /** Older API. */
+  missedWeeks?: number[];
+  /** Older API. */
+  averageRating?: number;
+  /** Older API. */
+  minimumRequired?: number;
+  /** Older API. */
+  meetsRequirement?: boolean;
 }
 
 export interface StudentProgressData {
@@ -248,10 +265,12 @@ export interface StudentProgressData {
     program: string;
     itStatus: ITStatus;
   };
+  /** The internship this progress describes. */
+  internshipId?: string;
   progress: ProgressInfo;
   logbookStats: ProgressLogbookStats;
-  placement?: ProgressPlacement;
-  supervisors?: ProgressSupervisors;
+  /** Supervisor id (not populated here). */
+  supervisor?: string | null;
 }
 
 export interface StudentProgressResponse {

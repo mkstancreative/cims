@@ -10,6 +10,9 @@ import {
   Square,
   CheckSquare,
   XSquare,
+  Users,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import {
   useQuizSession,
@@ -34,6 +37,18 @@ function refId(ref: unknown): string {
     return String((ref as { _id?: string })._id ?? "");
   }
   return "";
+}
+
+/** "Ada Obi" → "AO". */
+function initials(name: string): string {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase())
+      .join("") || "?"
+  );
 }
 
 function studentName(record: QuizAttendanceRecord): string {
@@ -103,6 +118,7 @@ export default function RollCall() {
   const total = records.length;
   const presentCount = records.filter(isPresent).length;
   const absentCount = total - presentCount;
+  const presentPct = total ? Math.round((presentCount / total) * 100) : 0;
 
   const dirty = records.some((r) => isPresent(r) !== r.present);
 
@@ -197,7 +213,7 @@ export default function RollCall() {
       )}
 
       {status === "unlocked" && (
-        <div className="rc-banner">
+        <div className="rc-banner rc-banner--live">
           <Info size={14} />
           <span>
             The quiz is live for the students marked present. A latecomer can
@@ -219,25 +235,45 @@ export default function RollCall() {
 
       {/* ── Summary ── */}
       <div className="rc-summary">
-        <div className="rc-stat">
-          <span className="rc-stat-label">On the roll</span>
-          <span className="rc-stat-value">{total}</span>
+        <div className="rc-stat rc-stat--total">
+          <span className="rc-stat-icon"><Users size={18} /></span>
+          <span>
+            <span className="rc-stat-label">On the roll</span>
+            <span className="rc-stat-value">{total}</span>
+          </span>
         </div>
-        <div className="rc-stat">
-          <span className="rc-stat-label">Present</span>
-          <span className="rc-stat-value present">{presentCount}</span>
+        <div className="rc-stat rc-stat--present">
+          <span className="rc-stat-icon"><UserCheck size={18} /></span>
+          <span>
+            <span className="rc-stat-label">Present</span>
+            <span className="rc-stat-value">{presentCount}</span>
+          </span>
         </div>
-        <div className="rc-stat">
-          <span className="rc-stat-label">Absent</span>
-          <span className="rc-stat-value absent">{absentCount}</span>
+        <div className="rc-stat rc-stat--absent">
+          <span className="rc-stat-icon"><UserX size={18} /></span>
+          <span>
+            <span className="rc-stat-label">Absent</span>
+            <span className="rc-stat-value">{absentCount}</span>
+          </span>
         </div>
       </div>
+
+      {total > 0 && (
+        <div className="rc-meter" aria-label={`${presentCount} of ${total} present`}>
+          <div className="rc-meter__track">
+            <div className="rc-meter__fill" style={{ width: `${presentPct}%` }} />
+          </div>
+          <span className="rc-meter__text">
+            {presentCount} of {total} present · {presentPct}%
+          </span>
+        </div>
+      )}
 
       {/* ── Actions ── */}
       <div className="rc-actions">
         <button
           type="button"
-          className="rc-btn"
+          className="rc-btn rc-btn--present"
           onClick={() => setAll(true)}
           disabled={!editable || total === 0}
         >
@@ -246,7 +282,7 @@ export default function RollCall() {
         </button>
         <button
           type="button"
-          className="rc-btn"
+          className="rc-btn rc-btn--absent"
           onClick={() => setAll(false)}
           disabled={!editable || total === 0}
         >
@@ -256,7 +292,7 @@ export default function RollCall() {
 
         <span className="rc-spacer" />
 
-        {dirty && <span className="rc-dirty">Unsaved changes</span>}
+        {dirty && <span className="rc-dirty">● Unsaved changes</span>}
 
         <button
           type="button"
@@ -277,7 +313,7 @@ export default function RollCall() {
         {status === "open" && (
           <button
             type="button"
-            className="rc-btn rc-btn--primary"
+            className="rc-btn rc-btn--unlock"
             onClick={() => unlock(id)}
             // The API refuses an unlock with nobody present; disabling here
             // says why before they find out the hard way.
@@ -329,6 +365,9 @@ export default function RollCall() {
                 key={key || refId(record.student)}
                 className={`rc-row${present ? " present" : ""}`}
               >
+                <span className="rc-avatar" aria-hidden="true">
+                  {initials(studentName(record))}
+                </span>
                 <div className="rc-row-body">
                   <div className="rc-name">{studentName(record)}</div>
                   <div className="rc-meta">

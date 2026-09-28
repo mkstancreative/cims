@@ -1,6 +1,5 @@
 import { Eye } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
-import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import type { Student } from "../../../api/types/student";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
@@ -12,7 +11,6 @@ interface AdminStudentsTableProps {
   onPageChange: (p: number) => void;
   onLimitChange: (l: number) => void;
   onView: (student: Student) => void;
-  onProgress: (student: Student) => void;
   // onUpdateStatus: (student: Student) => void;
   // bulk selection (optional — omit for read-only tables)
   selectedIds?: Set<string>;
@@ -122,7 +120,6 @@ export default function AdminStudentsTable({
   onLimitChange,
   onView,
   // onUpdateStatus,
-  onProgress,
   selectedIds,
   onSelectionChange,
   hideSelection = false,
@@ -213,26 +210,16 @@ export default function AdminStudentsTable({
     },
     {
       header: "Actions",
+      // One destination — the student's profile — so a button, not a menu.
       render: (row) => (
-        <ActionDropDown
-          actions={[
-            {
-              label: "View Profile",
-              icon: <Eye size={13} />,
-              onClick: () => onView(row),
-            },
-            {
-              label: "View Progress",
-              icon: <Eye size={13} />,
-              onClick: () => onProgress(row),
-            },
-            // {
-            //   label: "Update Status",
-            //   icon: <Pencil size={13} />,
-            //   onClick: () => onUpdateStatus(row),
-            // },
-          ]}
-        />
+        <button
+          type="button"
+          className="table-view-btn"
+          onClick={() => onView(row)}
+          aria-label={`View ${row.user?.firstName ?? "student"} ${row.user?.lastName ?? ""}`.trim()}
+        >
+          <Eye size={14} /> View
+        </button>
       ),
     },
   ];

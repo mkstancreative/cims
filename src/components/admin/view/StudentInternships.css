@@ -1,0 +1,319 @@
+/* ─── Student profile: internships + per-internship progress ───────────── */
+.si {
+  grid-column: 1 / -1;
+}
+
+.si-count {
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.si-note {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+.si-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.si-item + .si-item {
+  border-top: 1px solid var(--color-border);
+}
+
+.si-item__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.si-item__main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.si-item__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.si-current {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-accent-muted);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.si-item__meta {
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+}
+
+.si-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: 8px;
+  background: var(--color-bg-secondary);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.si-toggle:hover {
+  background: var(--color-accent-muted);
+}
+
+.si-toggle__icon {
+  transition: transform 0.15s ease;
+}
+
+.si-item.is-open .si-toggle__icon {
+  transform: rotate(180deg);
+}
+
+/* Progress panel */
+.si-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 18px 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+}
+
+.si-progress--loading,
+.si-progress--empty {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.si-progress--empty svg {
+  color: var(--color-amber);
+}
+
+.si-progress__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.si-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.si-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 20px;
+  flex: 1;
+  min-width: 220px;
+  margin: 0;
+}
+
+.si-facts dt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.si-facts dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.si-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.si-ok,
+.si-bad {
+  font-size: 11.5px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.si-ok {
+  color: var(--color-primary);
+}
+
+.si-bad {
+  color: #dc2626;
+}
+
+.si-logbook {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.si-logbook__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.si-logbook__cell strong {
+  font-size: 18px;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.si-logbook__cell span {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.si-logbook--ok strong {
+  color: var(--color-primary);
+}
+
+.si-logbook--pending strong {
+  color: var(--color-amber);
+}
+
+.si-logbook--bad strong {
+  color: #dc2626;
+}
+
+.si-weeks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.si-week {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* Week states — submission colours when the API reports them */
+.si-week--approved {
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+}
+
+.si-week--submitted {
+  background: rgba(245, 158, 11, 0.85);
+  color: #fff;
+}
+
+.si-week--rejected,
+.si-week--missed {
+  background: #ef4444;
+  color: #fff;
+}
+
+.si-week--draft {
+  border: 1px dashed var(--color-accent-border);
+  color: var(--color-text-secondary);
+}
+
+/* Timeline states — used when there's no per-week submission data */
+.si-week--past {
+  background: var(--color-slate-muted);
+  color: var(--color-text-secondary);
+}
+
+.si-week--current {
+  border: 2px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.si-week--upcoming {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.si-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+}
+
+.si-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.si-legend .si-week {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.si-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 560px) {
+  .si-logbook {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .si-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -51,6 +51,8 @@ export const useUpdateInternshipStatus = () => {
     mutationFn: updateInternshipStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["internships"] });
+      // A student's profile and progress reflect their internship's status.
+      queryClient.invalidateQueries({ queryKey: ["students"] });
       toast.success("Internship status updated.");
     },
     onError: (err: unknown) =>
@@ -64,6 +66,8 @@ export const useSetCurrentInternship = () => {
     mutationFn: setCurrentInternship,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["internships"] });
+      // Changes the student's current batch, period and default progress.
+      queryClient.invalidateQueries({ queryKey: ["students"] });
       toast.success("Current internship set.");
     },
     onError: (err: unknown) =>

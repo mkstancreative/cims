@@ -5,7 +5,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: none;
+  /* White in light mode, like the cards below it. */
+  background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 7px 14px;
@@ -15,11 +16,21 @@
   cursor: pointer;
   transition: all 0.15s;
   width: fit-content;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .sv-back:hover {
-  background: var(--color-bg-secondary);
+  border-color: var(--color-accent-border);
   color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .sv-back {
+  background: none;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .sv-back:hover {
+  background: var(--color-bg-secondary);
 }
 
 /* ── Hero ──────────────────────────────────────────────────────────────── */
@@ -28,11 +39,16 @@
   align-items: center;
   gap: 20px;
   padding: 24px;
-  background: var(--color-bg-primary);
+  /* White in light mode, like the section cards; dark mode unchanged. */
+  background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   flex-wrap: wrap;
+}
+
+[data-theme="dark"] .sv-hero {
+  background: var(--color-bg-primary);
 }
 
 .sv-avatar-wrap {
@@ -110,12 +126,17 @@
 }
 
 .sv-stat-card {
-  background: var(--color-bg-primary);
+  /* White in light mode, like the hero and sections; dark mode unchanged. */
+  background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 18px 16px;
   text-align: center;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .sv-stat-card {
+  background: var(--color-bg-primary);
 }
 
 .sv-stat-value {
@@ -139,12 +160,18 @@
 }
 
 /* ── Section card ────────────────────────────────────────────────────────── */
+/* White card in light mode, so it stands out from the off-white page; dark
+   mode keeps the darker body under the lighter header. */
 .sv-section {
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .sv-section {
+  background: var(--color-bg-primary);
 }
 
 .sv-section-header {
