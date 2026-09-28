@@ -2,7 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/services/api";
 import { dashboardStats as studentDashboardStats } from "../api/services/itstudent";
 import { supervisorDashboardStats } from "../api/services/schoolSupervisors";
-import { isPaymentRequiredError } from "../helpers/registration";
+import {
+  isNoInternshipError,
+  isPaymentRequiredError,
+} from "../helpers/registration";
 import type {
   StudentDashboardResponse,
   AdminDashboardResponse,
@@ -20,9 +23,12 @@ export const useStudentDashboard = () =>
     queryKey: ["student-dashboard"],
     queryFn: studentDashboardStats,
     staleTime: 2 * 60 * 1000,
-    // An unpaid fee won't fix itself on retry — show the payment panel at once.
+    // An unpaid fee or a missing enrolment won't fix itself on retry — show
+    // the matching panel at once.
     retry: (failureCount, error) =>
-      !isPaymentRequiredError(error) && failureCount < 3,
+      !isPaymentRequiredError(error) &&
+      !isNoInternshipError(error) &&
+      failureCount < 3,
   });
 
 export const useAdminDashboard = () =>

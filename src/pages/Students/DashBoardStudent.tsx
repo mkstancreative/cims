@@ -13,9 +13,11 @@ import { ProgressSection } from "../../components/student/dashboard/ProgressSect
 import { FinalDetailsSection } from "../../components/student/dashboard/FinalDetailsSection";
 import { NotificationsSection } from "../../components/student/dashboard/NotificationsSection";
 import { PaymentRequiredPanel } from "../../components/student/dashboard/PaymentRequiredPanel";
+import { EnrolmentPendingPanel } from "../../components/student/dashboard/EnrolmentPendingPanel";
 import { fmt, ago } from "../../helpers/utilities";
 import {
   apiErrorMessage,
+  isNoInternshipError,
   isPaymentRequiredError,
 } from "../../helpers/registration";
 
@@ -30,6 +32,9 @@ export default function DashBoardStudent() {
     return (
       <PaymentRequiredPanel message={apiErrorMessage(error, "")} />
     );
+
+  // Paid but not placed in a batch yet — show where their registration stands.
+  if (isNoInternshipError(error)) return <EnrolmentPendingPanel />;
 
   if (!dashResp?.data)
     return (

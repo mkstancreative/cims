@@ -37,6 +37,13 @@ export const useVerifyPayment = (reference: string | null) => {
   });
 };
 
+/** `verifyPayment` on demand (e.g. "I've already paid"); the caller reports. */
+export const useConfirmPayment = () => {
+  return useMutation({
+    mutationFn: (reference: string) => verifyPayment(reference),
+  });
+};
+
 export const useMyRegistrations = () => {
   return useQuery({
     queryKey: ["registrations", "my"],

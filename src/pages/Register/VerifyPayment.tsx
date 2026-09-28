@@ -1,8 +1,12 @@
+import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import "../Login/Login.css";
 import { useVerifyPayment } from "../../hooks/useRegistrations";
 import { useAuth } from "../../context/useAuth";
+import { paymentOutcome } from "../../helpers/registration";
+import { clearPendingRegistration } from "../../helpers/pendingRegistration";
 
 type Phase = "loading" | "success" | "failed" | "pending" | "missing";
 
@@ -19,24 +23,20 @@ const VerifyPayment = () => {
     if (!reference) return "missing";
     if (isLoading) return "loading";
     if (isError || !data) return "failed";
-
-    const status = (data.data?.status ?? "").toLowerCase();
-    if (
-      ["success", "successful", "paid", "completed", "new", "enrolled"].includes(
-        status,
-      )
-    ) {
-      return "success";
-    }
-    if (
-      ["pending", "processing", "ongoing", "pending_payment"].includes(status)
-    ) {
-      return "pending";
-    }
-    return "failed";
+    return paymentOutcome(data.data?.status);
   };
 
   const phase = resolvePhase();
+
+  // Paid: forget the pending attempt and drop the gated dashboard data, so
+  // "Go to Dashboard" loads the real thing instead of the payment panel.
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (phase !== "success") return;
+    clearPendingRegistration();
+    queryClient.invalidateQueries({ queryKey: ["student-dashboard"] });
+    queryClient.invalidateQueries({ queryKey: ["registrations"] });
+  }, [phase, queryClient]);
 
   const config: Record<
     Phase,

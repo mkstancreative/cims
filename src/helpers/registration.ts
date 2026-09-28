@@ -48,6 +48,39 @@ export function isPaymentRequiredError(err: unknown): boolean {
   return /registration payment/i.test(res.data?.message ?? "");
 }
 
+/**
+ * True when the dashboard has nothing to show yet because the student isn't
+ * in an internship ("Student has no current internship…") — e.g. paid but
+ * still waiting for the coordinator to enrol them into a batch.
+ */
+export function isNoInternshipError(err: unknown): boolean {
+  return /no current internship/i.test(
+    (err as ApiError)?.response?.data?.message ?? "",
+  );
+}
+
+/** The student's most recent registration. */
+export function latestRegistration(
+  registrations: Registration[] | undefined,
+): Registration | null {
+  const sorted = [...(registrations ?? [])].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
+  return sorted[0] ?? null;
+}
+
+export type PaymentOutcome = "success" | "pending" | "failed";
+
+/** Reads the status `GET /registrations/verify-payment` answers with. */
+export function paymentOutcome(status: string | undefined): PaymentOutcome {
+  const s = (status ?? "").toLowerCase();
+  if (["success", "successful", "paid", "completed", "new", "enrolled"].includes(s))
+    return "success";
+  if (["pending", "processing", "ongoing", "pending_payment"].includes(s))
+    return "pending";
+  return "failed";
+}
+
 const UNPAID_PAYMENT_STATUSES = ["pending", "failed", "abandoned"];
 
 /** The registration still waiting on payment (the newest, if several). */

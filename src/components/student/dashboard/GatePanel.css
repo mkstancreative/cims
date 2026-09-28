@@ -1,0 +1,306 @@
+/* ─── Gate panels — shown in place of the dashboard (unpaid, awaiting enrolment) ─── */
+.gate-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 560px;
+  margin: 24px auto 0;
+  padding: 40px 32px 28px;
+  border-radius: 16px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.gate-panel__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  color: var(--color-amber);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.gate-panel__title {
+  margin: 0 0 10px;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.gate-panel__text {
+  max-width: 420px;
+  margin: 0 0 24px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.gate-panel__loading {
+  margin-bottom: 24px;
+  color: var(--color-text-muted);
+  font-size: 13.5px;
+}
+
+.gate-panel__details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.gate-panel__details > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.gate-panel__details dt {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.gate-panel__details dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: right;
+}
+
+.gate-panel__details .gate-panel__amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.gate-panel__notice {
+  width: 100%;
+  margin: 0 0 24px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--color-slate-muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.gate-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.gate-panel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1 1 180px;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.gate-panel__btn:hover:not(:disabled) {
+  border-color: var(--color-accent-border);
+  background: var(--color-surface-overlay);
+}
+
+.gate-panel__btn--primary {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+}
+
+.gate-panel__btn--primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-glow-sm);
+}
+
+.gate-panel__btn:focus-visible,
+.gate-panel__signout:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.gate-panel__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.gate-panel__signout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.gate-panel__signout:hover:not(:disabled) {
+  color: var(--color-text-primary);
+}
+
+.gate-panel__spin {
+  animation: gate-panel-spin 0.9s linear infinite;
+}
+
+@keyframes gate-panel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-panel__spin {
+    animation: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .gate-panel {
+    margin-top: 8px;
+    padding: 28px 18px 22px;
+  }
+}
+
+/* ── Awaiting enrolment ───────────────────────────────────────────────── */
+.gate-panel__icon--progress {
+  color: var(--color-accent);
+  background: var(--color-accent-muted);
+  border-color: var(--color-accent-border);
+}
+
+.gate-panel__icon--danger {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Registered → Paid → Enrolled */
+.gate-panel__steps {
+  display: flex;
+  width: 100%;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.gate-panel__step {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* connector line to the previous step */
+.gate-panel__step + .gate-panel__step::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--color-border);
+}
+
+.gate-panel__step.is-done + .gate-panel__step::before {
+  background: var(--color-accent);
+}
+
+.gate-panel__step-dot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+}
+
+.gate-panel__step.is-done {
+  color: var(--color-text-primary);
+}
+
+.gate-panel__step.is-done .gate-panel__step-dot {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+}
+
+.gate-panel__step.is-current {
+  color: var(--color-accent);
+}
+
+.gate-panel__step.is-current .gate-panel__step-dot {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 0 0 0 4px var(--color-accent-muted);
+}
+
+.gate-panel__reason {
+  width: 100%;
+  margin: 0 0 24px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.06);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+.gate-panel__reason strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--color-text-primary);
+}
+
+a.gate-panel__btn {
+  text-decoration: none;
+}
