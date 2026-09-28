@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -20,6 +20,7 @@ import { useAuth } from "../../context/useAuth";
 import type { UserRole } from "../../api/types/auth";
 import ForgotPassword from "../../components/auth/ForgotPassword";
 import GoogleButton from "../../components/auth/GoogleButton";
+import PageLoader from "../../components/ui/PageLoader/PageLoader";
 
 const features: AuthFeature[] = [
   {
@@ -49,18 +50,50 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isForgotOpen, setIsForgotOpen] = useState(false);
 
-  const { mutate: login, isPending } = useLoginUser();
-  const { mutate: googleLogin, isPending: googlePending } = useGoogleLogin();
+  const {
+    mutate: login,
+    isPending,
+    isSuccess: loginDone,
+  } = useLoginUser();
+  const {
+    mutate: googleLogin,
+    isPending: googlePending,
+    isSuccess: googleDone,
+  } = useGoogleLogin();
   const { isAuthenticated, user, isLoading } = useAuth();
 
+  // Fetch the shared dashboard shell while the user is still typing, so it is
+  // ready (or close) by the time they sign in.
+  useEffect(() => {
+    const preload = () =>
+      void import("../../components/layout/DashBoardLayout");
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(preload);
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(preload, 1500);
+    return () => clearTimeout(id);
+  }, []);
+
   if (!isLoading && isAuthenticated && user) {
+    // A sign-in that just happened navigates by itself (to the dashboard, or
+    // to the payment page when the fee is unpaid) — redirecting here too would
+    // race it. Either way, show a loader: navigation waits on lazy code, and
+    // React keeps this screen up meanwhile, so it must not be blank.
+    if (loginDone || googleDone) return <PageLoader label="Signing you in…" />;
+
     const roleHome: Record<UserRole, string> = {
       admin: "/admin/dashboard",
       coordinator: "/admin/dashboard",
       supervisor: "/supervisor/dashboard",
       student: "/student/dashboard",
     };
-    return <Navigate to={roleHome[user.role] ?? "/"} replace />;
+    return (
+      <>
+        <PageLoader label="Opening your dashboard…" />
+        <Navigate to={roleHome[user.role] ?? "/"} replace />
+      </>
+    );
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {

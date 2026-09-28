@@ -11,6 +11,7 @@ import { NotificationsProvider } from "./context";
 import { NotificationPopupContainer } from "./components/ui/NotificationPopup";
 import ChangePassword from "./components/shared/forms/ChangePassword";
 import { useAuth } from "./context/useAuth";
+import PageLoader from "./components/ui/PageLoader/PageLoader";
 
 // Lazy-load role layouts so each bundle stays small
 const AdminLayout = lazy(() => import("./layout/AdminLayout"));
@@ -35,43 +36,6 @@ const GlobalAuthModals = () => {
     />
   );
 };
-
-const PageLoader = () => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: "100vh",
-      background: "var(--color-bg-primary)",
-      color: "var(--color-accent)",
-      gap: 10,
-      fontSize: 14,
-      fontFamily: "var(--font-sans, system-ui)",
-    }}
-  >
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      style={{ animation: "spin 1s linear infinite" }}
-    >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeDasharray="60"
-        strokeDashoffset="20"
-        strokeLinecap="round"
-      />
-    </svg>
-    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    Loading…
-  </div>
-);
 
 function App() {
   return (

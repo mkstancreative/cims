@@ -383,7 +383,9 @@
   gap: 10px;
   min-width: 0;
 }
-.dash-topbar__mobile-menu-btn {
+/* Both classes: must outrank .dash-topbar__icon-btn's display:flex, which
+   comes later in this file. Shown again under 900px (see media query). */
+.dash-topbar__icon-btn.dash-topbar__mobile-menu-btn {
   display: none;
   flex-shrink: 0;
 }
@@ -788,7 +790,7 @@
     left: 0 !important;
     padding: 0 16px;
   }
-  .dash-topbar__mobile-menu-btn {
+  .dash-topbar__icon-btn.dash-topbar__mobile-menu-btn {
     display: flex;
   }
   .dash-topbar__breadcrumb,
