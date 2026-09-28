@@ -84,21 +84,23 @@ export default function LogBook() {
           </div>
         </div>
 
-        {/* ── Search + Reset ── */}
-        <div className="filter-wrapper">
-          <SearchInput
-            value={search}
-            onChange={(val) => {
-              setSearch(val);
-              setPage(1);
-            }}
-            placeholder="Search by notes…"
-            onClear={handleReset}
-          />
-        </div>
-
-        {/* ── Filters ── */}
-        <div className="filter-selects-block">
+        {/* ── Search + filters ── */}
+        <div className="filter-selects-block filter-selects-block--with-search">
+          <div className="filter-search-field">
+            <span className="filter-label">Search</span>
+            <SearchInput
+              value={search}
+              onChange={(val) => {
+                setSearch(val);
+                setPage(1);
+              }}
+              placeholder="Search by notes…"
+              onClear={() => {
+                setSearch("");
+                setPage(1);
+              }}
+            />
+          </div>
           <SelectFilter
             label="Status"
             options={STATUS_OPTIONS}

@@ -24,11 +24,14 @@ import { durationLabel, formatPrice } from "../../../helpers/duration";
 import { fmt } from "../../../helpers/utilities";
 import { useQuizzes } from "../../../hooks/useQuizzes";
 import { batchQuizTitle } from "../../../helpers/batchQuiz";
+import { supervisorName } from "../../../helpers/batchSupervisor";
 
 interface BatchesTableProps {
   search?: string;
   status?: BatchStatus | "";
   session?: string;
+  /** Client-side: show only batches with / without a supervisor. */
+  supervisorFilter?: "" | "assigned" | "unassigned";
   page: number;
   limit: number;
   onPageChange: (p: number) => void;
@@ -42,16 +45,12 @@ interface BatchesTableProps {
   onDeleteRequest: (batch: Batch) => void;
 }
 
-function supervisorLabel(batch: Batch): string {
-  const u = batch.supervisor?.user;
-  if (u) return `${u.firstName} ${u.lastName}`.trim();
-  return "—";
-}
 
 export default function BatchesTable({
   search,
   status,
   session,
+  supervisorFilter = "",
   page,
   limit,
   onPageChange,
@@ -64,9 +63,13 @@ export default function BatchesTable({
   onAnnounce,
   onDeleteRequest,
 }: BatchesTableProps) {
+  // There's no supervisor filter server-side, so while it's on, load every
+  // batch in one go and filter + paginate here (GeneralTable pages the rows
+  // itself when `meta` is null). Otherwise page on the server as usual.
+  const filtering = Boolean(supervisorFilter);
   const { data, isLoading } = useBatches({
-    page,
-    limit,
+    page: filtering ? 1 : page,
+    limit: filtering ? 1000 : limit,
     search,
     status,
     session,
@@ -81,9 +84,15 @@ export default function BatchesTable({
   const { mutate: activate } = useActivateBatch();
   const { mutate: archive } = useArchiveBatch();
 
-  const batches: Batch[] = data?.data ?? [];
+  const allBatches: Batch[] = data?.data ?? [];
+  const batches = filtering
+    ? allBatches.filter((b) =>
+        supervisorFilter === "assigned" ? b.supervisor : !b.supervisor,
+      )
+    : allBatches;
 
-  const meta: TableMeta | null = data
+  const meta: TableMeta | null =
+    data && !filtering
     ? {
         page: data.page,
         pages: data.pages,
@@ -159,7 +168,22 @@ export default function BatchesTable({
     },
     {
       header: "Supervisor",
-      render: (row) => supervisorLabel(row),
+      render: (row) => {
+        const name = supervisorName(row.supervisor);
+        if (name) return name;
+        // Unassigned means nobody reviews these students' logbooks — make it
+        // an action, not a dash.
+        return (
+          <button
+            type="button"
+            className="bt-assign-sup"
+            onClick={() => onAssignSupervisor(row)}
+            disabled={row.status === "archived"}
+          >
+            <UserPlus size={12} /> Assign supervisor
+          </button>
+        );
+      },
     },
     {
       header: "Quiz",

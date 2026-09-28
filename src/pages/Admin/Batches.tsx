@@ -27,6 +27,8 @@ interface FilterState {
   limit: number;
   status: BatchStatus | "";
   session: string;
+  /** Find batches nobody is supervising. */
+  supervisor: "" | "assigned" | "unassigned";
 }
 
 // ── Assign supervisor modal ───────────────────────────────────────────────────
@@ -113,6 +115,7 @@ export default function Batches() {
     limit: 10,
     status: "",
     session: "",
+    supervisor: "",
   });
 
   const setField = <K extends keyof FilterState>(
@@ -143,6 +146,9 @@ export default function Batches() {
       />,
     );
 
+  const openAssignSupervisor = (batch: Batch) =>
+    openModal(<AssignSupervisorModal batch={batch} onClose={closeModal} />);
+
   const openView = (batch: Batch) =>
     openModal(
       <BatchViewModal
@@ -150,11 +156,19 @@ export default function Batches() {
         id={batch._id}
         onClose={closeModal}
         onEdit={openEdit}
+        onAssignSupervisor={openAssignSupervisor}
       />,
     );
 
   const handleReset = () => {
-    setFilter({ search: "", page: 1, limit: 1000, status: "", session: "" });
+    setFilter({
+      search: "",
+      page: 1,
+      limit: 10,
+      status: "",
+      session: "",
+      supervisor: "",
+    });
   };
 
   return (
@@ -201,6 +215,19 @@ export default function Batches() {
             onChange={(value) => setField("status", value as BatchStatus | "")}
             name="status"
           />
+          <SelectFilter
+            label="Supervisor"
+            options={[
+              { value: "", label: "All Batches" },
+              { value: "assigned", label: "Assigned" },
+              { value: "unassigned", label: "Unassigned" },
+            ]}
+            value={filter.supervisor}
+            onChange={(value) =>
+              setField("supervisor", value as FilterState["supervisor"])
+            }
+            name="supervisor"
+          />
 
           <div className="filter-container">
             <label className="filter-label" htmlFor="batch-session-filter">
@@ -234,17 +261,14 @@ export default function Batches() {
             search={filter.search}
             status={filter.status}
             session={filter.session}
+            supervisorFilter={filter.supervisor}
             page={filter.page}
             limit={filter.limit}
             onPageChange={(p) => setFilter((prev) => ({ ...prev, page: p }))}
             onLimitChange={(l) => setField("limit", l)}
             onView={openView}
             onEdit={openEdit}
-            onAssignSupervisor={(batch) =>
-              openModal(
-                <AssignSupervisorModal batch={batch} onClose={closeModal} />,
-              )
-            }
+            onAssignSupervisor={openAssignSupervisor}
             onManageCurricula={(batch) =>
               openModal(
                 <ManageBatchCurriculaModal

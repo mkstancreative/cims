@@ -91,6 +91,116 @@
   color: var(--color-text-secondary);
 }
 
+/* Supervisor card */
+.bv-sup {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-accent);
+}
+
+.bv-sup > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bv-sup__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.bv-sup__body strong {
+  font-size: 14.5px;
+  color: var(--color-text-primary);
+}
+
+.bv-sup__flag {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.15);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--color-amber);
+}
+
+.bv-sup__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 2px;
+}
+
+.bv-sup__contact a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-accent);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.bv-sup__contact a:hover {
+  text-decoration: underline;
+}
+
+.bv-sup__warn {
+  margin-top: 4px;
+  color: var(--color-amber);
+  font-weight: 600;
+}
+
+/* Unassigned / deactivated — a subtle amber flag, not a red error */
+.bv-sup--none,
+.bv-sup--inactive {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.07);
+  color: var(--color-amber);
+}
+
+.bv-sup__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  align-self: center;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-accent);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-on-primary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bv-sup__action:hover {
+  background: var(--color-accent-hover);
+}
+
+.bv-sup__action--quiet {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+}
+
+.bv-sup__action--quiet:hover {
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
+}
+
 /* Curricula */
 .bv-curricula {
   display: flex;
@@ -133,5 +243,12 @@
   }
   .bv-details {
     grid-template-columns: 1fr;
+  }
+  .bv-sup {
+    flex-wrap: wrap;
+  }
+  .bv-sup__action {
+    width: 100%;
+    justify-content: center;
   }
 }

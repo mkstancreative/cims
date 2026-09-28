@@ -1,10 +1,23 @@
 import { useMemo } from "react";
-import { Layers, Pencil } from "lucide-react";
+import {
+  Layers,
+  Mail,
+  Pencil,
+  Phone,
+  UserPlus,
+  UserRound,
+  UserX,
+} from "lucide-react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import { useBatchById } from "../../../hooks/useBatches";
 import { useQuizzes } from "../../../hooks/useQuizzes";
 import { batchQuizTitle } from "../../../helpers/batchQuiz";
+import {
+  supervisorInactive,
+  supervisorName,
+  supervisorPhone,
+} from "../../../helpers/batchSupervisor";
 import { durationLabel, formatPrice } from "../../../helpers/duration";
 import { fmt } from "../../../helpers/utilities";
 import type { Batch, BatchCurriculumLink } from "../../../api/types/batch";
@@ -15,6 +28,8 @@ interface BatchViewModalProps {
   onClose: () => void;
   /** Offered as a footer action; omitted = no edit button. */
   onEdit?: (batch: Batch) => void;
+  /** Opens assignment — offered when unassigned or the supervisor is inactive. */
+  onAssignSupervisor?: (batch: Batch) => void;
 }
 
 const curriculumName = (link: BatchCurriculumLink) =>
@@ -23,7 +38,12 @@ const curriculumName = (link: BatchCurriculumLink) =>
     : link.curriculum?.name ?? "Curriculum";
 
 /** Read-only overview of one batch, loaded fresh with `useBatchById`. */
-export default function BatchViewModal({ id, onClose, onEdit }: BatchViewModalProps) {
+export default function BatchViewModal({
+  id,
+  onClose,
+  onEdit,
+  onAssignSupervisor,
+}: BatchViewModalProps) {
   const { data, isLoading, isError } = useBatchById(id);
   const batch = data?.data?.batch;
   const stats = data?.data?.studentStats;
@@ -35,7 +55,11 @@ export default function BatchViewModal({ id, onClose, onEdit }: BatchViewModalPr
     [quizzesResp],
   );
 
-  const supervisor = batch?.supervisor?.user;
+  const sup = batch?.supervisor ?? null;
+  const supName = supervisorName(sup);
+  const supPhone = supervisorPhone(sup);
+  const supInactive = supervisorInactive(sup);
+  const canAssign = Boolean(batch && onAssignSupervisor && batch.status !== "archived");
   const createdBy =
     batch?.createdBy && typeof batch.createdBy === "object"
       ? `${batch.createdBy.firstName ?? ""} ${batch.createdBy.lastName ?? ""}`.trim()
@@ -99,6 +123,72 @@ export default function BatchViewModal({ id, onClose, onEdit }: BatchViewModalPr
             </section>
           )}
 
+          {/* ── Supervisor ── */}
+          <section>
+            <h4 className="bv-heading">Supervisor</h4>
+            {!supName ? (
+              <div className="bv-sup bv-sup--none">
+                <UserX size={18} />
+                <div className="bv-sup__body">
+                  <strong>No supervisor assigned</strong>
+                  <span>Nobody is reviewing these students' logbooks yet.</span>
+                </div>
+                {canAssign && (
+                  <button
+                    type="button"
+                    className="bv-sup__action"
+                    onClick={() => onAssignSupervisor!(batch)}
+                  >
+                    <UserPlus size={14} /> Assign supervisor
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className={`bv-sup${supInactive ? " bv-sup--inactive" : ""}`}>
+                <UserRound size={18} />
+                <div className="bv-sup__body">
+                  <strong>
+                    {supName}
+                    {supInactive && <em className="bv-sup__flag">Deactivated</em>}
+                  </strong>
+                  {(sup?.specialization || sup?.staffId) && (
+                    <span>
+                      {[sup?.specialization, sup?.staffId].filter(Boolean).join(" · ")}
+                    </span>
+                  )}
+                  <span className="bv-sup__contact">
+                    {sup?.user?.email && (
+                      <a href={`mailto:${sup.user.email}`}>
+                        <Mail size={13} /> {sup.user.email}
+                      </a>
+                    )}
+                    {supPhone && (
+                      <a href={`tel:${supPhone}`}>
+                        <Phone size={13} /> {supPhone}
+                      </a>
+                    )}
+                  </span>
+                  {supInactive && (
+                    <span className="bv-sup__warn">
+                      This supervisor's account is deactivated, so nobody is
+                      currently covering this batch.
+                    </span>
+                  )}
+                </div>
+                {canAssign && (
+                  <button
+                    type="button"
+                    className={`bv-sup__action${supInactive ? "" : " bv-sup__action--quiet"}`}
+                    onClick={() => onAssignSupervisor!(batch)}
+                  >
+                    <UserPlus size={14} />{" "}
+                    {supInactive ? "Reassign supervisor" : "Reassign"}
+                  </button>
+                )}
+              </div>
+            )}
+          </section>
+
           {/* ── Details ── */}
           <section>
             <h4 className="bv-heading">Details</h4>
@@ -128,19 +218,6 @@ export default function BatchViewModal({ id, onClose, onEdit }: BatchViewModalPr
                   {batch.itPeriod?.duration
                     ? `${batch.itPeriod.duration} week${batch.itPeriod.duration === 1 ? "" : "s"}`
                     : "—"}
-                </dd>
-              </div>
-              <div>
-                <dt>Supervisor</dt>
-                <dd>
-                  {supervisor ? (
-                    <>
-                      {supervisor.firstName} {supervisor.lastName}
-                      <span className="bv-sub">{supervisor.email}</span>
-                    </>
-                  ) : (
-                    "Not assigned"
-                  )}
                 </dd>
               </div>
               <div>

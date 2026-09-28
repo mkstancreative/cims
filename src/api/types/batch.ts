@@ -24,16 +24,34 @@ export interface ITPeriod {
   duration?: number;
 }
 
+/**
+ * The batch's supervisor. `null` on the batch when nobody is assigned.
+ *
+ * The NAME is on `user`, not here — a Supervisor is a staff record pointing
+ * at a User account. The list endpoint returns just `_id` + `user` names; the
+ * detail endpoint adds the rest.
+ */
 export interface BatchSupervisorRef {
   _id: string;
-  staffId?: string;
-  specialization?: string;
   user?: {
     _id: string;
     firstName: string;
     lastName: string;
-    email: string;
+    /** Detail only. */
+    email?: string;
+    /** Detail only — the login account's number. */
+    phone?: string;
   };
+  /** Detail only. */
+  staffId?: string;
+  specialization?: string;
+  /** Detail only — the work number on the staff record. Prefer it. */
+  phone?: string;
+  /**
+   * Detail only. `false` = the batch still points at a deactivated
+   * supervisor, so nobody is actually covering it.
+   */
+  isActive?: boolean;
 }
 
 export interface BatchCurriculumLink {
