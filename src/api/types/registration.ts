@@ -139,13 +139,73 @@ export interface RegistrationListResponse {
 
 export interface ReviewQueueParams {
   status?: string;
+  /** Duration `_id` — filter the queue to one priced tier before selecting. */
+  duration?: string;
+  search?: string;
   page?: number;
   limit?: number;
 }
 
+// ─── Bulk enrolment — `PUT /registrations/enroll` ────────────────────────────
+
+/** The API refuses more than this many ids in one call. */
+export const ENROLL_MAX_IDS = 200;
+
+/** One batch, 1–200 registrations. Enrolling one student is an array of one. */
 export interface EnrollPayload {
-  id: string;
   batchId: string;
+  registrationIds: string[];
+}
+
+export type EnrollReason =
+  /** No registration with that id — the list is stale. */
+  | "NOT_FOUND"
+  /** Not awaiting enrolment (already enrolled, rejected, or unpaid). */
+  | "NOT_NEW"
+  /** The student paid for a different period than this batch runs. */
+  | "DURATION_MISMATCH"
+  /** Unexpected server error on that row — safe to retry. */
+  | "ENROLL_FAILED";
+
+export interface EnrolledRow {
+  registration: string;
+  student: string;
+  internship: string;
+  /** The internship already existed; it was synced rather than duplicated. */
+  alreadyEnrolled?: boolean;
+  /** Pre-durations registration: its period could not be verified. */
+  warning?: string;
+}
+
+export interface FailedRow {
+  registration: string;
+  reason: EnrollReason | string;
+  /** Written for an admin — render as-is. */
+  message: string;
+  /** DURATION_MISMATCH only. */
+  data?: {
+    paidDuration: DurationRef | null;
+    batchDuration: DurationRef;
+  };
+}
+
+/**
+ * `200` = at least one row enrolled; `400` with the same shape = none did.
+ * Never treat `200` as total success — branch on `summary.failed`.
+ *
+ * `summary` / `data` are ABSENT when the request was rejected before anything
+ * ran (bad batch, batch without a duration, validation) — the service throws
+ * for those, so a returned value always carries them.
+ */
+export interface EnrollResponse {
+  success: boolean;
+  message: string;
+  summary: { total: number; enrolled: number; failed: number };
+  data: {
+    batch: { _id: string; name: string; session: string };
+    enrolled: EnrolledRow[];
+    failed: FailedRow[];
+  };
 }
 
 export interface RejectPayload {
@@ -158,26 +218,6 @@ export interface ReEnrollPayload {
   programLevel: string;
   /** Required. Any ACTIVE duration — including one already taken. */
   durationId: string;
-}
-
-/**
- * `PUT /registrations/:id/enroll`.
- *
- * A top-level `warning` can now ride along on a `success: true` response —
- * it means the registration predates durations and could not be checked
- * against the batch. Show it as an advisory banner, never as an error.
- */
-export interface EnrollResponse {
-  success: boolean;
-  message?: string;
-  warning?: string;
-  data?: Registration;
-}
-
-/** `400` body when the batch's tier is not the one the student paid for. */
-export interface EnrollDurationMismatch {
-  paidDuration?: DurationRef;
-  batchDuration?: DurationRef;
 }
 
 /** `PUT /registrations/:id/cancel` — a cancelled student may register again. */

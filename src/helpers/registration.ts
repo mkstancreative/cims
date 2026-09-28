@@ -59,6 +59,15 @@ export function isNoInternshipError(err: unknown): boolean {
   );
 }
 
+/**
+ * Groups registrations by the tier they paid for — a bulk enrolment must stay
+ * inside one group. Pre-durations registrations form their own group.
+ */
+export const NO_DURATION = "none";
+export function durationKey(reg: Registration): string {
+  return reg.duration?._id ?? NO_DURATION;
+}
+
 /** The student's most recent registration. */
 export function latestRegistration(
   registrations: Registration[] | undefined,

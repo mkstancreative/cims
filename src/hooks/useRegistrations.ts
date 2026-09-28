@@ -5,7 +5,7 @@ import {
   verifyPayment,
   getMyRegistrations,
   getReviewQueue,
-  enrollRegistration,
+  enrollRegistrations,
   rejectRegistration,
   reEnroll,
   payRegistration,
@@ -103,19 +103,21 @@ export const useReviewQueue = (params?: ReviewQueueParams) => {
   });
 };
 
-export const useEnrollRegistration = () => {
+/**
+ * Bulk enrolment. Resolves with the per-row result even when some — or all —
+ * rows failed; the caller decides what to show from `summary.failed`. Only a
+ * request rejected outright (bad batch, no duration, validation) errors.
+ */
+export const useEnrollRegistrations = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: enrollRegistration,
-    onSuccess: (data) => {
+    mutationFn: enrollRegistrations,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["registrations"] });
-      toast.success(data?.message ?? "Registration enrolled into batch.");
-      // `warning` rides along on a success response for registrations that
-      // predate durations — advisory, not an error.
-      if (data?.warning) toast.warn(data.warning);
+      queryClient.invalidateQueries({ queryKey: ["batches"] });
     },
     onError: (err: unknown) =>
-      toast.error(getErrMsg(err, "Failed to enroll registration.")),
+      toast.error(getErrMsg(err, "Failed to enroll registrations.")),
   });
 };
 

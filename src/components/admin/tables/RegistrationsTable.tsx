@@ -6,9 +6,11 @@ import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import { useReviewQueue } from "../../../hooks/useRegistrations";
 import {
   applicantName,
+  durationKey,
   regNumber,
   institutionName,
 } from "../../../helpers/registration";
+import { durationLabel } from "../../../helpers/duration";
 import type {
   Registration,
   ReviewQueueParams,
@@ -17,41 +19,74 @@ import type {
 interface RegistrationsTableProps {
   search?: string;
   status?: string;
+  /** Duration `_id` — narrows the queue to one priced tier. */
+  duration?: string;
   page: number;
   limit: number;
   onPageChange: (p: number) => void;
   onLimitChange: (l: number) => void;
   onEnroll: (registration: Registration) => void;
   onReject: (registration: Registration) => void;
+  /** Ids ticked for bulk enrolment. */
+  selectedIds: ReadonlySet<string>;
+  onToggleRow: (registration: Registration) => void;
+  /** Tick or untick every selectable row on the current page. */
+  onTogglePage: (registrations: Registration[], select: boolean) => void;
+  /**
+   * The duration group (see `durationKey`) the selection is locked to, or
+   * null while nothing is selected. Rows outside it can't be ticked — one
+   * bulk enrolment never mixes durations.
+   */
+  lockedDuration: string | null;
 }
+
+/** Only registrations awaiting enrolment can be enrolled. */
+const isSelectable = (r: Registration) => r.status === "new";
 
 export default function RegistrationsTable({
   search,
   status,
+  duration,
   page,
   limit,
   onPageChange,
   onLimitChange,
   onEnroll,
   onReject,
+  selectedIds,
+  onToggleRow,
+  onTogglePage,
+  lockedDuration,
 }: RegistrationsTableProps) {
   const params: ReviewQueueParams = {
     page,
     limit,
     ...(status ? { status } : {}),
+    ...(duration ? { duration } : {}),
+    ...(search?.trim() ? { search: search.trim() } : {}),
   };
 
   const { data, isLoading } = useReviewQueue(params);
 
-  const rowsAll: Registration[] = data?.data ?? [];
-  // Search is client-side against the current page (list endpoint has no search param).
-  const rows = search
-    ? rowsAll.filter(
-        (r) =>
-          applicantName(r).toLowerCase().includes(search.toLowerCase()) ||
-          regNumber(r).toLowerCase().includes(search.toLowerCase()),
-      )
-    : rowsAll;
+  const rows: Registration[] = data?.data ?? [];
+  const eligible = rows.filter(isSelectable);
+
+  // "Select all" works within one duration: the locked one, or — before
+  // anything is picked — the page's, if every eligible row shares it.
+  const pageKeys = new Set(eligible.map(durationKey));
+  const targetKey =
+    lockedDuration ?? (pageKeys.size === 1 ? [...pageKeys][0] : null);
+  const selectable = targetKey
+    ? eligible.filter((r) => durationKey(r) === targetKey)
+    : [];
+  const pageSelected = selectable.filter((r) => selectedIds.has(r._id)).length;
+  const allOnPage = selectable.length > 0 && pageSelected === selectable.length;
+  const headerHint =
+    eligible.length > 0 && selectable.length === 0
+      ? lockedDuration
+        ? "No applicants on this page share the selected duration"
+        : "These applicants paid for different durations — filter by duration to select all"
+      : "Select all awaiting enrolment on this page";
 
   const currentPage = data?.page ?? 1;
   const pages = data?.pages ?? 1;
@@ -59,7 +94,7 @@ export default function RegistrationsTable({
     ? {
         page: currentPage,
         pages,
-        count: data.total ?? rowsAll.length,
+        count: data.total ?? rows.length,
         limit,
         hasPrev: currentPage > 1,
         hasNext: currentPage < pages,
@@ -67,6 +102,41 @@ export default function RegistrationsTable({
     : null;
 
   const columns: Column<Registration>[] = [
+    {
+      header: (
+        <input
+          type="checkbox"
+          className="reg-select-box"
+          aria-label={headerHint}
+          title={headerHint}
+          checked={allOnPage}
+          ref={(el) => {
+            if (el) el.indeterminate = pageSelected > 0 && !allOnPage;
+          }}
+          disabled={selectable.length === 0}
+          onChange={() => onTogglePage(selectable, !allOnPage)}
+        />
+      ),
+      render: (row) => {
+        if (!isSelectable(row)) return null;
+        const otherDuration =
+          lockedDuration !== null && durationKey(row) !== lockedDuration;
+        const label = otherDuration
+          ? `${applicantName(row)} paid for a different duration than your selection`
+          : `Select ${applicantName(row)}`;
+        return (
+          <input
+            type="checkbox"
+            className="reg-select-box"
+            aria-label={label}
+            title={otherDuration ? label : undefined}
+            checked={selectedIds.has(row._id)}
+            disabled={otherDuration}
+            onChange={() => onToggleRow(row)}
+          />
+        );
+      },
+    },
     { header: "Applicant", render: (row) => applicantName(row) },
     { header: "Reg. Number", render: (row) => regNumber(row) },
     {
@@ -74,6 +144,15 @@ export default function RegistrationsTable({
       render: (row) => `${row.program.type} — ${row.program.level}`,
     },
     { header: "Institution", render: (row) => institutionName(row) },
+    {
+      header: "Duration",
+      render: (row) =>
+        row.duration ? (
+          durationLabel(row.duration)
+        ) : (
+          <span style={{ color: "var(--color-text-muted)" }}>—</span>
+        ),
+    },
     {
       header: "Payment",
       render: (row) => <StatusBadge status={row.payment.status} />,

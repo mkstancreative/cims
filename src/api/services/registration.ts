@@ -57,16 +57,27 @@ export const getReviewQueue = async (
 };
 
 /**
- * Enrolment is refused when the batch's duration is not the one the student
- * paid for. A legacy registration that predates durations comes back 200 with
- * a top-level `warning` instead — show it, don't swallow it.
+ * Enrols 1–200 registrations into one batch. It can PARTLY succeed: the body
+ * carries per-row `enrolled` / `failed` lists on a 200 (some went through)
+ * and on a 400 (none did) alike, so a 400 with a `summary` is returned, not
+ * thrown. Anything else — unknown batch, batch without a duration, bad
+ * payload — was rejected before any row ran, and throws.
  */
-export const enrollRegistration = async ({
-  id,
-  batchId,
-}: EnrollPayload): Promise<EnrollResponse> => {
-  const response = await api.put(`/registrations/${id}/enroll`, { batchId });
-  return response.data;
+export const enrollRegistrations = async (
+  payload: EnrollPayload,
+): Promise<EnrollResponse> => {
+  try {
+    const response = await api.put<EnrollResponse>(
+      "/registrations/enroll",
+      payload,
+    );
+    return response.data;
+  } catch (err) {
+    const body = (err as { response?: { data?: Partial<EnrollResponse> } })
+      .response?.data;
+    if (body?.summary && body?.data) return body as EnrollResponse;
+    throw err;
+  }
 };
 
 export const rejectRegistration = async ({ id, reason }: RejectPayload) => {
