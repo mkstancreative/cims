@@ -211,3 +211,13 @@
   background: #fff8e1;
   color: #f9a825;
 }
+/* Internship superseded by a newer one — muted, never alarming */
+.status-badge-tip {
+  display: inline-flex;
+  cursor: help;
+}
+
+[data-theme="dark"] .status-badge.abandoned {
+  background: rgba(148, 163, 184, 0.14);
+  color: #94a3b8;
+}

@@ -1,23 +1,27 @@
 import React, { useState } from "react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import Spinner from "../../ui/Spinner/Spinner";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import MutationResult from "../../ui/MutationResult/MutationResult";
 import { useUpdateStudentStatus } from "../../../hooks/useStudents";
 import type {
   Student,
   ITStatus,
+  SettableITStatus,
   UpdateStatusApiResult,
 } from "../../../api/types/student";
 
 // ── Allowed status transitions ───────────────────────────────────────────────
-const STATUS_TRANSITIONS: Partial<Record<ITStatus, ITStatus[]>> = {
+// `abandoned` is never a target — the server sets it when a newer internship
+// is activated. Re-activating is its only way out (a restore).
+const STATUS_TRANSITIONS: Partial<Record<ITStatus, SettableITStatus[]>> = {
   placed: ["active"],
   active: ["completed", "placed"],
+  abandoned: ["active"],
 };
 // completed is terminal — no outgoing transitions
 
-const STATUS_META: Record<ITStatus, { label: string; color: string }> = {
+const STATUS_META: Record<SettableITStatus, { label: string; color: string }> = {
   placed: { label: "Placed", color: "var(--color-slate)" },
   active: { label: "Active (IT Ongoing)", color: "var(--color-primary-hover)" },
   completed: { label: "Completed", color: "var(--color-primary-hover)" },
@@ -41,16 +45,16 @@ export default function UpdateStudentStatus({
 
   // For single-student mode, compute allowed targets from the transition map.
   // For bulk mode, use the union of all allowed transitions across selected students.
-  const allowedStatuses: ITStatus[] = isBulkCalc
-    ? ([
+  const allowedStatuses: SettableITStatus[] = isBulkCalc
+    ? [
         ...new Set(
           students.flatMap((s) => STATUS_TRANSITIONS[s.itStatus] ?? []),
         ),
-      ] as ITStatus[])
+      ]
     : (STATUS_TRANSITIONS[firstStatus] ?? []);
 
-  const [status, setStatus] = useState<ITStatus>(
-    allowedStatuses[0] ?? firstStatus,
+  const [status, setStatus] = useState<SettableITStatus>(
+    allowedStatuses[0] ?? "active",
   );
   const [result, setResult] = useState<UpdateStatusApiResult | null>(null);
 
@@ -59,6 +63,9 @@ export default function UpdateStudentStatus({
   const isBulk = students.length > 1;
   const isTerminal = !isBulkCalc && allowedStatuses.length === 0;
   const allSameStatus = students.every((s) => s.itStatus === status);
+  // Activating closes each student's other active internship(s).
+  const activating =
+    status === "active" && students.some((s) => s.itStatus !== "active");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,7 +204,7 @@ export default function UpdateStudentStatus({
                       {s.registrationNumber}
                     </div>
                   </div>
-                  <StatusBadge status={s.itStatus} />
+                  <InternshipStatusBadge status={s.itStatus} />
                 </div>
               );
             })}
@@ -235,7 +242,12 @@ export default function UpdateStudentStatus({
               }}
             >
               {allowedStatuses.map((value) => {
-                const { label, color } = STATUS_META[value];
+                const { color } = STATUS_META[value];
+                const label =
+                  value === "active" &&
+                  students.every((s) => s.itStatus === "abandoned")
+                    ? "Active (restore)"
+                    : STATUS_META[value].label;
                 const isSelected = status === value;
                 return (
                   <label
@@ -278,6 +290,20 @@ export default function UpdateStudentStatus({
                 );
               })}
             </div>
+          )}
+          {!isTerminal && activating && (
+            <p
+              style={{
+                margin: "10px 0 0",
+                fontSize: 12.5,
+                lineHeight: 1.5,
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              Any other active internship for{" "}
+              {isBulk ? "these students" : "this student"} will be closed as
+              abandoned.
+            </p>
           )}
         </div>
       </form>

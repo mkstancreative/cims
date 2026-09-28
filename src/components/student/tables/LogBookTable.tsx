@@ -20,6 +20,8 @@ interface LogBookTableProps {
   onView: (logbook: LogBookListItem) => void;
   onEdit: (logbook: LogBookListItem) => void;
   onDeleteRequest: (logbook: LogBookListItem) => void;
+  /** The internship was abandoned — its logbooks are locked. */
+  readOnly?: boolean;
 }
 
 // Map status → badge colours matching LogBookShared.css pattern
@@ -41,6 +43,7 @@ export default function LogBookTable({
   onView,
   onEdit,
   onDeleteRequest,
+  readOnly = false,
 }: LogBookTableProps) {
   const { data, isLoading } = useLogBooks({
     page,
@@ -118,14 +121,15 @@ export default function LogBookTable({
               icon: <Pencil size={13} />,
               onClick: () => onEdit(row),
               disabled:
-                row.status !== "draft" && row.status !== "needs_revision",
+                readOnly ||
+                (row.status !== "draft" && row.status !== "needs_revision"),
             },
             {
               label: "Delete",
               icon: <Trash2 size={13} />,
               onClick: () => onDeleteRequest(row),
               danger: true,
-              disabled: row.status === "approved",
+              disabled: readOnly || row.status === "approved",
             },
           ]}
         />

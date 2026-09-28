@@ -14,6 +14,7 @@ import { FinalDetailsSection } from "../../components/student/dashboard/FinalDet
 import { NotificationsSection } from "../../components/student/dashboard/NotificationsSection";
 import { PaymentRequiredPanel } from "../../components/student/dashboard/PaymentRequiredPanel";
 import { EnrolmentPendingPanel } from "../../components/student/dashboard/EnrolmentPendingPanel";
+import { AbandonedNotice } from "../../components/student/dashboard/AbandonedNotice";
 import { fmt, ago } from "../../helpers/utilities";
 import {
   apiErrorMessage,
@@ -119,7 +120,12 @@ export default function DashBoardStudent() {
         }
       />
 
-      <QuizAttendanceChip />
+      {/* `isCurrent` isn't "live" — a current internship can be abandoned. */}
+      {itStatus === "abandoned" ? (
+        <AbandonedNotice what="Its logbooks, quiz and evaluation are closed." />
+      ) : (
+        <QuizAttendanceChip />
+      )}
 
       <div>
         <SectionHead

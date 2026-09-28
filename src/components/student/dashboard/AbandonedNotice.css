@@ -1,0 +1,29 @@
+.abandoned-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-slate);
+  border-radius: 10px;
+  background: var(--color-slate-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.abandoned-notice > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-slate);
+}
+
+.abandoned-notice strong {
+  display: block;
+  color: var(--color-text-primary);
+}
+
+.abandoned-notice a {
+  font-weight: 600;
+  color: var(--color-accent);
+}

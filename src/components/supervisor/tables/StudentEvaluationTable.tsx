@@ -1,7 +1,8 @@
 import type { PendingEvaluationsResponse } from "../../../api/types/evaluation";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
+import { ABANDONED_HINT, isAbandoned } from "../../../helpers/internship";
 import { ClipboardCheck } from "lucide-react";
 
 // Row shape returned by usePendingEvaluations()
@@ -55,20 +56,29 @@ export default function StudentEvaluationTable({
     {
       header: "IT Status",
       render: (row) =>
-        row.itStatus ? <StatusBadge status={row.itStatus} /> : "—",
+        row.itStatus ? <InternshipStatusBadge status={row.itStatus} /> : "—",
     },
     {
       header: "Action",
-      render: (row) => (
-        <button
-          className="eval-submit-btn"
-          onClick={() => onEvaluate(row)}
-          title="Submit evaluation"
-        >
-          <ClipboardCheck size={13} />
-          Evaluate
-        </button>
-      ),
+      render: (row) =>
+        // Closed when a newer internship started — the API refuses evaluation.
+        isAbandoned(row.itStatus) ? (
+          <span
+            style={{ fontSize: 12, color: "var(--color-text-muted)" }}
+            title={ABANDONED_HINT}
+          >
+            Closed
+          </span>
+        ) : (
+          <button
+            className="eval-submit-btn"
+            onClick={() => onEvaluate(row)}
+            title="Submit evaluation"
+          >
+            <ClipboardCheck size={13} />
+            Evaluate
+          </button>
+        ),
     },
   ];
 

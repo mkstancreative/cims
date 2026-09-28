@@ -5,7 +5,6 @@ import {
   Users,
   UserCheck,
   AlertCircle,
-  ClipboardList,
   Bell,
 } from "lucide-react";
 import { useSupervisorDashboard } from "../../hooks/useDashboard";
@@ -20,6 +19,7 @@ import {
 } from "../../components/shared/dashboard/DashboardKit";
 import "../../components/shared/dashboard/dashboard.css";
 import { useAuth } from "../../context/useAuth";
+import MyDepartments from "../../components/supervisor/dashboard/MyDepartments";
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function DashBoardSupervisor() {
@@ -39,6 +39,8 @@ export default function DashBoardSupervisor() {
   const totalStudents = stu?.totalAssigned ?? 0;
   const activeStudents = (stu?.placed ?? 0) + (stu?.active ?? 0);
   const completedStudents = stu?.completed ?? 0;
+  // Closed when a newer internship started — the fourth bucket of the total.
+  const abandonedStudents = stu?.abandoned ?? 0;
   const needingEval = stu?.needingEvaluation ?? 0;
   const pendingLogbooks = logs?.pendingReview ?? 0;
   const unreadNotifs = notifs?.unreadCount ?? 0;
@@ -183,6 +185,16 @@ export default function DashBoardSupervisor() {
                   {completedStudents}
                 </span>
               </div>
+              <div className="db-ring-card__row">
+                <span className="db-ring-card__row-lbl">Abandoned</span>
+                <span
+                  className="db-ring-card__row-val"
+                  style={{ color: "var(--color-text-muted)" }}
+                  title="Closed when a newer internship started."
+                >
+                  {abandonedStudents}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -201,6 +213,7 @@ export default function DashBoardSupervisor() {
             { label: "Placed", value: stu?.placed ?? 0 },
             { label: "Active (Interning)", value: stu?.active ?? 0 },
             { label: "Completed", value: completedStudents },
+            { label: "Abandoned", value: abandonedStudents },
             { label: "Needing Evaluation", value: needingEval },
           ]}
         />
@@ -271,30 +284,9 @@ export default function DashBoardSupervisor() {
         />
       </div>
 
-      {/* ── Department Breakdown ─────────────────────────────────────────────── */}
-      {stu?.departmentBreakdown &&
-        Object.keys(stu.departmentBreakdown).length > 0 && (
-          <div>
-            <SectionHead
-              title="Department Breakdown"
-              sub="Students by department"
-              icon={<ClipboardList size={16} />}
-              color="primary"
-            />
-            <div className="db-kpi-grid" style={{ marginTop: 16 }}>
-              {Object.entries(stu.departmentBreakdown).map(([dept, stats]) => (
-                <KpiCard
-                  key={dept}
-                  label={dept}
-                  value={stats.total}
-                  sub={`Active: ${stats.active} · Completed: ${stats.completed}`}
-                  icon={<Users size={18} />}
-                  color="primary"
-                />
-              ))}
-            </div>
-          </div>
-        )}
+      {/* ── My departments — live counts, linking through to the filtered
+          student list. Replaces the dashboard's departmentBreakdown. ── */}
+      <MyDepartments />
     </div>
   );
 }

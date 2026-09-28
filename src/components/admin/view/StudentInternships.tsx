@@ -7,9 +7,10 @@ import {
   Clock,
   History,
   RefreshCw,
+  RotateCcw,
   Star,
 } from "lucide-react";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import ConfirmModal from "../../ui/ConfirmModal/ConfirmModal";
 import InternshipStatusForm from "../forms/InternshipStatusForm";
@@ -20,6 +21,7 @@ import {
 } from "../../../hooks/useInternships";
 import { useStudentProgress } from "../../../hooks/useStudents";
 import { formatDate } from "../../../helpers/utilities";
+import { isAbandoned } from "../../../helpers/internship";
 import type { Internship } from "../../../api/types/internship";
 import "./StudentInternships.css";
 
@@ -296,6 +298,14 @@ export default function StudentInternships({ studentId }: { studentId: string })
     useSetCurrentInternship();
   const [makeCurrent, setMakeCurrent] = useState<Internship | null>(null);
 
+  // Abandoned cycles (closed when a newer one started) sit behind a toggle so
+  // the live internship stays obvious. The current one is always shown.
+  const [showEarlier, setShowEarlier] = useState(false);
+  const earlier = internships.filter((i) => isAbandoned(i.itStatus) && !i.isCurrent);
+  const visible = showEarlier
+    ? internships
+    : internships.filter((i) => !earlier.includes(i));
+
   const toggle = (id: string) => {
     const next = new Set(openIds);
     if (next.has(id)) next.delete(id);
@@ -319,12 +329,17 @@ export default function StudentInternships({ studentId }: { studentId: string })
       ) : internships.length === 0 ? (
         <p className="si-note">No internships yet — this student hasn't been enrolled into a batch.</p>
       ) : (
+        <>
         <ul className="si-list">
-          {internships.map((i) => {
+          {visible.map((i) => {
             const isOpen = openIds.has(i._id);
             const panelId = `si-progress-${i._id}`;
+            const abandoned = isAbandoned(i.itStatus);
             return (
-              <li key={i._id} className={`si-item${isOpen ? " is-open" : ""}`}>
+              <li
+                key={i._id}
+                className={`si-item${isOpen ? " is-open" : ""}${abandoned ? " si-item--abandoned" : ""}`}
+              >
                 <div className="si-item__row">
                   <div className="si-item__main">
                     <span className="si-item__title">
@@ -336,12 +351,13 @@ export default function StudentInternships({ studentId }: { studentId: string })
                       {safeDate(i.itPeriod?.startDate)} → {safeDate(i.itPeriod?.endDate)}
                     </span>
                   </div>
-                  <StatusBadge status={i.itStatus} />
+                  <InternshipStatusBadge status={i.itStatus} />
                   <ActionDropDown
                     actions={[
                       {
-                        label: "Change status",
-                        icon: <RefreshCw size={13} />,
+                        // Re-activating is the only way out of abandoned.
+                        label: abandoned ? "Restore (make active)" : "Change status",
+                        icon: abandoned ? <RotateCcw size={13} /> : <RefreshCw size={13} />,
                         onClick: () =>
                           openModal(
                             <InternshipStatusForm
@@ -380,6 +396,23 @@ export default function StudentInternships({ studentId }: { studentId: string })
             );
           })}
         </ul>
+        {earlier.length > 0 && (
+          <button
+            type="button"
+            className="si-earlier"
+            onClick={() => setShowEarlier((v) => !v)}
+            aria-expanded={showEarlier}
+          >
+            {showEarlier
+              ? "Hide earlier cycles"
+              : `Show ${earlier.length} earlier cycle${earlier.length === 1 ? "" : "s"} (abandoned)`}
+            <ChevronDown
+              size={14}
+              style={{ transform: showEarlier ? "rotate(180deg)" : undefined }}
+            />
+          </button>
+        )}
+        </>
       )}
 
       <ConfirmModal

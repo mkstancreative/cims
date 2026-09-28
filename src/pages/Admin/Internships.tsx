@@ -79,6 +79,8 @@ export default function Internships() {
         { value: "placed", label: "Placed" },
         { value: "active", label: "Active" },
         { value: "completed", label: "Completed" },
+        // Superseded by a newer internship — an archived view.
+        { value: "abandoned", label: "Abandoned" },
       ],
       value: filters.itStatus,
       onChange: (v) => setField("itStatus", v as InternshipStatus | ""),

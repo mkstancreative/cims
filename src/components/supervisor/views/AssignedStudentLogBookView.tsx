@@ -19,7 +19,8 @@ import {
 } from "../../../hooks/useSchoolSupervisor";
 import { useCurriculum } from "../../../hooks/useCurriculum";
 import type { Topic, Subtopic } from "../../../api/types/curriculum";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
+import { isAbandoned } from "../../../helpers/internship";
 import "./AssignedStudentLogBookView.css";
 
 // ─── Status meta ─────────────────────────────────────────────────────────────
@@ -79,8 +80,10 @@ export default function AssignedStudentLogBookView() {
   const topicTitle = topicObj?.title ?? "—";
   const subtopicTitle = subtopicObj?.title ?? "—";
 
+  // An abandoned internship's logbooks are locked — the API refuses review.
+  const locked = isAbandoned(student?.itStatus);
   // Review can only be submitted for submitted logbooks
-  const canReview = logbook?.status === "submitted";
+  const canReview = logbook?.status === "submitted" && !locked;
 
   const handleSubmitReview = (action: "approve" | "reject") => {
     if (!reviewText.trim()) return;
@@ -132,7 +135,7 @@ export default function AssignedStudentLogBookView() {
               <span className={`lbv2-status-pill ${statusEntry?.cls ?? ""}`}>
                 {statusEntry?.label ?? logbook.status}
               </span>
-              <StatusBadge status={student.itStatus} />
+              <InternshipStatusBadge status={student.itStatus} />
             </div>
           </div>
 
@@ -234,7 +237,9 @@ export default function AssignedStudentLogBookView() {
 
             {!canReview && (
               <div className="lbv2-review-hint">
-                {logbook.status === "approved" ? (
+                {locked ? (
+                  "This internship was closed when the student's newer one started, so its logbooks are locked."
+                ) : logbook.status === "approved" ? (
                   <span className="lbv2-approved-note">
                     <CheckCircle2 size={13} /> This logbook has already been approved.
                   </span>

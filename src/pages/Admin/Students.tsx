@@ -144,6 +144,8 @@ export default function Students() {
         { value: "placed", label: "Placed" },
         { value: "active", label: "Active" },
         { value: "completed", label: "Completed" },
+        // Superseded by a newer internship — an archived view.
+        { value: "abandoned", label: "Abandoned" },
       ],
       value: filters.itStatus,
       // "Placed" is the page's default view, not an extra filter.

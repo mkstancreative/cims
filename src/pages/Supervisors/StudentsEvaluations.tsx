@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClipboardList, Search, Download } from "lucide-react";
+import { ClipboardList, Download } from "lucide-react";
 import { useCompositeResults } from "../../hooks/useEvaluations";
 import { useModal } from "../../context/ModalContext";
 import type { CompositeResultsParams, Evaluation } from "../../api/types/evaluation";
@@ -10,9 +10,14 @@ import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import SubmitEvaluationForm from "../../components/supervisor/forms/SubmitEvaluationForm";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
-import "../../components/ui/SelectFilter/SelectFilter.css";
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
-import { useBatches, useDepartments } from "../../hooks/useBatches";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
+import { useMyBatches } from "../../hooks/useBatches";
+import { useMyDepartments } from "../../hooks/useSchoolSupervisor";
+import type { Batch } from "../../api/types/batch";
 
 // ─── Grade options ─────────────────────────────────────────────────────────────
 const GRADE_OPTIONS = ["A", "B", "C", "D", "E", "F"] as const;
@@ -91,8 +96,14 @@ export default function StudentsEvaluations() {
 
   const { openModal, closeModal } = useModal();
 
-  const { data: batchesData } = useBatches();
-  const { data: deptsData } = useDepartments();
+  // Only the supervisor's own batches — `/batches` is admin-only.
+  const { data: myBatchesData } = useMyBatches();
+  const batches: Batch[] =
+    (myBatchesData as { data?: Batch[] } | undefined)?.data ?? [];
+  // The supervisor's own departments — `/admin/all-departments` is admin-only.
+  const { data: deptsData } = useMyDepartments({ limit: 100 });
+  const deptNames = (deptsData?.data ?? []).map((d) => d.name);
+  if (department && !deptNames.includes(department)) deptNames.push(department);
 
   // ── Build params (omit empty values) ──
   const params: CompositeResultsParams = {
@@ -138,6 +149,71 @@ export default function StudentsEvaluations() {
       />,
     );
   };
+
+  // Clears the filters but keeps whatever is typed in the search box.
+  const clearFilters = () => {
+    setDepartment("");
+    setBatchId("");
+    setStatus("");
+    setGrade("");
+    setPage(1);
+  };
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "status",
+      label: "Status",
+      options: [
+        { value: "", label: "All Statuses" },
+        { value: "pending", label: "Pending" },
+        { value: "completed", label: "Completed" },
+      ],
+      value: status,
+      onChange: (v) => {
+        setStatus(v as "pending" | "completed" | "");
+        setPage(1);
+      },
+    },
+    {
+      key: "grade",
+      label: "Grade",
+      options: [
+        { value: "", label: "All Grades" },
+        ...GRADE_OPTIONS.map((g) => ({ value: g, label: `Grade ${g}` })),
+      ],
+      value: grade,
+      onChange: (v) => {
+        setGrade(v as Grade | "");
+        setPage(1);
+      },
+    },
+    {
+      key: "batchId",
+      label: "Batch",
+      options: [
+        { value: "", label: "All Batches" },
+        ...batches.map((b) => ({ value: b._id, label: b.name })),
+      ],
+      value: batchId,
+      onChange: (v) => {
+        setBatchId(v);
+        setPage(1);
+      },
+    },
+    {
+      key: "department",
+      label: "Department",
+      options: [
+        { value: "", label: "All Departments" },
+        ...deptNames.map((d) => ({ value: d, label: d })),
+      ],
+      value: department,
+      onChange: (v) => {
+        setDepartment(v);
+        setPage(1);
+      },
+    },
+  ];
 
   const handleReset = () => {
     setSearch("");
@@ -230,87 +306,22 @@ export default function StudentsEvaluations() {
         </div>
       </div>
 
-      {/* ── Filters ── */}
-      <div className="filter-wrapper">
-        {/* Reg number search */}
-        <SearchInput
-          value={search}
-          onChange={(v) => { setSearch(v); setPage(1); }}
-          onClear={() => { setSearch(""); setPage(1); }}
-          placeholder="Search by reg number…"
-        />
-      </div>
-
-      <div className="filter-selects-block">
-        <SelectFilter
-          label="Department"
-          options={[
-            { value: "", label: "All Departments" },
-            ...(deptsData?.data.map((d) => ({ value: d, label: d })) || []),
-          ]}
-          value={department}
-          onChange={(val) => { setDepartment(val); setPage(1); }}
-          name="department"
-        />
-
-        <SelectFilter
-          label="Batch"
-          options={[
-            { value: "", label: "All Batches" },
-            ...(batchesData?.data.map((b) => ({ value: b._id, label: b.name })) || []),
-          ]}
-          value={batchId}
-          onChange={(val) => { setBatchId(val); setPage(1); }}
-          name="batchId"
-        />
-
-        <SelectFilter
-          label="Status"
-          options={[
-            { value: "", label: "All Statuses" },
-            { value: "pending", label: "Pending" },
-            { value: "completed", label: "Completed" },
-          ]}
-          value={status}
-          onChange={(val) => { setStatus(val as "pending" | "completed" | ""); setPage(1); }}
-          name="status"
-        />
-
-        <SelectFilter
-          label="Grade"
-          options={[
-            { value: "", label: "All Grades" },
-            ...GRADE_OPTIONS.map((g) => ({ value: g, label: `Grade ${g}` })),
-          ]}
-          value={grade}
-          onChange={(val) => { setGrade(val as Grade | ""); setPage(1); }}
-          name="grade"
-        />
-
-        <ResetButton onClick={handleReset} />
-      </div>
-
-      {/* ── Summary bar ── */}
-      {!isLoading && (
-        <div className="eval-summary-bar">
-          <span className="eval-summary-item">
-            <Search size={12} />
-            {total} result{total !== 1 ? "s" : ""}
-          </span>
-          {status && (
-            <span className="eval-summary-item">Status: <strong>{status}</strong></span>
-          )}
-          {grade && (
-            <span className="eval-summary-item">Grade: <strong>{grade}</strong></span>
-          )}
-          {department && (
-            <span className="eval-summary-item">Dept: <strong>{department}</strong></span>
-          )}
-          {batchId && (
-            <span className="eval-summary-item">Batch: <strong>{batchId}</strong></span>
-          )}
+      {/* ── Search + filters ── */}
+      <div className="filter-wrapper fp-toolbar">
+        <div className="fp-toolbar__row">
+          <div className="fp-toolbar__search">
+            <SearchInput
+              value={search}
+              onChange={(v) => { setSearch(v); setPage(1); }}
+              onClear={() => { setSearch(""); setPage(1); }}
+              placeholder="Search by reg number…"
+            />
+          </div>
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+          <ResetButton onClick={handleReset} />
         </div>
-      )}
+        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
+      </div>
 
       {/* ── Table ── */}
       <div className="table-wrapper">
@@ -325,8 +336,6 @@ export default function StudentsEvaluations() {
       </div>
 
       <style>{`
-        .eval-summary-bar{display:flex;align-items:center;gap:16px;padding:10px 16px;background:var(--color-bg-secondary);border:1px solid var(--color-border);border-radius:10px;font-size:12.5px;color:var(--color-text-secondary);flex-wrap:wrap}
-        .eval-summary-item{display:inline-flex;align-items:center;gap:5px}
         .eval-submit-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1.5px solid var(--color-accent);background:var(--color-accent-muted);color:var(--color-accent);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s,background .15s}
         .eval-submit-btn:hover{background:var(--color-accent);color:#fff}
         .eval-export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--color-primary-hover);background:rgba(var(--color-primary-rgb), .1);color:var(--color-primary-hover);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}

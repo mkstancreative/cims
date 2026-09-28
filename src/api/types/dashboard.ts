@@ -122,6 +122,8 @@ export interface AdminDashStudents {
   placed: number;
   active: number;
   completed: number;
+  /** Superseded by a newer internship. Older API: absent. */
+  abandoned?: number;
 }
 
 export interface AdminDashCompanies {
@@ -174,10 +176,12 @@ export interface SupervisorDashStudents {
   active: number;
   placed: number;
   completed: number;
+  /** Superseded by a newer internship. Older API: absent. */
+  abandoned?: number;
   needingEvaluation: number;
   departmentBreakdown?: Record<
     string,
-    { total: number; active: number; completed: number }
+    { total: number; active: number; completed: number; abandoned?: number }
   >;
 }
 

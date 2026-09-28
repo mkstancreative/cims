@@ -73,7 +73,7 @@ export interface StudentSummary {
   placement: PlacementBase;
   user: User;
   registrationNumber: string;
-  itStatus: "active" | "inactive" | "completed";
+  itStatus: "placed" | "active" | "inactive" | "completed" | "abandoned";
 }
 
 export interface StudentsResponse {
@@ -129,7 +129,7 @@ export interface StudentDetail {
   registrationNumber: string;
   batch: Batch;
   session: string;
-  itStatus: "active" | "inactive" | "completed";
+  itStatus: "placed" | "active" | "inactive" | "completed" | "abandoned";
   passportPhoto: string;
   createdAt: string;
   updatedAt: string;
@@ -321,4 +321,46 @@ export interface SchoolEvaluationResponse {
     finalGrade: string;
     status: string;
   };
+}
+
+// ─── My departments (`GET /supervisors/departments`) ─────────────────────
+
+/**
+ * A department this supervisor has actively-training students in. There is
+ * no department id in the system — departments are embedded `{ name, code }`
+ * on each student and every filter keys off the name.
+ */
+export interface SupervisorDepartment {
+  /** Identical to `name`. Bind it as a key; pass it as `?department=`. */
+  id: string;
+  name: string;
+  /** Best-effort, usually null. Never use as an identifier. */
+  code: string | null;
+  /** Training now, on the internship the system defaults to. The normal case. */
+  activeAndCurrent: number;
+  /**
+   * Still on an earlier cycle while a newer placement already exists —
+   * unscoped actions (logbooks, progress, quiz) land on the newer one.
+   */
+  activeAndNotCurrent: number;
+  /** activeAndCurrent + activeAndNotCurrent */
+  totalActive: number;
+}
+
+export interface SupervisorDepartmentsResponse {
+  success: boolean;
+  /** Number of DEPARTMENTS, not students. */
+  total: number;
+  page: number;
+  /** 0 when there are no results. */
+  pages: number;
+  data: SupervisorDepartment[];
+}
+
+export interface AssignedStudentsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  /** A department name, from `SupervisorDepartment.name`. */
+  department?: string;
 }

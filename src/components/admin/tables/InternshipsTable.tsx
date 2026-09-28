@@ -1,7 +1,7 @@
 import { RefreshCw, Star, CheckCircle2 } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import {
   useInternships,
@@ -90,7 +90,7 @@ export default function InternshipsTable({
     { header: "Session", render: (row) => row.session ?? "—" },
     {
       header: "IT Status",
-      render: (row) => <StatusBadge status={row.itStatus} />,
+      render: (row) => <InternshipStatusBadge status={row.itStatus} />,
     },
     {
       header: "Current",

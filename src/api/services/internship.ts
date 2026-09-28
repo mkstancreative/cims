@@ -4,6 +4,7 @@ import type {
   MyHistoryResponse,
   InternshipParams,
   UpdateInternshipStatusPayload,
+  UpdateInternshipStatusResponse,
 } from "../types/internship";
 
 export const getMyHistory = async (): Promise<MyHistoryResponse> => {
@@ -31,7 +32,7 @@ export const getInternship = async (id: string) => {
 export const updateInternshipStatus = async ({
   id,
   status,
-}: UpdateInternshipStatusPayload) => {
+}: UpdateInternshipStatusPayload): Promise<UpdateInternshipStatusResponse> => {
   const response = await api.put(`/internships/${id}/status`, { status });
   return response.data;
 };

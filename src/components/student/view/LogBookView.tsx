@@ -19,12 +19,15 @@ interface LogBookViewProps {
   isOpen: boolean;
   onClose: () => void;
   logbook: LogBookListItem;
+  /** The internship was abandoned — its logbooks are locked. */
+  readOnly?: boolean;
 }
 
 export default function LogBookView({
   isOpen,
   onClose,
   logbook,
+  readOnly = false,
 }: LogBookViewProps) {
   const { data, isLoading: isLoadingEntry } = useLogBookById(logbook._id);
   const { data: curriculumData, isLoading: isLoadingCurriculum } = useMyCurriculum();
@@ -61,6 +64,7 @@ export default function LogBookView({
           status={logbook.status}
           id={logbook._id}
           onClose={onClose}
+          readOnly={readOnly}
         />
       )}
     </CustomModal>
@@ -75,6 +79,7 @@ function LogBookViewInner({
   status,
   id,
   onClose,
+  readOnly,
 }: {
   entry: LogBook | undefined;
   curriculumName: string;
@@ -83,6 +88,7 @@ function LogBookViewInner({
   status: string;
   id: string;
   onClose: () => void;
+  readOnly: boolean;
 }) {
   const { mutate: submit, isPending: submitting } = useSubmitLogBook();
 
@@ -165,7 +171,7 @@ function LogBookViewInner({
         </button>
 
         {/* Submit for review — draft or needs revision */}
-        {(status === "draft" || status === "needs_revision") && (
+        {!readOnly && (status === "draft" || status === "needs_revision") && (
           <button
             type="button"
             className="modal-submit lbv-submit-btn"

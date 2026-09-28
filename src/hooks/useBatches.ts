@@ -26,6 +26,7 @@ import {
   getDepartments,
 } from "../api/services/batch";
 import type { Batch, BatchParams } from "../api/types/batch";
+import { abandonedNotice } from "../helpers/internship";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -138,6 +139,13 @@ export const useActivateBatch = () => {
         toast.info(
           `${data.data.newlyActivated} student(s) activated. ${skipped} were skipped — they are outside their IT period.`,
         );
+      }
+
+      // Activating students closes their earlier cycles in other batches.
+      const notice = abandonedNotice(data?.data?.abandoned);
+      if (notice) {
+        queryClient.invalidateQueries({ queryKey: ["students"] });
+        toast.info(notice);
       }
     },
     onError: (err: unknown) =>

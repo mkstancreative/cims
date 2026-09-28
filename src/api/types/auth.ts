@@ -148,7 +148,7 @@ export interface MeProfile {
   _id: string;
   registrationNumber: string;
   session?: string;
-  itStatus?: "placed" | "active" | "completed";
+  itStatus?: "placed" | "active" | "completed" | "abandoned";
   passportPhoto?: string;
   department?: MeDepartment;
   program?: MeProgram;

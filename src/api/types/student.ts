@@ -1,7 +1,11 @@
 import type { Supervisor } from "./supervisor";
 // ─── Student Types ────────────────────────────────────────────────────────────
 
-export type ITStatus = "placed" | "active" | "completed";
+/** `abandoned` is server-set only — see `SettableITStatus`. */
+export type ITStatus = "placed" | "active" | "completed" | "abandoned";
+
+/** The statuses the bulk status endpoint accepts. */
+export type SettableITStatus = Exclude<ITStatus, "abandoned">;
 
 export interface StudentUser {
   _id: string;
@@ -184,7 +188,7 @@ export interface BulkUploadResponse {
 // ── Status Update ────────────────────────────────────────────────────────────
 export interface StudentStatusUpdate {
   studentId: string;
-  status: ITStatus;
+  status: SettableITStatus;
 }
 
 export interface UpdateStudentStatusPayload {
@@ -206,6 +210,8 @@ export interface UpdateStatusApiResult {
     successful: number;
     failed: number;
     errors: UpdateStatusError[];
+    /** Earlier active internships closed as abandoned by these activations. */
+    abandoned?: number;
   };
 }
 

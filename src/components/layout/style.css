@@ -698,12 +698,24 @@
   filter: brightness(1.1);
   transform: translateY(-1px);
 }
+/* White in light mode, like the cards around it; dark mode keeps the overlay. */
 .dash-btn--ghost {
-  background: var(--color-surface-overlay);
-  border: 1px solid var(--color-surface-border);
-  color: var(--color-text-muted);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 .dash-btn--ghost:hover {
+  border-color: var(--color-accent-border);
+  color: var(--color-text-primary);
+}
+[data-theme="dark"] .dash-btn--ghost {
+  background: var(--color-surface-overlay);
+  border-color: var(--color-surface-border);
+  color: var(--color-text-muted);
+  box-shadow: none;
+}
+[data-theme="dark"] .dash-btn--ghost:hover {
   background: var(--color-surface-overlay-hover);
   color: var(--color-text-primary);
 }

@@ -317,3 +317,34 @@
     justify-content: center;
   }
 }
+
+/* Abandoned — closed when a newer internship started. De-emphasised, not red. */
+.si-item--abandoned .si-item__title,
+.si-item--abandoned .si-item__meta {
+  color: var(--color-text-muted);
+}
+
+.si-earlier {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 18px;
+  border: none;
+  border-top: 1px dashed var(--color-border);
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.si-earlier:hover {
+  color: var(--color-accent);
+}
+
+.si-earlier svg {
+  transition: transform 0.15s ease;
+}

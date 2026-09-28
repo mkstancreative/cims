@@ -5,6 +5,8 @@ import type {
   LogbookListResponse,
   LogbookDetailResponse,
   ReviewPayload,
+  AssignedStudentsParams,
+  SupervisorDepartmentsResponse,
 } from "../types/schoolSupervisor";
 
 export const supervisorDashboardStats = async () => {
@@ -13,9 +15,22 @@ export const supervisorDashboardStats = async () => {
 };
 
 export const getAssignedStudents = async (
-  params?: Partial<Pick<StudentsResponse, "page" | "total">>,
+  params?: AssignedStudentsParams,
 ): Promise<StudentsResponse> => {
   const response = await api.get("/supervisors/school/students", { params });
+  return response.data;
+};
+
+/**
+ * The caller's departments with active-student counts. Supervisors only (403
+ * otherwise); 404 means the account has no supervisor record. Not the same as
+ * `/admin/all-departments`, which lists every department.
+ */
+export const getMyDepartments = async (params?: {
+  page?: number;
+  limit?: number;
+}): Promise<SupervisorDepartmentsResponse> => {
+  const response = await api.get("/supervisors/departments", { params });
   return response.data;
 };
 

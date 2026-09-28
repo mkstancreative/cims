@@ -112,6 +112,9 @@ export default function BatchViewModal({
                     ["Placed", stats.placed],
                     ["Active", stats.active],
                     ["Completed", stats.completed],
+                    // Earlier cycles closed when the student's newer
+                    // internship started.
+                    ["Abandoned", stats.abandoned],
                   ] as const
                 ).map(([label, value]) => (
                   <div key={label} className="bv-stat">

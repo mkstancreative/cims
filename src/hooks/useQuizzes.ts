@@ -39,6 +39,12 @@ export const useMyQuiz = () => {
   return useQuery({
     queryKey: ["quizzes", "my"],
     queryFn: getMyQuiz,
+    // A 400 (e.g. INTERNSHIP_ABANDONED) is an answer, not a blip — don't retry.
+    retry: (count, err) => {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      return !(status && status >= 400 && status < 500) && count < 3;
+    },
   });
 };
 

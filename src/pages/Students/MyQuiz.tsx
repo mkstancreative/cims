@@ -12,6 +12,7 @@ import {
   Clock,
   ClipboardCheck,
   UserX,
+  Archive,
 } from "lucide-react";
 import { useMyQuiz, useSubmitQuiz } from "../../hooks/useQuizzes";
 import Spinner from "../../components/ui/Spinner/Spinner";
@@ -74,7 +75,26 @@ const LOCK_STATES: Record<
     body: "You have already taken this quiz. There is one attempt per student.",
     showProgress: false,
   },
+  INTERNSHIP_ABANDONED: {
+    icon: <Archive size={30} />,
+    tone: "accent",
+    title: "Internship Closed",
+    body: "This internship was closed when your newer one started, so its quiz is no longer available. Your quiz will be on your current internship.",
+    showProgress: false,
+  },
 };
+
+/** The lock code and message on a refused `GET /quizzes/my`, if any. */
+function quizErrorLock(
+  err: unknown,
+): { code: QuizLockCode; message?: string } | null {
+  const data = (
+    err as { response?: { data?: { code?: string; message?: string } } }
+  )?.response?.data;
+  if (data?.code === "INTERNSHIP_ABANDONED")
+    return { code: "INTERNSHIP_ABANDONED", message: data.message };
+  return null;
+}
 
 // ─── Locked state ─────────────────────────────────────────────────────────────
 function LockedCard({
@@ -312,10 +332,11 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function MyQuiz() {
-  const { data, isLoading } = useMyQuiz();
+  const { data, isLoading, error } = useMyQuiz();
   const [started, setStarted] = useState(false);
 
   const quizData = data?.data;
+  const errorLock = quizErrorLock(error);
 
   return (
     <div className="page-container">
@@ -337,6 +358,8 @@ export default function MyQuiz() {
         <div style={{ display: "flex", justifyContent: "center", padding: 60 }}>
           <Spinner size={28} color="var(--color-accent)" text="Loading quiz…" />
         </div>
+      ) : errorLock ? (
+        <LockedCard code={errorLock.code} message={errorLock.message} />
       ) : !quizData ? (
         <div
           style={{

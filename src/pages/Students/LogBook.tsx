@@ -11,6 +11,8 @@ import LogBookTable from "../../components/student/tables/LogBookTable";
 import CreateLogBookDraft from "../../components/student/forms/CreateLogBookDraft";
 import LogBookView from "../../components/student/view/LogBookView";
 import { useDeleteLogBook } from "../../hooks/useLogBooks";
+import { useCurrentInternshipAbandoned } from "../../hooks/useInternships";
+import { AbandonedNotice } from "../../components/student/dashboard/AbandonedNotice";
 import { formatDate } from "../../helpers/utilities";
 
 // ─── Filter options ───────────────────────────────────────────────────────────
@@ -39,6 +41,9 @@ export default function LogBook() {
   );
 
   const { mutate: remove, isPending: deleting } = useDeleteLogBook();
+  // An abandoned internship's logbooks are locked server-side — hide the
+  // actions rather than let them fail.
+  const locked = useCurrentInternshipAbandoned();
 
   const confirmDelete = () => {
     if (deleteTarget) {
@@ -56,7 +61,14 @@ export default function LogBook() {
     openModal(<CreateLogBookDraft isOpen onClose={closeModal} />);
 
   const openView = (logbook: LogBookListItem) =>
-    openModal(<LogBookView isOpen onClose={closeModal} logbook={logbook} />);
+    openModal(
+      <LogBookView
+        isOpen
+        onClose={closeModal}
+        logbook={logbook}
+        readOnly={locked}
+      />,
+    );
 
   const openEdit = (logbook: LogBookListItem) =>
     openModal(
@@ -79,10 +91,16 @@ export default function LogBook() {
               </p>
             </div>
           </div>
-          <div className="page-header-right">
-            <AddButton text="New Entry" onClick={openCreate} />
-          </div>
+          {!locked && (
+            <div className="page-header-right">
+              <AddButton text="New Entry" onClick={openCreate} />
+            </div>
+          )}
         </div>
+
+        {locked && (
+          <AbandonedNotice what="Its logbooks are locked — you can view them, but not add, edit or submit." />
+        )}
 
         {/* ── Search + filters ── */}
         <div className="filter-selects-block filter-selects-block--with-search">
@@ -129,6 +147,7 @@ export default function LogBook() {
             onView={openView}
             onEdit={openEdit}
             onDeleteRequest={setDeleteTarget}
+            readOnly={locked}
           />
         </div>
       </div>

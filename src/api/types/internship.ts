@@ -1,6 +1,13 @@
 // ─── Internship Types ─────────────────────────────────────────────────────────
 
-export type InternshipStatus = "placed" | "active" | "completed";
+/**
+ * `abandoned` is set by the server only — when a newer internship for the same
+ * student is activated. It can't be sent; see `SettableInternshipStatus`.
+ */
+export type InternshipStatus = "placed" | "active" | "completed" | "abandoned";
+
+/** The statuses `PUT /internships/:id/status` accepts. */
+export type SettableInternshipStatus = Exclude<InternshipStatus, "abandoned">;
 
 export interface InternshipBatchRef {
   _id: string;
@@ -84,5 +91,13 @@ export interface InternshipParams {
 
 export interface UpdateInternshipStatusPayload {
   id: string;
-  status: InternshipStatus;
+  status: SettableInternshipStatus;
+}
+
+export interface UpdateInternshipStatusResponse {
+  success: boolean;
+  message?: string;
+  data: Internship;
+  /** Other active internships of this student closed as abandoned. */
+  abandoned?: number;
 }

@@ -4,7 +4,7 @@ import { ArrowLeft, User, BookOpen, Phone, Mail } from "lucide-react";
 import { useStudentById } from "../../../hooks/useStudents";
 import type { StudentDetail } from "../../../api/types/student";
 import "./AdminStudentView.css";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import { formatDate } from "../../../helpers/utilities";
 import StudentInternships from "./StudentInternships";
 
@@ -140,7 +140,7 @@ export default function AdminStudentView() {
           </div>
         </div>
         <div className="sv-hero-badge">
-          <StatusBadge status={s.itStatus} />
+          <InternshipStatusBadge status={s.itStatus} />
         </div>
       </div>
 

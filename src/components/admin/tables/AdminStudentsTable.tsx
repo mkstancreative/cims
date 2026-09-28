@@ -2,7 +2,7 @@ import { Eye } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import type { Student } from "../../../api/types/student";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 
 interface AdminStudentsTableProps {
   students: Student[];
@@ -206,7 +206,7 @@ export default function AdminStudentsTable({
     { header: "Session", accessor: "session" },
     {
       header: "IT Status",
-      render: (row) => <StatusBadge status={row.itStatus} />,
+      render: (row) => <InternshipStatusBadge status={row.itStatus} />,
     },
     {
       header: "Actions",

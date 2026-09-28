@@ -8,7 +8,10 @@ import {
   updateInternshipStatus,
   setCurrentInternship,
 } from "../api/services/internship";
-import type { InternshipParams } from "../api/types/internship";
+import type {
+  InternshipParams,
+  UpdateInternshipStatusResponse,
+} from "../api/types/internship";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -49,11 +52,21 @@ export const useUpdateInternshipStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateInternshipStatus,
-    onSuccess: () => {
+    onSuccess: (res: UpdateInternshipStatusResponse) => {
       queryClient.invalidateQueries({ queryKey: ["internships"] });
       // A student's profile and progress reflect their internship's status.
       queryClient.invalidateQueries({ queryKey: ["students"] });
+      // Activating can abandon the student's other active internship(s),
+      // which moves batch counts too.
+      if (res?.abandoned) queryClient.invalidateQueries({ queryKey: ["batches"] });
       toast.success("Internship status updated.");
+      if (res?.abandoned) {
+        toast.info(
+          res.abandoned === 1
+            ? "This student's earlier active internship was closed as abandoned."
+            : `${res.abandoned} earlier active internships for this student were closed as abandoned.`,
+        );
+      }
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to update internship status.")),
@@ -73,4 +86,15 @@ export const useSetCurrentInternship = () => {
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to set current internship.")),
   });
+};
+
+/**
+ * True when the student's current internship was abandoned — closed because a
+ * newer one was activated. `isCurrent` doesn't mean live: an abandoned
+ * internship stays current until a newer one exists, and it's read-only.
+ */
+export const useCurrentInternshipAbandoned = () => {
+  const { data } = useMyInternshipHistory();
+  const current = data?.data?.find((i) => i.isCurrent);
+  return current?.itStatus === "abandoned";
 };

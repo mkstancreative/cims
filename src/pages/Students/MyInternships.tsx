@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Briefcase, RefreshCw, Star } from "lucide-react";
 import GeneralTable from "../../components/ui/GeneralTable/GeneralTable";
-import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../components/ui/StatusBadge/InternshipStatusBadge";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
 import { useMyInternshipHistory } from "../../hooks/useInternships";
 import { formatDate } from "../../helpers/utilities";
@@ -84,7 +84,7 @@ export default function MyInternships() {
     { header: "Supervisor", render: (row) => supervisorName(row.supervisor) },
     {
       header: "Status",
-      render: (row) => <StatusBadge status={row.itStatus} />,
+      render: (row) => <InternshipStatusBadge status={row.itStatus} />,
     },
   ];
 

@@ -93,6 +93,8 @@ export interface BatchStudentStats {
   placed: number;
   active: number;
   completed: number;
+  /** Superseded by a newer internship. Older API: absent. */
+  abandoned?: number;
 }
 
 export interface BatchListResponse {
@@ -151,6 +153,8 @@ export interface ActivateBatchResponse {
     /** Students outside their IT period, skipped rather than activated. */
     skippedOutsidePeriod: number;
     alreadyActive: number;
+    /** Students' earlier internships (in other batches) closed as abandoned. */
+    abandoned?: number;
   };
 }
 

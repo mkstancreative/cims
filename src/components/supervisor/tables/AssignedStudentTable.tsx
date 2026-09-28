@@ -4,7 +4,7 @@ import type { StudentSummary } from "../../../api/types/schoolSupervisor";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import ActionDropdown from "../../ui/ActionDropdown/ActionDropDown";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 
 interface AssignedStudentTableProps {
   data: StudentSummary[];
@@ -44,7 +44,7 @@ export default function AssignedStudentTable({
     },
     {
       header: "Status",
-      render: (row) => <StatusBadge status={row.itStatus} />,
+      render: (row) => <InternshipStatusBadge status={row.itStatus} />,
     },
     {
       header: "Actions",

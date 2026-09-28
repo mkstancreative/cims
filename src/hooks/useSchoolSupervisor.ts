@@ -6,8 +6,10 @@ import {
   getStudentLogbooks,
   getLogbookDetail,
   reviewLogbook,
+  getMyDepartments,
   type LogbookListParams,
 } from "../api/services/schoolSupervisors";
+import type { AssignedStudentsParams } from "../api/types/schoolSupervisor";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -19,8 +21,11 @@ function getErrMsg(err: unknown, fallback: string) {
 export const supervisorQueryKeys = {
   all: ["school-supervisor"] as const,
 
-  students: (params?: { page?: number }) =>
+  students: (params?: AssignedStudentsParams) =>
     [...supervisorQueryKeys.all, "students", params] as const,
+
+  departments: (params?: { page?: number; limit?: number }) =>
+    [...supervisorQueryKeys.all, "departments", params] as const,
 
   studentDetail: (id: string) =>
     [...supervisorQueryKeys.all, "student", id] as const,
@@ -34,13 +39,28 @@ export const supervisorQueryKeys = {
 
 // ─── Hooks ────────────────────────────────────────────────
 
-export const useAssignedStudents = (params?: {
-  page?: number;
-  total?: number;
-}) => {
+export const useAssignedStudents = (params?: AssignedStudentsParams) => {
   return useQuery({
     queryKey: supervisorQueryKeys.students(params),
     queryFn: () => getAssignedStudents(params),
+  });
+};
+
+/** The supervisor's departments with active-student counts. */
+export const useMyDepartments = (
+  params?: { page?: number; limit?: number },
+  enabled = true,
+) => {
+  return useQuery({
+    queryKey: supervisorQueryKeys.departments(params),
+    queryFn: () => getMyDepartments(params),
+    enabled,
+    // 403 / 404 are answers (wrong role, account not set up) — don't retry.
+    retry: (count, err) => {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      return !(status && status >= 400 && status < 500) && count < 3;
+    },
   });
 };
 

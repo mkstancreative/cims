@@ -1,4 +1,5 @@
 import {
+  Archive,
   BookOpen,
   CheckCircle2,
   Layers,
@@ -34,7 +35,14 @@ export default function DashBoardAdmin() {
     placed: 0,
     active: 0,
     completed: 0,
+    abandoned: 0,
   };
+  // Internships closed when a newer cycle started — the fourth bucket, so the
+  // four add up to `totalInternships`. Absent on older APIs.
+  const abandoned = students.abandoned ?? 0;
+  // Superseded cycles aren't a placement failure, so they're left out of the
+  // rate rather than counted against it.
+  const liveInternships = students.totalInternships - abandoned;
   const supervisors = resp.data?.supervisors ?? { total: 0 };
   const logbooks = resp.data?.logbooks ?? {
     pending: 0,
@@ -48,10 +56,10 @@ export default function DashBoardAdmin() {
     `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase();
 
   const placementRate =
-    students.totalInternships > 0
+    liveInternships > 0
       ? Math.round(
           ((students.placed + students.active + students.completed) /
-            students.totalInternships) *
+            liveInternships) *
             100,
         )
       : 0;
@@ -135,9 +143,16 @@ export default function DashBoardAdmin() {
             trendType={placementRate >= 60 ? "up" : "warn"}
           />
           <KpiCard
+            label="Abandoned"
+            value={abandoned}
+            sub="Closed when a newer internship started"
+            icon={<Archive size={18} />}
+            color="info"
+          />
+          <KpiCard
             label="Placement Rate"
             value={`${placementRate}%`}
-            sub="Placed + Active + Completed"
+            sub="Placed + Active + Completed, excl. abandoned"
             icon={<TrendingUp size={18} />}
             color={
               placementRate >= 70

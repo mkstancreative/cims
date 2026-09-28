@@ -11,7 +11,9 @@ import type {
   StudentParams,
   UpdateStudentStatusPayload,
   StudentProgressResponse,
+  UpdateStatusApiResult,
 } from "../api/types/student";
+import { abandonedNotice } from "../helpers/internship";
 
 function getErrMsg(err: unknown, fallback: string) {
   const e = err as { response?: { data?: { message?: string } } };
@@ -62,9 +64,16 @@ export const useUpdateStudentStatus = () => {
   return useMutation({
     mutationFn: (payload: UpdateStudentStatusPayload) =>
       updateStudentStatus(payload),
-    onSuccess: () => {
+    onSuccess: (res: UpdateStatusApiResult) => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["internships"] });
       toast.success("Student status updated.");
+      // Activations close the students' other active internships.
+      const notice = abandonedNotice(res?.data?.abandoned);
+      if (notice) {
+        queryClient.invalidateQueries({ queryKey: ["batches"] });
+        toast.info(notice);
+      }
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to update student status.")),

@@ -1,7 +1,7 @@
 import React from "react";
 import { User, BookOpen, Phone, Mail, BarChart2 } from "lucide-react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
-import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import { useStudentDetail } from "../../../hooks/useSchoolSupervisor";
 import { formatDate } from "../../../helpers/utilities";
 import "./AssignedStudentView.css";
@@ -165,7 +165,7 @@ export default function AssignedStudentView({
               </div>
             </div>
             <div className="asv-hero-badge">
-              <StatusBadge status={s.itStatus} />
+              <InternshipStatusBadge status={s.itStatus} />
             </div>
           </div>
 

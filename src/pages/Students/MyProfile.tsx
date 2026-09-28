@@ -19,7 +19,7 @@ import type { UpdateStudentProfilePayload } from "../../api/types/itstudent";
 import "./MyProfile.css";
 import { formatDate } from "../../helpers/utilities";
 import AddButton from "../../components/ui/AddButton/AddButton";
-import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
+import InternshipStatusBadge from "../../components/ui/StatusBadge/InternshipStatusBadge";
 
 function InfoRow({
   label,
@@ -298,7 +298,7 @@ export default function MyProfile() {
                     {meData?.data.user.role}
                   </span>
                   {profile?.itStatus && (
-                    <StatusBadge status={profile.itStatus} />
+                    <InternshipStatusBadge status={profile.itStatus} />
                   )}
                 </div>
               </div>

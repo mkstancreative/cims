@@ -133,7 +133,9 @@ export type QuizLockCode =
   | "NO_SESSION"
   | "SESSION_NOT_UNLOCKED"
   | "NOT_MARKED_PRESENT"
-  | "ALREADY_SUBMITTED";
+  | "ALREADY_SUBMITTED"
+  /** 400 — the internship was closed when a newer one started. */
+  | "INTERNSHIP_ABANDONED";
 
 export interface MyQuizSessionRef {
   _id: string;

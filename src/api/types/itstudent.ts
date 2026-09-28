@@ -125,7 +125,8 @@ export interface StudentWeeklyProgress {
     | "inactive"
     | "seeking_placement"
     | "pending_verification"
-    | "placed";
+    | "placed"
+    | "abandoned";
   weeksCompleted: number;
   daysRemaining: number;
   totalWeeks: number;
@@ -230,7 +231,8 @@ export interface PlacementStatusData {
     | "inactive"
     | "seeking_placement"
     | "pending_verification"
-    | "placed";
+    | "placed"
+    | "abandoned";
   placement: Placement;
   supervisors: Supervisors;
   itPeriod: ITPeriod;
