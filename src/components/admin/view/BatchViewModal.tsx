@@ -152,7 +152,9 @@ export default function BatchViewModal({
                 <div className="bv-sup__body">
                   <strong>
                     {supName}
-                    {supInactive && <em className="bv-sup__flag">Deactivated</em>}
+                    {supInactive && (
+                      <StatusBadge status="deactivated" className="bv-sup__flag" />
+                    )}
                   </strong>
                   {(sup?.specialization || sup?.staffId) && (
                     <span>

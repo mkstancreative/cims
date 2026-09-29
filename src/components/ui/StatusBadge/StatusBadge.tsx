@@ -1,118 +1,52 @@
 import "./StatusBadge.css";
+import { statusTone, type StatusTone } from "../../../helpers/status";
 
-type StatusKey =
-  | "active"
-  | "inactive"
-  | "created"
-  | "archived"
-  | "withdrawn"
-  | "enabled"
-  | "disabled"
-  | "present"
-  | "absent"
-  | "success"
-  | "pending"
-  | "seeking_placement"
-  | "placed"
-  | "completed"
-  | "failed"
-  | "enrolled"
-  | "rejected"
-  | "uploaded"
-  | "open"
-  | "closed"
-  | "ended"
-  | "passed"
-  | "in-progress"
-  | "students_uploaded"
-  | "in_progress"
-  | "completed"
-  | "verified"
-  | "pending_verification"
-  | "read"
-  | "unread"
-  | "successful"
-  | "approved"
-  | "abandoned"
-  | "reversed"
-  | "refunded"
-  | "cancelled"
-  | "pending_payment"
-
-const statusMap: Record<StatusKey, StatusKey> = {
-  // Student / applicant
-  active: "active",
-  inactive: "inactive",
-  created: "created",
-  archived: "archived",
-  withdrawn: "withdrawn",
-
-  // Admins / Lecturers
-  enabled: "enabled",
-  disabled: "disabled",
-
-  // Attendance
-  present: "present",
-  absent: "absent",
-
-  // Fees / payments
-  success: "success",
-  pending: "pending",
-  seeking_placement: "seeking_placement",
-  pending_verification: "pending_verification",
-  placed: "placed",
-  failed: "failed",
-  abandoned: "abandoned",
-  reversed: "reversed",
-  refunded: "refunded",
-  cancelled: "cancelled",
-  pending_payment: "pending_payment",
-
-  // Enrollment
-  enrolled: "enrolled",
-  rejected: "rejected",
-
-  uploaded: "uploaded",
-
-  open: "open",
-  closed: "closed",
-  ended: "ended",
-  read: "read",
-  unread: "unread",
-
-  // Academic
-  passed: "passed",
-  "in-progress": "in-progress",
-  students_uploaded: "students_uploaded",
-  in_progress: "in_progress",
-  completed: "completed",
-  verified: "verified",
-  approved: "approved",
-
-  // Certificate
-  successful: "successful",
-};
-
-interface StatusBadgeProps {
-  status?: string;
-  category?: string;
-  type?: string;
+/** "needs_revision" → "Needs revision" */
+function formatLabel(value: string): string {
+  const text = value.replace(/[_-]+/g, " ").trim();
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
-function StatusBadge({ status, category, type }: StatusBadgeProps) {
-  const value = status || category || type;
+interface StatusBadgeProps {
+  status?: string | null;
+  /** Older call sites pass the value under one of these names. */
+  category?: string;
+  type?: string;
+  /** Text to show instead of the formatted status (e.g. "Processing"). */
+  label?: string;
+  /** Override the tone the status would get. */
+  tone?: StatusTone;
+  /** Tooltip. */
+  title?: string;
+  className?: string;
+}
 
-  const getStatusClass = (statusText?: string): string => {
-    if (!statusText) return "status-badge";
-
-    const text = statusText.toLowerCase() as StatusKey;
-
-    return statusMap[text] || "status-badge";
-  };
+/**
+ * The one status pill in the app: a dot, the label, a tinted background and a
+ * matching text colour. The tone comes from `statusTone`; anything unknown
+ * renders grey rather than breaking.
+ */
+function StatusBadge({
+  status,
+  category,
+  type,
+  label,
+  tone,
+  title,
+  className,
+}: StatusBadgeProps) {
+  const value = status || category || type || "";
+  if (!value && !label) return <>—</>;
 
   return (
-    <span className={`status-badge ${getStatusClass(value)}`}>
-      <span>{String(value).replace(/_/g, " ")}</span>
+    <span
+      className={`status-badge status-badge--${tone ?? statusTone(value)}${
+        className ? ` ${className}` : ""
+      }`}
+      title={title}
+    >
+      <span className="status-badge__dot" aria-hidden="true" />
+      {label ?? formatLabel(value)}
     </span>
   );
 }

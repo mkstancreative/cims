@@ -1,5 +1,6 @@
 import { ClipboardList } from "lucide-react";
 import { ProgressRing, InfoPanel } from "../../shared/dashboard/DashboardKit";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import type { StudentDashProgress } from "../../../api/types/dashboard";
 
 interface ProgressSectionProps {
@@ -74,19 +75,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
         rows={[
           {
             label: "Status",
-            value: (
-              <span
-                style={{
-                  textTransform: "capitalize",
-                  color: hasEvaluation
-                    ? "var(--color-primary)"
-                    : "var(--color-text-muted)",
-                  fontWeight: 600,
-                }}
-              >
-                {evaluationStatus}
-              </span>
-            ),
+            value: <StatusBadge status={evaluationStatus} />,
           },
           {
             label: "Final Score",

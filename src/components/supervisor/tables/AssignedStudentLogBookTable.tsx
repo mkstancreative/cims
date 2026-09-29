@@ -3,28 +3,8 @@ import { formatDate } from "../../../helpers/utilities";
 import ActionDropdown from "../../ui/ActionDropdown/ActionDropDown";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
-import type {
-  LogbookSummary,
-  LogbookStatus,
-} from "../../../api/types/schoolSupervisor";
-
-// ─── Status pill ─────────────────────────────────────────────────────
-
-const STATUS_META: Record<LogbookStatus, { label: string; cls: string }> = {
-  draft: { label: "Draft", cls: "lbt-status--draft" },
-  submitted: { label: "Submitted", cls: "lbt-status--submitted" },
-  approved: { label: "Approved", cls: "lbt-status--approved" },
-  rejected: { label: "Rejected", cls: "lbt-status--rejected" },
-  needs_revision: { label: "Needs Revision", cls: "lbt-status--revision" },
-};
-
-function StatusPill({ status }: { status: LogbookStatus }) {
-  const meta = STATUS_META[status] ?? {
-    label: status,
-    cls: "lbt-status--draft",
-  };
-  return <span className={`lbt-status-pill ${meta.cls}`}>{meta.label}</span>;
-}
+import type { LogbookSummary } from "../../../api/types/schoolSupervisor";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 
 // ─── Props ────────────────────────────────────────────────────────────
 
@@ -81,7 +61,7 @@ export default function AssignedStudentLogBookTable({
     },
     {
       header: "Status",
-      render: (row) => <StatusPill status={row.status} />,
+      render: (row) => <StatusBadge status={row.status} />,
     },
     {
       header: "Actions",
@@ -103,13 +83,6 @@ export default function AssignedStudentLogBookTable({
     <>
       <style>{`
         .lbt-hours{font-size:13px;font-weight:600;color:var(--color-primary)}
-        .lbt-status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;text-transform:capitalize}
-        .lbt-status-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-        .lbt-status--draft{background:rgba(var(--color-primary-rgb), .12);color:var(--color-primary)}
-        .lbt-status--submitted{background:rgba(251,191,36,.12);color:#fbbf24}
-        .lbt-status--approved{background:rgba(var(--color-primary-rgb), .12);color:var(--color-primary)}
-        .lbt-status--rejected{background:rgba(239,68,68,.12);color:#ef4444}
-        .lbt-status--revision{background:rgba(234,88,12,.12);color:#ea580c}
       `}</style>
       <GeneralTable<LogbookSummary>
         columns={columns}

@@ -12,6 +12,7 @@ import type {
 } from "../../../api/types/notifications";
 import type { Batch } from "../../../api/types/batch";
 import { formatDateTime } from "../../../helpers/utilities";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import "./BatchForm.css";
 import "./BatchAnnouncementForm.css";
 
@@ -214,9 +215,7 @@ export default function BatchAnnouncementForm({
           sends.map((item) => (
             <div key={item.broadcastId} className="ba-row">
               <div className="ba-row-head">
-                <span className={`ba-type ba-type--${item.type}`}>
-                  {item.type}
-                </span>
+                <StatusBadge status={item.type} />
                 <span className="ba-title">{item.title}</span>
                 <span className="ba-read">
                   {item.readCount}/{item.recipients} read

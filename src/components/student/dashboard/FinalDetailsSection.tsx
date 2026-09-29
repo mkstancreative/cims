@@ -1,5 +1,6 @@
 import React from "react";
 import { Briefcase } from "lucide-react";
+import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import type { StudentDashBatch, StudentDashSupervisor } from "../../../api/types/dashboard";
 
 interface FinalDetailsSectionProps {
@@ -116,11 +117,7 @@ export const FinalDetailsSection: React.FC<FinalDetailsSectionProps> = ({
         <Row label="IT Rotation" value={period?.name ?? "—"} />
         <Row
           label="Status"
-          value={
-            <span style={{ textTransform: "capitalize" }}>
-              {itStatus.replace(/_/g, " ")}
-            </span>
-          }
+          value={<InternshipStatusBadge status={itStatus} />}
         />
         <Row
           label="Start Date"

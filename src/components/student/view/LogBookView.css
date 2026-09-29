@@ -78,46 +78,9 @@
   color: var(--color-text-secondary);
 }
 
+/* Status badge sits at the end of the meta bar */
 .lbv-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
-  text-transform: capitalize;
   margin-left: auto;
-}
-
-.lbv-status::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-.lbv-status.draft {
-  background: rgba(var(--color-primary-rgb), 0.12);
-  color: var(--color-primary);
-}
-.lbv-status.submitted {
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
-}
-.lbv-status.approved {
-  background: rgba(var(--color-primary-rgb), 0.12);
-  color: var(--color-primary);
-}
-.lbv-status.rejected {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-}
-.lbv-status.needs-revision {
-  background: rgba(234, 88, 12, 0.12);
-  color: #ea580c;
 }
 
 /* Sections */

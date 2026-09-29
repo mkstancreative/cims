@@ -19,19 +19,10 @@ import {
 } from "../../../hooks/useSchoolSupervisor";
 import { useCurriculum } from "../../../hooks/useCurriculum";
 import type { Topic, Subtopic } from "../../../api/types/curriculum";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import { isAbandoned } from "../../../helpers/internship";
 import "./AssignedStudentLogBookView.css";
-
-// ─── Status meta ─────────────────────────────────────────────────────────────
-
-const STATUS_META: Record<string, { label: string; cls: string }> = {
-  draft: { label: "Draft", cls: "lbv2-status--draft" },
-  submitted: { label: "Submitted", cls: "lbv2-status--submitted" },
-  approved: { label: "Approved", cls: "lbv2-status--approved" },
-  rejected: { label: "Rejected", cls: "lbv2-status--rejected" },
-  needs_revision: { label: "Needs Revision", cls: "lbv2-status--revision" },
-};
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -69,8 +60,6 @@ export default function AssignedStudentLogBookView() {
   const curriculum = currResponse?.data;
 
   const isLoading = loadingLogbook || loadingCurriculum;
-
-  const statusEntry = logbook ? STATUS_META[logbook.status] : null;
 
   // Resolve curriculum names
   const topicObj = curriculum?.topics?.find((t: Topic) => t._id === logbook?.topic);
@@ -132,9 +121,7 @@ export default function AssignedStudentLogBookView() {
               </div>
             </div>
             <div className="lbv2-hero-right">
-              <span className={`lbv2-status-pill ${statusEntry?.cls ?? ""}`}>
-                {statusEntry?.label ?? logbook.status}
-              </span>
+              <StatusBadge status={logbook.status} />
               <InternshipStatusBadge status={student.itStatus} />
             </div>
           </div>

@@ -4,7 +4,7 @@ import ActionDropdown from "../../ui/ActionDropdown/ActionDropDown";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import { useLogBooks } from "../../../hooks/useLogBooks";
 import { formatDate } from "../../../helpers/utilities";
-import "../LogBookShared.css";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import type {
   LogBookListItem,
   LogBookStatus,
@@ -23,15 +23,6 @@ interface LogBookTableProps {
   /** The internship was abandoned — its logbooks are locked. */
   readOnly?: boolean;
 }
-
-// Map status → badge colours matching LogBookShared.css pattern
-const STATUS_CLS: Record<string, string> = {
-  draft: "lb-status draft",
-  submitted: "lb-status submitted",
-  approved: "lb-status approved",
-  rejected: "lb-status rejected",
-  needs_revision: "lb-status needs-revision",
-};
 
 export default function LogBookTable({
   search,
@@ -99,11 +90,7 @@ export default function LogBookTable({
     },
     {
       header: "Status",
-      render: (row) => {
-        const cls = STATUS_CLS[row.status] ?? "lb-status draft";
-        const label = row.status.replace("_", " ");
-        return <span className={cls}>{label}</span>;
-      },
+      render: (row) => <StatusBadge status={row.status} />,
     },
     {
       header: "Actions",

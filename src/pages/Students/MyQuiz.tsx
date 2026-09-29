@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useMyQuiz, useSubmitQuiz } from "../../hooks/useQuizzes";
 import Spinner from "../../components/ui/Spinner/Spinner";
+import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import type {
   MyQuizCurriculumProgress,
   MyQuizSessionRef,
@@ -123,7 +124,8 @@ function LockedCard({
 
         {session && (
           <p className="mq-session-chip">
-            Sitting {session.sitting} · {session.status.replace(/_/g, " ")}
+            Sitting {session.sitting}
+            <StatusBadge status={session.status} />
           </p>
         )}
 

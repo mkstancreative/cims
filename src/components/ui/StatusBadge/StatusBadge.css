@@ -1,223 +1,113 @@
+/* ─── Status badge — dot + label on a tinted pill ─────────────────────────
+   One tone per kind of state (see StatusBadge.tsx). Each tone sets --sb-rgb
+   (the tint and dot) and --sb-text (the label); dark mode lifts the text. */
 .status-badge {
+  --sb-rgb: 100, 116, 139;
+  --sb-text: #475569;
   display: inline-flex;
   align-items: center;
-  gap: 1px;
-  padding: 2px 4px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: bolder;
-  text-transform: capitalize;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--sb-rgb), 0.22);
+  background: rgba(var(--sb-rgb), 0.12);
+  color: var(--sb-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
-/* Student */
-.status-badge.active {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
+.status-badge__dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(var(--sb-rgb));
 }
 
-.status-badge.inactive {
-  background: #ffebee;
-  color: #c62828;
+/* Tones — light mode */
+.status-badge--green {
+  --sb-rgb: 22, 163, 74;
+  --sb-text: #15803d;
 }
 
-.status-badge.archived {
-  background: #fff3e0;
-  color: #ef6c00;
+.status-badge--teal {
+  --sb-rgb: 13, 148, 136;
+  --sb-text: #0f766e;
 }
 
-.status-badge.withdrawn {
-  background: #fdecea;
-  color: #d32f2f;
+/* Yellow-leaning so "pending" never reads as orange "needs revision" */
+.status-badge--amber {
+  --sb-rgb: 202, 138, 4;
+  --sb-text: #a16207;
 }
 
-.status-badge.present {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
+.status-badge--orange {
+  --sb-rgb: 234, 88, 12;
+  --sb-text: #c2410c;
 }
 
-.status-badge.absent {
-  background: #ffebee;
-  color: #c62828;
+.status-badge--red {
+  --sb-rgb: 220, 38, 38;
+  --sb-text: #b91c1c;
 }
 
-.status-badge.seeking_placement {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
+.status-badge--brand {
+  --sb-rgb: 165, 111, 99;
+  --sb-text: #8a5a4f;
 }
 
-.status-badge.placed {
-  background: #ffebee;
-  color: var(--color-primary-hover);
+.status-badge--grey {
+  --sb-rgb: 100, 116, 139;
+  --sb-text: #475569;
 }
 
-.status-badge.pending {
-  background: #fff8e1;
-  color: #f9a825;
+/* Tones — dark mode: brighter dot and label on a slightly stronger tint */
+[data-theme="dark"] .status-badge {
+  background: rgba(var(--sb-rgb), 0.16);
+  border-color: rgba(var(--sb-rgb), 0.3);
 }
 
-/* Enrollment */
-.status-badge.enrolled {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
+[data-theme="dark"] .status-badge--green {
+  --sb-rgb: 34, 197, 94;
+  --sb-text: #4ade80;
 }
 
-.status-badge.rejected {
-  background: #ffebee;
-  color: #c62828;
+[data-theme="dark"] .status-badge--teal {
+  --sb-rgb: 20, 184, 166;
+  --sb-text: #2dd4bf;
 }
 
-/* Academic */
-.status-badge.passed {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
+[data-theme="dark"] .status-badge--amber {
+  --sb-rgb: 234, 179, 8;
+  --sb-text: #facc15;
 }
 
-.status-badge.successful {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
+[data-theme="dark"] .status-badge--orange {
+  --sb-rgb: 249, 115, 22;
+  --sb-text: #fb923c;
 }
 
-.status-badge.failed {
-  background: #ffebee;
-  color: #c62828;
+[data-theme="dark"] .status-badge--red {
+  --sb-rgb: 239, 68, 68;
+  --sb-text: #f87171;
 }
 
-.status-badge.in-progress {
-  background: #fff8e1;
-  color: #f9a825;
+[data-theme="dark"] .status-badge--brand {
+  --sb-rgb: 217, 155, 127;
+  --sb-text: #e8b49c;
 }
 
-.status-badge.in_progress {
-  background: #fff8e1;
-  color: #f9a825;
+[data-theme="dark"] .status-badge--grey {
+  --sb-rgb: 148, 163, 184;
+  --sb-text: #94a3b8;
 }
 
-/* Admission */
-.status-badge.applied {
-  background: var(--color-primary-muted);
-  color: var(--color-secondary);
-}
-
-.status-badge.admitted {
-  background: var(--color-primary-muted);
-  color: var(--color-secondary);
-}
-
-/* Transactions / IT Status */
-.status-badge.uploaded {
-  background: var(--color-slate-muted);
-  color: var(--color-slate);
-}
-
-.status-badge.pending_verification {
-  background: #fff8e1;
-  color: #f57f17;
-}
-
-.status-badge.created {
-  background: var(--color-primary-muted);
-  color: var(--color-secondary);
-}
-
-.status-badge.completed {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-
-.status-badge.approved {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-
-.status-badge.failed {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.status-badge.success {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-
-/* Admins / Lecturers */
-.status-badge.enabled {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-
-.status-badge.disabled {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.status-badge.ended {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.status-badge.open {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-
-.status-badge.closed {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.status-badge.awaiting {
-  background: #fff8e1;
-  color: #f9a825;
-}
-.status-badge.students_uploaded {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-.status-badge.verified {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-.status-badge.pending_verification {
-  background: #fff8e1;
-  color: #f9a825;
-}
-.status-badge.read {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-hover);
-}
-.status-badge.unread {
-  background: #fff8e1;
-  color: #f9a825;
-}
-
-/* Payments */
-.status-badge.abandoned {
-  background: #eceff1;
-  color: #546e7a;
-}
-.status-badge.reversed {
-  background: #fff3e0;
-  color: #ef6c00;
-}
-.status-badge.refunded {
-  background: var(--color-primary-muted);
-  color: var(--color-secondary);
-}
-.status-badge.cancelled {
-  background: #fdecea;
-  color: #d32f2f;
-}
-.status-badge.pending_payment {
-  background: #fff8e1;
-  color: #f9a825;
-}
-/* Internship superseded by a newer one — muted, never alarming */
+/* Tooltip wrapper (InternshipStatusBadge) */
 .status-badge-tip {
   display: inline-flex;
   cursor: help;
-}
-
-[data-theme="dark"] .status-badge.abandoned {
-  background: rgba(148, 163, 184, 0.14);
-  color: #94a3b8;
 }

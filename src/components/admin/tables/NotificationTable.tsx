@@ -41,34 +41,7 @@ export default function NotificationTable({
   const columns = [
     {
       header: "Type",
-      render: (n: Notification) => (
-        <span
-          className={`notif-type-badge notif-type-${n.type}`}
-          style={{
-            padding: "4px 8px",
-            borderRadius: "4px",
-            fontSize: "12px",
-            fontWeight: "600",
-            textTransform: "capitalize",
-            backgroundColor:
-              {
-                info: "var(--color-slate-muted)",
-                success: "var(--color-primary-muted)",
-                warning: "#fef3c7",
-                error: "#fee2e2",
-              }[n.type] || "#f3f4f6",
-            color:
-              {
-                info: "var(--color-slate)",
-                success: "var(--color-primary-hover)",
-                warning: "#b45309",
-                error: "#b91c1c",
-              }[n.type] || "#374151",
-          }}
-        >
-          {n.type}
-        </span>
-      ),
+      render: (n: Notification) => <StatusBadge status={n.type} />,
     },
     {
       header: "Category",

@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { HelpCircle, Unlink } from "lucide-react";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import Spinner from "../../ui/Spinner/Spinner";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import {
   useAssignBatchQuiz,
   useUnassignBatchQuiz,
@@ -113,7 +114,7 @@ export default function BatchQuizModal({
               <span className="bq-current__title">
                 {currentTitle}
                 {currentQuiz && !currentQuiz.isActive && (
-                  <em className="bq-tag bq-tag--muted">inactive</em>
+                  <StatusBadge status="inactive" className="bq-tag" />
                 )}
               </span>
               <button

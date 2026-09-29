@@ -12,6 +12,7 @@ import {
   Send,
 } from "lucide-react";
 import { formatDate } from "../../../helpers/utilities";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import { dayOfWeek } from "../../../helpers/logbook";
 import "./LogBookView.css";
 
@@ -103,15 +104,6 @@ function LogBookViewInner({
 
   const e = entry;
 
-  const statusMeta: Record<string, { label: string; cls: string }> = {
-    draft: { label: "Draft", cls: "draft" },
-    submitted: { label: "Submitted", cls: "submitted" },
-    approved: { label: "Approved", cls: "approved" },
-    rejected: { label: "Rejected", cls: "rejected" },
-    needs_revision: { label: "Needs Revision", cls: "needs-revision" },
-  };
-  const sm = statusMeta[e.status] ?? { label: e.status, cls: "draft" };
-
   return (
     <div className="lbv-root">
       {/* ── Meta bar ── */}
@@ -129,7 +121,7 @@ function LogBookViewInner({
           <Clock size={13} />
           <span>{e.hoursSpent ?? 0} hours</span>
         </div>
-        <span className={`lbv-status ${sm.cls}`}>{sm.label}</span>
+        <StatusBadge status={e.status} className="lbv-status" />
       </div>
 
       {/* ── Curriculum & Topics ── */}

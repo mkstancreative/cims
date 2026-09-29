@@ -1,30 +1,27 @@
 import React from "react";
 import { GraduationCap } from "lucide-react";
 import type { CertificateStatus } from "../../../api/types/certificate";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 
 interface CertificateStatusBannerProps {
   certificate: CertificateStatus | null;
   loadingCert: boolean;
 }
 
-const STATUS_TEXT: Record<string, { label: string; color: string; sub: string }> =
-  {
-    approved: {
-      label: "Approved",
-      color: "var(--color-primary)",
-      sub: "Your certificate has been approved.",
-    },
-    rejected: {
-      label: "Rejected",
-      color: "#ef4444",
-      sub: "Your certificate request was not approved.",
-    },
-    pending: {
-      label: "Processing",
-      color: "var(--color-accent)",
-      sub: "Awaiting administrative review.",
-    },
-  };
+const STATUS_TEXT: Record<string, { label: string; sub: string }> = {
+  approved: {
+    label: "Approved",
+    sub: "Your certificate has been approved.",
+  },
+  rejected: {
+    label: "Rejected",
+    sub: "Your certificate request was not approved.",
+  },
+  pending: {
+    label: "Processing",
+    sub: "Awaiting administrative review.",
+  },
+};
 
 export const CertificateStatusBanner: React.FC<
   CertificateStatusBannerProps
@@ -67,11 +64,21 @@ export const CertificateStatusBanner: React.FC<
         <GraduationCap size={20} />
       </div>
       <div>
-        <div style={{ fontWeight: 600, fontSize: "14px" }}>
-          <span style={{ color: "var(--color-text-primary)" }}>
-            Certificate Status:{" "}
-          </span>
-          <span style={{ color: meta.color }}>{meta.label}</span>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontWeight: 600,
+            fontSize: "14px",
+            color: "var(--color-text-primary)",
+          }}
+        >
+          Certificate Status:
+          <StatusBadge
+            status={STATUS_TEXT[status] ? status : "pending"}
+            label={meta.label}
+          />
         </div>
         <div style={{ fontSize: "12px", color: "var(--color-text-muted)" }}>
           {sub}
