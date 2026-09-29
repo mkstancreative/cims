@@ -6,59 +6,32 @@
   margin-bottom: 18px;
 }
 
-/* ── Collapsible "Transaction Statuses" ── */
-.payments-section-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 18px;
-  margin-bottom: 0;
-  padding: 0 0 4px;
-  border: none;
-  border-bottom: 1px solid var(--color-divider);
-  background: none;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
+/* ── Payment stats: both sections fold as one panel from the header ── */
+.payments-stats__title {
+  margin-top: 0;
+  margin-bottom: 12px;
+  border-bottom-color: var(--color-divider);
 }
 
-.payments-section-toggle:hover {
-  color: var(--color-text-primary);
-}
-
-.payments-section-toggle:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.payments-section-toggle__icon {
-  flex-shrink: 0;
-  color: var(--color-text-muted);
-  transform: rotate(-90deg);
-  transition: transform 0.2s ease;
-}
-
-.payments-section-toggle[aria-expanded="true"] .payments-section-toggle__icon {
-  transform: rotate(0deg);
-}
-
-/* Animates height via grid rows: 0fr (closed) → 1fr (open) */
+/* Animates height via grid rows: 0fr (closed) → 1fr (open). The page's
+   20px flex gap spaces it; closed, it pulls up by one gap so the header and
+   filters sit the normal distance apart instead of two gaps. */
 .payments-collapse {
   display: grid;
   grid-template-rows: 0fr;
-  margin-bottom: 18px;
-  transition: grid-template-rows 0.25s ease;
+  margin-top: -20px;
+  transition:
+    grid-template-rows 0.25s ease,
+    margin-top 0.25s ease;
 }
 
-/* The collapse owns the spacing below, so it holds when closed too */
-.payments-collapse .payments-summary-grid {
+.payments-collapse .payments-summary-grid:last-child {
   margin-bottom: 0;
 }
 
 .payments-collapse.is-open {
   grid-template-rows: 1fr;
+  margin-top: 0;
 }
 
 .payments-collapse__inner {
@@ -66,13 +39,59 @@
   overflow: hidden;
 }
 
-.payments-collapse.is-open .payments-collapse__inner {
-  padding-top: 12px;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .payments-section-toggle__icon,
   .payments-collapse {
     transition: none;
   }
+}
+
+/* ── Header: open / close both stat sections ── */
+.payments-stats-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 9px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+/* Beats the global button:focus/:active accent border */
+.payments-stats-btn:focus,
+.payments-stats-btn:active {
+  border: 1px solid var(--color-accent-border);
+}
+
+.payments-stats-btn:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-muted);
+}
+
+/* Stats showing — filled, so the button reads as "on" */
+.payments-stats-btn.is-open,
+.payments-stats-btn.is-open:focus,
+.payments-stats-btn.is-open:active {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+}
+
+.payments-stats-btn.is-open:hover {
+  background: var(--color-accent-hover);
+}
+
+.payments-stats-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }

@@ -225,29 +225,13 @@ export function DashboardSkeleton({
   wide = false,
 }: DashboardSkeletonProps) {
   return (
-    <div className="db-page">
-      <div
-        style={{
-          height: 140,
-          borderRadius: 20,
-          background: "var(--color-surface-overlay)",
-          animation: "pulse 1.5s ease-in-out infinite",
-        }}
-      />
+    <div className="db-page" aria-busy="true" aria-label="Loading dashboard">
+      <div className="db-skel db-skel--banner" />
       <div className={`db-kpi-grid${wide ? " db-kpi-grid--wide" : ""}`}>
         {Array.from({ length: cards }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              height: 110,
-              borderRadius: 16,
-              background: "var(--color-surface-overlay)",
-              animation: "pulse 1.5s ease-in-out infinite",
-            }}
-          />
+          <div key={i} className="db-skel db-skel--card" />
         ))}
       </div>
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
     </div>
   );
 }

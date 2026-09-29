@@ -504,3 +504,66 @@
     font-size: 28px;
   }
 }
+
+/* ── Loading skeleton ────────────────────────────────────────────────────────
+   Light mode: white blocks like the cards they stand in for, with a soft
+   shimmer — a dark tint over the off-white page read as grey. Dark mode keeps
+   the faint overlay. */
+.db-skel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.db-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-slate-rgb), 0.06) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: db-skel-shimmer 1.4s ease-in-out infinite;
+}
+
+.db-skel--banner {
+  height: 140px;
+  border-radius: 20px;
+}
+
+.db-skel--card {
+  height: 110px;
+  border-radius: 16px;
+}
+
+@keyframes db-skel-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+[data-theme="dark"] .db-skel {
+  border-color: transparent;
+  background: var(--color-surface-overlay);
+  box-shadow: none;
+}
+
+[data-theme="dark"] .db-skel::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db-skel::after {
+    animation: none;
+  }
+}

@@ -8,7 +8,7 @@ import {
   CreditCard,
   DollarSign,
   Activity,
-  ChevronDown,
+  BarChart3,
 } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
@@ -40,12 +40,12 @@ const STATUS_OPTIONS = [
   "cancelled",
 ];
 
-// Remembers whether the admin collapsed "Transaction Statuses".
-const STATUSES_OPEN_KEY = "payments.statusesOpen";
+// Remembers whether the admin folded the payment stats away.
+const STATS_OPEN_KEY = "payments.statsOpen";
 
-const readStatusesOpen = () => {
+const readStatsOpen = () => {
   try {
-    return localStorage.getItem(STATUSES_OPEN_KEY) !== "false";
+    return localStorage.getItem(STATS_OPEN_KEY) !== "false";
   } catch {
     return true;
   }
@@ -88,7 +88,7 @@ const INITIAL_FILTERS: FilterState = {
 export default function Payments() {
   const { openModal, closeModal } = useModal();
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
-  const [statusesOpen, setStatusesOpen] = useState(readStatusesOpen);
+  const [statsOpen, setStatsOpen] = useState(readStatsOpen);
 
   const setField = <K extends keyof FilterState>(
     field: K,
@@ -196,10 +196,11 @@ export default function Payments() {
   const { data: summaryResponse } = usePaymentSummary(summaryParams);
   const summary = normalizeSummary(summaryResponse);
 
-  const toggleStatuses = () =>
-    setStatusesOpen((open) => {
+  // Financial Reconciliation and Transaction Statuses fold as one panel.
+  const toggleStats = () =>
+    setStatsOpen((open) => {
       try {
-        localStorage.setItem(STATUSES_OPEN_KEY, String(!open));
+        localStorage.setItem(STATS_OPEN_KEY, String(!open));
       } catch {
         // Storage blocked — the toggle still works for this visit.
       }
@@ -230,53 +231,60 @@ export default function Payments() {
             </p>
           </div>
         </div>
+        <div className="page-header-right">
+          <button
+            type="button"
+            className={`payments-stats-btn${statsOpen ? " is-open" : ""}`}
+            onClick={toggleStats}
+            aria-expanded={statsOpen}
+            aria-controls="payments-stats"
+          >
+            <BarChart3 size={15} />
+            {statsOpen ? "Hide payment stats" : "See payment stats"}
+          </button>
+        </div>
       </div>
 
-      {/* ── Summary ── */}
-      <div className="section-title-divider" style={{ marginTop: 0, marginBottom: 12 }}>Financial Reconciliation</div>
-      <div className="payments-summary-grid">
-        <StatCard
-          label="Total Collected"
-          value={formatAmount(summary.paidAmount)}
-          icon={<DollarSign size={20} />}
-          color="var(--color-primary-hover)"
-        />
-        <StatCard
-          label="Total Settled"
-          value={formatAmount(summary.settledAmount)}
-          icon={<CircleCheck size={20} />}
-          color="var(--color-slate)"
-        />
-        <StatCard
-          label="Gateway Fees"
-          value={formatAmount(summary.gatewayFees)}
-          icon={<CreditCard size={20} />}
-          color="#f59e0b"
-        />
-        <StatCard
-          label="Settlement Gap"
-          value={formatAmount(summary.settlementGap)}
-          icon={<AlertTriangle size={20} />}
-          color={summary.settlementGap > 0 ? "#ef4444" : "#6b7280"}
-        />
-      </div>
-
-      <button
-        type="button"
-        className="section-title-divider payments-section-toggle"
-        onClick={toggleStatuses}
-        aria-expanded={statusesOpen}
-        aria-controls="payments-statuses"
-      >
-        Transaction Statuses
-        <ChevronDown size={16} className="payments-section-toggle__icon" />
-      </button>
+      {/* ── Payment stats — both sections fold together from the header ── */}
       <div
-        id="payments-statuses"
-        className={`payments-collapse${statusesOpen ? " is-open" : ""}`}
-        inert={!statusesOpen}
+        id="payments-stats"
+        className={`payments-collapse payments-stats${statsOpen ? " is-open" : ""}`}
+        inert={!statsOpen}
       >
         <div className="payments-collapse__inner">
+          <div className="section-title-divider payments-stats__title">
+            Financial Reconciliation
+          </div>
+          <div className="payments-summary-grid">
+            <StatCard
+              label="Total Collected"
+              value={formatAmount(summary.paidAmount)}
+              icon={<DollarSign size={20} />}
+              color="var(--color-primary-hover)"
+            />
+            <StatCard
+              label="Total Settled"
+              value={formatAmount(summary.settledAmount)}
+              icon={<CircleCheck size={20} />}
+              color="var(--color-slate)"
+            />
+            <StatCard
+              label="Gateway Fees"
+              value={formatAmount(summary.gatewayFees)}
+              icon={<CreditCard size={20} />}
+              color="#f59e0b"
+            />
+            <StatCard
+              label="Settlement Gap"
+              value={formatAmount(summary.settlementGap)}
+              icon={<AlertTriangle size={20} />}
+              color={summary.settlementGap > 0 ? "#ef4444" : "#6b7280"}
+            />
+          </div>
+
+          <div className="section-title-divider payments-stats__title">
+            Transaction Statuses
+          </div>
           <div className="payments-summary-grid">
             <StatCard
               label="Total Attempts"
