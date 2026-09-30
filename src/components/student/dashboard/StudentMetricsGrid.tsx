@@ -47,7 +47,7 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         progress={curriculumPercent}
       />
       <KpiCard
-        label="Draft Logbooks"
+        label="Draft Entries"
         value={logbooks.draft}
         sub="awaiting edits/submission"
         icon={<BookOpen size={18} />}
@@ -56,18 +56,18 @@ export const StudentMetricsGrid: React.FC<StudentMetricsGridProps> = ({
         trendType={logbooks.draft > 0 ? "warn" : "neutral"}
       />
       <KpiCard
-        label="Submitted Logbooks"
+        label="Submitted Entries"
         value={logbooks.submitted}
-        sub="pending supervisor review"
+        sub="logbook entries awaiting review"
         icon={<FileCheck size={18} />}
         color="amber"
         trend={logbooks.submitted > 0 ? "Awaiting" : "None"}
         trendType={logbooks.submitted > 0 ? "warn" : "neutral"}
       />
       <KpiCard
-        label="Approved Logbooks"
+        label="Approved Entries"
         value={logbooks.approved}
-        sub="successfully verified"
+        sub="logbook entries approved"
         icon={<CheckCircle size={18} />}
         color="secondary"
         trend={logbooks.approved > 0 ? "Completed" : "None"}

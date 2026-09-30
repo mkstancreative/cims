@@ -93,6 +93,27 @@ export const useReorderQuizQuestions = () => {
   });
 };
 
+/** The recorded result on a 409 ALREADY_SUBMITTED from submit, if any. */
+export function quizSubmitAttempt(
+  err: unknown,
+): { score: number; passed: boolean } | null {
+  const res = (
+    err as {
+      response?: {
+        status?: number;
+        data?: { code?: string; data?: { attempt?: { score?: number; passed?: boolean } } };
+      };
+    }
+  )?.response;
+  const attempt = res?.data?.data?.attempt;
+  if (
+    (res?.status === 409 || res?.data?.code === "ALREADY_SUBMITTED") &&
+    typeof attempt?.score === "number"
+  )
+    return { score: attempt.score, passed: Boolean(attempt.passed) };
+  return null;
+}
+
 export const useSubmitQuiz = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -108,7 +129,13 @@ export const useSubmitQuiz = () => {
       }
     },
     onError: (err: unknown) => {
-      toast.error(getErrMsg(err, "Failed to submit quiz."));
+      // 409 ALREADY_SUBMITTED isn't a failure — the recorded result comes
+      // back on `data.attempt` and the quiz screen shows the score.
+      if (quizSubmitAttempt(err)) {
+        toast.info("You've already taken this quiz — here's your result.");
+      } else {
+        toast.error(getErrMsg(err, "Failed to submit quiz."));
+      }
       // A refused submit carries a lock `code` — the gate state has moved on
       // (the sitting closed, they were never marked present), so refetch so
       // the page stops offering a quiz they cannot take.

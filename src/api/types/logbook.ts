@@ -159,3 +159,29 @@ export interface FraudCheckResponse {
     }>;
   };
 }
+
+// ─── Logbook minimums ─────────────────────────────────────────────────────────
+
+/**
+ * A batch duration tier's logbook floor and the student's position against
+ * it — the same shape on the student's progress/dashboard, the supervisor's
+ * evaluation verify report and the quiz lock.
+ *
+ * Counts are DISTINCT curriculum subtopics, never raw entries: ten entries on
+ * one subtopic is one subtopic. A `0` threshold means that gate is off.
+ */
+export interface LogbookTargets {
+  /** Subtopics needing a non-draft entry. */
+  minLogbook: number;
+  /** Subtopics needing an approved entry. Always <= minLogbook. */
+  minLogbookApproved: number;
+  submittedSubtopics: number;
+  approvedSubtopics: number;
+  totalSubtopics: number;
+  minLogbookMet: boolean;
+  minLogbookApprovedMet: boolean;
+  /** false = the tier demands more subtopics than the curriculum has. */
+  reachable: boolean;
+  /** null when the batch has no duration tier — no requirement at all. */
+  source: { _id: string; label: string } | null;
+}

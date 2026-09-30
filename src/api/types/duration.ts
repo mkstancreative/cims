@@ -29,6 +29,13 @@ export interface Duration {
    * never send it.
    */
   label: string;
+  /**
+   * Distinct curriculum SUBTOPICS (not entries) needing a non-draft logbook
+   * entry before a supervisor may evaluate. 0 = no gate (the default).
+   */
+  minLogbook?: number;
+  /** Distinct subtopics needing an APPROVED entry. Always <= minLogbook. */
+  minLogbookApproved?: number;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -41,6 +48,8 @@ export interface DurationRef {
   maxWeeks?: number;
   price?: number;
   label?: string;
+  minLogbook?: number;
+  minLogbookApproved?: number;
 }
 
 export interface PublicDurationListResponse {
@@ -67,6 +76,9 @@ export interface CreateDurationPayload {
   maxWeeks: number;
   price: number;
   sortOrder?: number;
+  /** Whole numbers 0–500. Send both together when changing either. */
+  minLogbook?: number;
+  minLogbookApproved?: number;
 }
 
 /** `isActive` is update-only — reactivating a retired tier is deliberate. */

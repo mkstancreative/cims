@@ -509,6 +509,27 @@ const Register = () => {
                     You are registering for{" "}
                     <strong>{durationLabel(selectedDuration)}</strong>. This is
                     what you will be charged now.
+                    {/* The tier's logbook commitment — distinct subtopics. */}
+                    {(selectedDuration.minLogbook ?? 0) > 0 && (
+                      <>
+                        {" "}
+                        Before you can be evaluated, you'll need logbook
+                        entries on at least{" "}
+                        <strong>
+                          {selectedDuration.minLogbook} curriculum subtopic
+                          {selectedDuration.minLogbook === 1 ? "" : "s"}
+                        </strong>
+                        {(selectedDuration.minLogbookApproved ?? 0) > 0 && (
+                          <>
+                            , with{" "}
+                            <strong>
+                              {selectedDuration.minLogbookApproved} approved
+                            </strong>
+                          </>
+                        )}
+                        .
+                      </>
+                    )}
                   </span>
                   <span className="reg-price__amount">
                     {formatPrice(selectedDuration.price)}

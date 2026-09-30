@@ -1,3 +1,5 @@
+import type { LogbookTargets } from "./logbook";
+
 // ── Student Dashboard API Types ───────────────────────────────────────────────
 
 export interface StudentDashStudent {
@@ -30,6 +32,9 @@ export interface StudentDashSupervisors {
 export interface StudentDashCurriculumProgress {
   totalSubtopics: number;
   approvedSubtopics: number;
+  /** Distinct subtopics with a non-draft entry. Absent on older APIs. */
+  submittedSubtopics?: number;
+  /** Approved-based. */
   percent: number;
 }
 
@@ -38,6 +43,8 @@ export interface StudentDashProgress {
   startDate: string;
   endDate: string;
   curriculum: StudentDashCurriculumProgress;
+  /** The tier's logbook minimum, in SUBTOPICS. Absent on older APIs. */
+  logbookTargets?: LogbookTargets;
 }
 
 export interface StudentDashLogbooks {

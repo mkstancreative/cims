@@ -151,6 +151,24 @@ export default function DurationsTable({
     },
     { header: "Price", render: (row) => formatPrice(row.price) },
     {
+      // Distinct subtopics, not entries. 0 on both = no gate.
+      header: "Logbook minimum",
+      render: (row) => {
+        const logged = row.minLogbook ?? 0;
+        const approved = row.minLogbookApproved ?? 0;
+        if (!logged && !approved)
+          return (
+            <span style={{ color: "var(--color-text-muted)" }}>None</span>
+          );
+        return (
+          <span style={{ fontSize: 12.5 }} title="Distinct curriculum subtopics">
+            <strong>{logged}</strong> logged · <strong>{approved}</strong>{" "}
+            approved
+          </span>
+        );
+      },
+    },
+    {
       header: "Status",
       render: (row) => (
         <StatusBadge status={row.isActive === false ? "inactive" : "active"} />

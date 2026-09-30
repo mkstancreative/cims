@@ -1,3 +1,5 @@
+import type { LogbookTargets } from "./logbook";
+
 // ─── Quiz Types ───────────────────────────────────────────────────────────────
 
 export interface QuizQuestion {
@@ -116,23 +118,34 @@ export interface StudentQuiz {
   passMark: number;
 }
 
+/**
+ * Informational only — the curriculum no longer gates the quiz. Don't frame
+ * it as the thing standing between the student and the paper.
+ */
 export interface MyQuizCurriculumProgress {
   totalSubtopics: number;
   approvedSubtopics: number;
+  /** Distinct subtopics with a non-draft entry. */
+  submittedSubtopics?: number;
   percent: number;
 }
 
 /**
  * Machine-readable lock reason. Branch on this, never on the message text.
  *
- * A student must clear three gates: curriculum complete, a sitting unlocked,
- * and marked present.
+ * The quiz opens once the supervisor has submitted the evaluation AND the
+ * student is marked present in an unlocked sitting. (`CURRICULUM_INCOMPLETE`
+ * is gone — the curriculum no longer gates it.)
  */
 export type QuizLockCode =
-  | "CURRICULUM_INCOMPLETE"
+  /** The supervisor hasn't evaluated yet. Carries `logbookTargets`. */
+  | "EVALUATION_NOT_SUBMITTED"
+  /** The IT is already completed, so the quiz is closed. */
+  | "INTERNSHIP_COMPLETED"
   | "NO_SESSION"
   | "SESSION_NOT_UNLOCKED"
   | "NOT_MARKED_PRESENT"
+  /** Not a lock — a recorded result (409 on submit). Always wins. */
   | "ALREADY_SUBMITTED"
   /** 400 — the internship was closed when a newer one started. */
   | "INTERNSHIP_ABANDONED";
@@ -149,7 +162,10 @@ export interface MyQuizResponse {
     quiz: StudentQuiz | { _id: string; title: string } | null;
     locked?: boolean;
     code?: QuizLockCode;
+    /** Absent on INTERNSHIP_ABANDONED. Informational only. */
     curriculum?: MyQuizCurriculumProgress;
+    /** EVALUATION_NOT_SUBMITTED only — who the student is waiting on. */
+    logbookTargets?: LogbookTargets;
     session?: MyQuizSessionRef | null;
     message?: string;
     alreadySubmitted?: boolean;
@@ -170,7 +186,11 @@ export interface SubmitQuizError {
   success: false;
   message: string;
   code?: QuizLockCode;
-  data?: { curriculum?: MyQuizCurriculumProgress };
+  data?: {
+    curriculum?: MyQuizCurriculumProgress;
+    /** On a 409 ALREADY_SUBMITTED — the recorded result, to show the score. */
+    attempt?: { score?: number; passed?: boolean; [key: string]: unknown };
+  };
 }
 
 export interface SubmitQuizResult {

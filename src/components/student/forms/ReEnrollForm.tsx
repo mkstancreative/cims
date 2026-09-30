@@ -170,7 +170,18 @@ export default function ReEnrollForm({ isOpen, onClose }: ReEnrollFormProps) {
             </select>
             <span className="re-hint">
               {selectedDuration
-                ? `You will be charged ${formatPrice(selectedDuration.price)} for ${durationLabel(selectedDuration)}.`
+                ? `You will be charged ${formatPrice(selectedDuration.price)} for ${durationLabel(selectedDuration)}.${
+                    // The tier's logbook commitment — distinct subtopics.
+                    (selectedDuration.minLogbook ?? 0) > 0
+                      ? ` You'll need logbook entries on at least ${selectedDuration.minLogbook} curriculum subtopic${
+                          selectedDuration.minLogbook === 1 ? "" : "s"
+                        }${
+                          (selectedDuration.minLogbookApproved ?? 0) > 0
+                            ? ` (${selectedDuration.minLogbookApproved} approved)`
+                            : ""
+                        } before you can be evaluated.`
+                      : ""
+                  }`
                 : "You may pick any available period, including one you have done before."}
             </span>
           </div>

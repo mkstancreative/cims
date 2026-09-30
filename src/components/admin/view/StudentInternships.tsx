@@ -225,6 +225,12 @@ function InternshipProgress({
               <dd>{curriculum.approvedSubtopics} / {curriculum.totalSubtopics}</dd>
             </div>
           )}
+          {curriculum?.submittedSubtopics !== undefined && (
+            <div>
+              <dt><BookOpen size={13} /> Subtopics logged</dt>
+              <dd>{curriculum.submittedSubtopics} / {curriculum.totalSubtopics}</dd>
+            </div>
+          )}
           <div>
             <dt><Clock size={13} /> Days remaining</dt>
             <dd>{Math.max(0, progress.daysRemaining ?? 0)}</dd>

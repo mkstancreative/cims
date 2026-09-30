@@ -1,3 +1,5 @@
+import type { LogbookTargets } from "./logbook";
+
 // ─── Evaluation Types ─────────────────────────────────────────────────────────
 
 export interface EvaluationRatings {
@@ -23,15 +25,32 @@ export interface SubmitEvaluationPayload {
 export interface EvaluationCurriculumProgress {
   totalSubtopics: number;
   approvedSubtopics: number;
+  /** Distinct subtopics with at least one non-draft entry. >= approved. */
+  submittedSubtopics?: number;
+  /** Approved-based. */
   percent: number;
 }
+
+/** The shared logbook-minimum shape — see `LogbookTargets`. */
+export type EvaluationLogbookTargets = LogbookTargets;
 
 /** Nothing the supervisor can do — submit stays disabled. */
 export interface EvaluationBlocker {
   kind: "blocker";
-  code: "INTERNSHIP_ABANDONED" | "INVALID_STATUS_TRANSITION" | (string & {});
+  code:
+    | "LOGBOOK_MINIMUM_NOT_MET"
+    | "LOGBOOK_APPROVED_MINIMUM_NOT_MET"
+    | "LOGBOOK_MINIMUM_UNREACHABLE"
+    | "INTERNSHIP_NOT_STARTED"
+    | "INTERNSHIP_ABANDONED"
+    | "INVALID_STATUS_TRANSITION"
+    | (string & {});
   status: number;
   message: string;
+  data?: {
+    curriculum?: EvaluationCurriculumProgress;
+    logbookTargets?: EvaluationLogbookTargets;
+  };
 }
 
 /** A judgement call the supervisor can waive with an acknowledgement flag. */
@@ -44,10 +63,12 @@ export interface EvaluationConfirmation {
   acknowledge: string;
   /** What the supervisor is accepting. Show verbatim. */
   consequence: string;
+  /** The only severity signal — always false. (`forfeitsFinalGrade` is gone.) */
   reversible: false;
-  /** true = confirming forfeits the final grade permanently. */
-  forfeitsFinalGrade: boolean;
-  data?: { curriculum: EvaluationCurriculumProgress };
+  data?: {
+    curriculum?: EvaluationCurriculumProgress;
+    logbookTargets?: EvaluationLogbookTargets;
+  };
 }
 
 /** Advisory only — never refuses anything. */
@@ -57,8 +78,8 @@ export interface EvaluationNotice {
     | "WILL_FINALIZE"
     | "QUIZ_NOT_SCORED"
     | "NO_QUIZ_ASSIGNED"
+    | "NO_CURRICULUM_LINKED"
     | "ALREADY_SUBMITTED"
-    | "INTERNSHIP_NOT_STARTED"
     | (string & {});
   message: string;
   data?: { submittedAt?: string };
@@ -84,6 +105,8 @@ export interface EvaluationVerifyReport {
       batch: { _id: string; name: string; session: string } | null;
     };
     curriculum: EvaluationCurriculumProgress & { remainingSubtopics: number };
+    /** Absent on older APIs. */
+    logbookTargets?: EvaluationLogbookTargets;
     /** `assigned: false` with `scored: true` is valid — a score outlives its quiz. */
     quiz: {
       assigned: boolean;

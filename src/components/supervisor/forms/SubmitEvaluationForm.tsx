@@ -11,8 +11,10 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import CustomModal from "../../ui/CustomModal/CustomModal";
 import { SkeletonLines } from "../../ui/Skeleton/Skeleton";
+import LogbookTargets from "../../shared/LogbookTargets/LogbookTargets";
 import {
   evaluationSubmitError,
   useEvaluationVerify,
@@ -102,16 +104,27 @@ function isPreflightRefusal(err: unknown): boolean {
 
 // ─── Preflight panel ─────────────────────────────────────────────────────────
 
-/** Tone and headline per notice — two of them need someone to act. */
+/** Tone and headline per notice — three of them need someone to act. */
 const NOTICE_META: Record<
   string,
   { tone: "amber" | "teal" | "grey" | "green"; title: string }
 > = {
   ALREADY_SUBMITTED: { tone: "amber", title: "Already submitted" },
   NO_QUIZ_ASSIGNED: { tone: "amber", title: "Needs a coordinator" },
+  NO_CURRICULUM_LINKED: { tone: "amber", title: "Needs a coordinator" },
   WILL_FINALIZE: { tone: "green", title: "This will finalize the grade" },
   QUIZ_NOT_SCORED: { tone: "teal", title: "Waiting on the quiz" },
-  INTERNSHIP_NOT_STARTED: { tone: "grey", title: "Internship not started" },
+};
+
+/**
+ * Who has to act on each blocker. The two logbook minimums are different
+ * people's work; "unreachable" is a configuration problem nobody here can fix.
+ */
+const BLOCKER_OWNER: Record<string, string> = {
+  LOGBOOK_MINIMUM_NOT_MET: "The student needs to log more subtopics.",
+  LOGBOOK_APPROVED_MINIMUM_NOT_MET: "Waiting on your logbook reviews.",
+  LOGBOOK_MINIMUM_UNREACHABLE:
+    "Configuration problem — contact a coordinator. Nobody in this batch can be evaluated until it's fixed.",
 };
 
 function NoticeAlert({ notice }: { notice: EvaluationNotice }) {
@@ -142,7 +155,13 @@ function NoticeAlert({ notice }: { notice: EvaluationNotice }) {
 }
 
 /** Everything a submit would hit, shown before the supervisor fills anything. */
-function PreflightPanel({ report }: { report: EvaluationVerifyReport }) {
+function PreflightPanel({
+  report,
+  onReviewLogbooks,
+}: {
+  report: EvaluationVerifyReport;
+  onReviewLogbooks: () => void;
+}) {
   const { verdict, blockers, confirmations, notices, context } = report;
   return (
     <div className="sef-checks">
@@ -151,29 +170,37 @@ function PreflightPanel({ report }: { report: EvaluationVerifyReport }) {
           <XCircle size={16} />
           <div>
             <strong>This evaluation can't be submitted</strong>
-            {blockers.length === 1 ? (
-              <p>{blockers[0].message}</p>
-            ) : (
-              <ul>
-                {blockers.map((b) => (
-                  <li key={b.code}>{b.message}</li>
-                ))}
-              </ul>
-            )}
+            <ul className="sef-blockers">
+              {blockers.map((b) => (
+                <li key={b.code}>
+                  {b.message}
+                  {BLOCKER_OWNER[b.code] && (
+                    <span className="sef-blockers__owner">
+                      {BLOCKER_OWNER[b.code]}
+                    </span>
+                  )}
+                  {b.code === "LOGBOOK_APPROVED_MINIMUM_NOT_MET" && (
+                    <button
+                      type="button"
+                      className="sef-link"
+                      onClick={onReviewLogbooks}
+                    >
+                      Review their logbooks →
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
 
+      <LogbookTargets targets={report.context.logbookTargets} />
+
       {/* Drive this off confirmWith, not confirmations — when blocked there's
           nothing to confirm even if a judgement call also applies. */}
       {verdict === "needs_confirmation" && report.confirmWith.length > 0 && (
-        <div
-          className={`sef-alert ${
-            confirmations.some((c) => c.forfeitsFinalGrade)
-              ? "sef-alert--red"
-              : "sef-alert--amber"
-          }`}
-        >
+        <div className="sef-alert sef-alert--amber">
           <ShieldAlert size={16} />
           <div>
             <strong>Needs your confirmation</strong>
@@ -208,16 +235,16 @@ function PreflightPanel({ report }: { report: EvaluationVerifyReport }) {
 // ─── Confirmation step ───────────────────────────────────────────────────────
 
 /**
- * The irreversible part. Shows each consequence verbatim; when it forfeits
- * the final grade the step turns red and names what's abandoned. Each
- * acknowledgement flag is its own checkbox — never a default-focused OK.
+ * The irreversible part. Shows each consequence verbatim, names the subtopics
+ * that can never be approved, and says what it does NOT cost — supervisors
+ * reasonably assume the quiz and grade are lost; they aren't. Each
+ * acknowledgement flag is its own checkbox, never a default-focused OK.
  */
 function ConfirmStep({
   report,
   acked,
   onAck,
   allAcked,
-  severe,
   busy,
   onBack,
   onConfirm,
@@ -226,41 +253,57 @@ function ConfirmStep({
   acked: Record<string, boolean>;
   onAck: (flag: string, value: boolean) => void;
   allAcked: boolean;
-  severe: boolean;
   busy: boolean;
   onBack: () => void;
   onConfirm: () => void;
 }) {
-  const { curriculum, student } = report.context;
+  const { curriculum, wouldFinalize } = report.context;
+  const remaining = curriculum.remainingSubtopics;
   return (
     <div className="sef-confirm">
       {report.confirmations.map((c) => (
-        <section
-          key={c.code}
-          className={`sef-conseq${c.forfeitsFinalGrade ? " sef-conseq--severe" : ""}`}
-        >
+        <section key={c.code} className="sef-conseq">
           <p className="sef-conseq__head">
             <ShieldAlert size={16} />
-            {c.forfeitsFinalGrade
-              ? "This permanently forfeits the final grade"
-              : "This can't be undone"}
+            This can't be undone
           </p>
           <p className="sef-conseq__msg">{c.message}</p>
           <p className="sef-conseq__text">{c.consequence}</p>
           {c.code === "CURRICULUM_INCOMPLETE" && (
-            <div className="sef-conseq__stats">
-              <span>
-                Curriculum: <strong>{curriculum.percent}%</strong> (
-                {curriculum.approvedSubtopics}/{curriculum.totalSubtopics})
-              </span>
-              <span>
-                Never approvable:{" "}
-                <strong>
-                  {curriculum.remainingSubtopics} subtopic
-                  {curriculum.remainingSubtopics === 1 ? "" : "s"}
-                </strong>
-              </span>
-            </div>
+            <>
+              <div className="sef-conseq__stats">
+                <span>
+                  Curriculum: <strong>{curriculum.percent}%</strong> (
+                  {curriculum.approvedSubtopics}/{curriculum.totalSubtopics}{" "}
+                  approved)
+                </span>
+                <span>
+                  Can never be approved:{" "}
+                  <strong>
+                    {remaining} subtopic{remaining === 1 ? "" : "s"}
+                  </strong>
+                </span>
+              </div>
+              <ul className="sef-keeps">
+                {wouldFinalize ? (
+                  <li>
+                    <CheckCircle2 size={13} /> Their quiz is already scored —
+                    submitting produces the final grade now.
+                  </li>
+                ) : (
+                  <>
+                    <li>
+                      <CheckCircle2 size={13} /> Their quiz still opens —
+                      submitting is what unlocks it, once attendance is taken.
+                    </li>
+                    <li>
+                      <CheckCircle2 size={13} /> Their final grade still arrives
+                      when the quiz is scored.
+                    </li>
+                  </>
+                )}
+              </ul>
+            </>
           )}
         </section>
       ))}
@@ -268,7 +311,9 @@ function ConfirmStep({
       {report.notices
         .filter(
           (n) =>
-            n.code === "ALREADY_SUBMITTED" || n.code === "NO_QUIZ_ASSIGNED",
+            n.code === "ALREADY_SUBMITTED" ||
+            n.code === "NO_QUIZ_ASSIGNED" ||
+            n.code === "NO_CURRICULUM_LINKED",
         )
         .map((n) => (
           <NoticeAlert key={n.code} notice={n} />
@@ -285,8 +330,10 @@ function ConfirmStep({
               disabled={busy}
             />
             <span>
-              {c?.forfeitsFinalGrade
-                ? `I understand that ${student.name ?? "this student"} will never receive a final grade for this internship, and I want to submit anyway.`
+              {c?.code === "CURRICULUM_INCOMPLETE"
+                ? `I understand ${remaining} subtopic${
+                    remaining === 1 ? "" : "s"
+                  } can never be approved after this, and I want to submit anyway.`
                 : "I understand this can't be undone, and I want to submit anyway."}
             </span>
           </label>
@@ -304,7 +351,7 @@ function ConfirmStep({
         </button>
         <button
           type="button"
-          className={`modal-submit${severe ? " sef-danger" : ""}`}
+          className="modal-submit"
           disabled={!allAcked || busy}
           onClick={onConfirm}
           style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
@@ -377,6 +424,7 @@ export default function SubmitEvaluationForm({
   /** Acknowledgement flags the supervisor has ticked. */
   const [acked, setAcked] = useState<Record<string, boolean>>({});
   const [checking, setChecking] = useState(false);
+  const navigate = useNavigate();
 
   const verifyParams = internshipId ? { internshipId } : undefined;
   const {
@@ -485,9 +533,6 @@ export default function SubmitEvaluationForm({
   // the preflight isn't available, so the form falls back to plain submit.
   const verifyFailed = !report && isPreflightRefusal(verifyError);
   const submitDisabled = busy || verifying || blocked || verifyFailed;
-  const severe = (report?.confirmations ?? []).some(
-    (c) => c.forfeitsFinalGrade,
-  );
 
   return (
     <CustomModal
@@ -506,7 +551,6 @@ export default function SubmitEvaluationForm({
           acked={acked}
           onAck={(flag, v) => setAcked((a) => ({ ...a, [flag]: v }))}
           allAcked={allAcked}
-          severe={severe}
           busy={busy}
           onBack={() => setStep("form")}
           onConfirm={handleConfirmedSubmit}
@@ -530,7 +574,13 @@ export default function SubmitEvaluationForm({
               </div>
             </div>
           ) : report ? (
-            <PreflightPanel report={report} />
+            <PreflightPanel
+              report={report}
+              onReviewLogbooks={() => {
+                handleClose();
+                navigate(`/supervisor/students/${studentId}/logbooks`);
+              }}
+            />
           ) : null}
 
           {/* Total score preview */}
@@ -644,7 +694,6 @@ export default function SubmitEvaluationForm({
         .sef-alert--green{--sef-rgb:22,163,74}
         .sef-confirm{display:flex;flex-direction:column;gap:16px}
         .sef-conseq{padding:14px 16px;border-radius:12px;border:1px solid rgba(var(--sef-rgb),.35);background:rgba(var(--sef-rgb),.07);--sef-rgb:202,138,4}
-        .sef-conseq--severe{--sef-rgb:220,38,38;border-width:1.5px}
         .sef-conseq__head{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:14px;font-weight:700;color:rgb(var(--sef-rgb))}
         .sef-conseq__msg{margin:0 0 8px;font-size:13px;color:var(--color-text-secondary);line-height:1.5}
         .sef-conseq__text{margin:0;font-size:13.5px;font-weight:600;line-height:1.55;color:var(--color-text-primary)}
@@ -652,10 +701,16 @@ export default function SubmitEvaluationForm({
         .sef-conseq__stats strong{color:var(--color-text-primary)}
         .sef-ack{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-bg-secondary);font-size:13px;line-height:1.5;color:var(--color-text-primary);cursor:pointer}
         .sef-ack input{flex-shrink:0;width:17px;height:17px;margin:2px 0 0;accent-color:#dc2626;cursor:pointer}
-        .modal-submit.sef-danger{background:#dc2626;border-color:#dc2626}
-        .modal-submit.sef-danger:hover:not(:disabled){background:#b91c1c}
+        .sef-keeps{display:flex;flex-direction:column;gap:4px;margin:10px 0 0;padding:0;list-style:none;font-size:12.5px;color:var(--color-text-secondary)}
+        .sef-keeps li{display:flex;align-items:flex-start;gap:6px}
+        .sef-keeps svg{flex-shrink:0;margin-top:2px;color:#16a34a}
+        .sef-blockers{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+        .sef-blockers__owner{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--color-text-primary)}
+        .sef-link{display:inline-block;margin-top:4px;padding:0;border:none;background:none;font:inherit;font-size:12.5px;font-weight:700;color:var(--color-accent);cursor:pointer}
+        .sef-link:hover{text-decoration:underline}
+        .sef-link:focus,.sef-link:active{border:none}
         [data-theme="dark"] .sef-alert--amber,[data-theme="dark"] .sef-conseq{--sef-rgb:250,204,21}
-        [data-theme="dark"] .sef-alert--red,[data-theme="dark"] .sef-conseq--severe{--sef-rgb:248,113,113}
+        [data-theme="dark"] .sef-alert--red{--sef-rgb:248,113,113}
       `}</style>
     </CustomModal>
   );

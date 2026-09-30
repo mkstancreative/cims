@@ -206,6 +206,19 @@ export default function BatchViewModal({
                     : "Not set"}
                 </dd>
               </div>
+              {/* The thresholds in force for this cohort — from the tier. */}
+              <div>
+                <dt>Logbook minimum</dt>
+                <dd>
+                  {batch.duration &&
+                  ((batch.duration.minLogbook ?? 0) > 0 ||
+                    (batch.duration.minLogbookApproved ?? 0) > 0)
+                    ? `${batch.duration.minLogbook ?? 0} subtopics logged · ${
+                        batch.duration.minLogbookApproved ?? 0
+                      } approved`
+                    : "None"}
+                </dd>
+              </div>
               <div>
                 <dt>Placement period</dt>
                 <dd>{batch.itPeriod?.name || "—"}</dd>

@@ -15,6 +15,7 @@ import { NotificationsSection } from "../../components/student/dashboard/Notific
 import { PaymentRequiredPanel } from "../../components/student/dashboard/PaymentRequiredPanel";
 import { EnrolmentPendingPanel } from "../../components/student/dashboard/EnrolmentPendingPanel";
 import { AbandonedNotice } from "../../components/student/dashboard/AbandonedNotice";
+import LogbookTargets from "../../components/shared/LogbookTargets/LogbookTargets";
 import { fmt, ago } from "../../helpers/utilities";
 import {
   apiErrorMessage,
@@ -141,6 +142,14 @@ export default function DashBoardStudent() {
           evaluation={evaluation}
         />
       </div>
+
+      {/* The tier's minimum counts SUBTOPICS — the cards above count entries.
+          Nothing renders when the batch has no requirement. */}
+      <LogbookTargets
+        targets={progress.logbookTargets}
+        title="Logbook requirement"
+        unreachableNote="Your batch asks for more logbook subtopics than its curriculum has, so it can't be met yet. Please let your coordinator know."
+      />
 
       <ProgressSection
         progress={progress}

@@ -13,23 +13,30 @@ import {
   ClipboardCheck,
   UserX,
   Archive,
+  Hourglass,
 } from "lucide-react";
-import { useMyQuiz, useSubmitQuiz } from "../../hooks/useQuizzes";
+import { Link } from "react-router-dom";
+import {
+  quizSubmitAttempt,
+  useMyQuiz,
+  useSubmitQuiz,
+} from "../../hooks/useQuizzes";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import type {
-  MyQuizCurriculumProgress,
   MyQuizSessionRef,
   QuizLockCode,
   StudentQuiz,
 } from "../../api/types/quiz";
 import { SkeletonCard } from "../../components/ui/Skeleton/Skeleton";
+import LogbookTargets from "../../components/shared/LogbookTargets/LogbookTargets";
+import type { LogbookTargets as LogbookTargetsData } from "../../api/types/logbook";
 import "./MyQuiz.css";
 
 /**
- * Copy per lock reason. A student must clear three gates: curriculum
- * complete, a sitting unlocked, and marked present. Branching on `code`
- * rather than message text is what makes these distinguishable — several are
- * waiting states, not failures.
+ * Copy per lock reason. The quiz opens once the supervisor has submitted the
+ * evaluation and the student is marked present in an unlocked sitting —
+ * curriculum progress no longer gates it. Branching on `code` rather than
+ * message text keeps waiting states apart from failures.
  */
 const LOCK_STATES: Record<
   QuizLockCode,
@@ -38,52 +45,124 @@ const LOCK_STATES: Record<
     tone: "amber" | "accent";
     title: string;
     body: string;
-    showProgress: boolean;
   }
 > = {
-  CURRICULUM_INCOMPLETE: {
-    icon: <Lock size={30} />,
-    tone: "amber",
-    title: "Quiz Locked",
-    body: "You need to complete more of your curriculum before the quiz unlocks. Keep working through your approved subtopics.",
-    showProgress: true,
+  EVALUATION_NOT_SUBMITTED: {
+    icon: <Hourglass size={30} />,
+    tone: "accent",
+    title: "Waiting for Your Evaluation",
+    body: "Your supervisor hasn't submitted your evaluation yet. Your quiz opens once they have and you've been marked present for your batch's sitting.",
+  },
+  INTERNSHIP_COMPLETED: {
+    icon: <CheckCircle size={30} />,
+    tone: "accent",
+    title: "Internship Completed",
+    body: "Your IT is already completed, so this quiz is closed.",
   },
   NO_SESSION: {
     icon: <Clock size={30} />,
     tone: "accent",
     title: "Waiting for Your Sitting",
     body: "Your quiz sitting hasn't been opened yet. There is nothing for you to do — your supervisor will open it and take attendance when it is time.",
-    showProgress: false,
   },
   SESSION_NOT_UNLOCKED: {
     icon: <ClipboardCheck size={30} />,
     tone: "accent",
     title: "Attendance Is Being Taken",
     body: "Your sitting is open and attendance is being taken. The quiz will appear here as soon as it is unlocked.",
-    showProgress: false,
   },
   NOT_MARKED_PRESENT: {
     icon: <UserX size={30} />,
     tone: "amber",
     title: "Not Marked Present",
     body: "You were not marked present for this quiz sitting, so the quiz is not open to you. Speak to your supervisor if you were in the room.",
-    showProgress: false,
   },
   ALREADY_SUBMITTED: {
     icon: <Award size={30} />,
     tone: "accent",
     title: "Already Submitted",
     body: "You have already taken this quiz. There is one attempt per student.",
-    showProgress: false,
   },
   INTERNSHIP_ABANDONED: {
     icon: <Archive size={30} />,
     tone: "accent",
     title: "Internship Closed",
     body: "This internship was closed when your newer one started, so its quiz is no longer available. Your quiz will be on your current internship.",
-    showProgress: false,
   },
 };
+
+/** Any code this screen doesn't know yet — the server's message says why. */
+const UNKNOWN_LOCK = {
+  icon: <Lock size={30} />,
+  tone: "amber" as const,
+  title: "Quiz Locked",
+  body: "Your quiz isn't open yet.",
+};
+
+/**
+ * On the "waiting for your evaluation" lock, say WHO the student is waiting
+ * on — themselves, their supervisor's approvals, or the evaluation itself —
+ * from the tier's logbook floor. Without it both sides see "waiting on the
+ * other".
+ */
+function WaitingOn({ targets }: { targets?: LogbookTargetsData }) {
+  const hasGate =
+    targets?.source &&
+    (targets.minLogbook > 0 || targets.minLogbookApproved > 0);
+  if (!targets || !hasGate) return null;
+
+  if (!targets.reachable) {
+    return (
+      <div className="mq-waiting">
+        <LogbookTargets
+          targets={targets}
+          title="Logbook requirement"
+          unreachableNote="Your batch asks for more logbook subtopics than its curriculum has, so it can't be met yet. Please let your coordinator know."
+        />
+      </div>
+    );
+  }
+
+  const step = !targets.minLogbookMet
+    ? {
+        tone: "amber",
+        who: "You",
+        text: `Log entries on ${
+          targets.minLogbook - targets.submittedSubtopics
+        } more curriculum subtopic${
+          targets.minLogbook - targets.submittedSubtopics === 1 ? "" : "s"
+        } — your supervisor can't evaluate you until you reach ${targets.minLogbook}.`,
+        action: true,
+      }
+    : !targets.minLogbookApprovedMet
+      ? {
+          tone: "accent",
+          who: "Your supervisor",
+          text: "You've logged enough subtopics. Your supervisor still needs to approve some of your entries before they can evaluate you.",
+          action: false,
+        }
+      : {
+          tone: "accent",
+          who: "Your supervisor",
+          text: "Your logbook requirement is met. Your supervisor just needs to submit your evaluation.",
+          action: false,
+        };
+
+  return (
+    <div className="mq-waiting">
+      <p className={`mq-waiting__who mq-waiting__who--${step.tone}`}>
+        <strong>Waiting on: {step.who}</strong>
+        <span>{step.text}</span>
+      </p>
+      <LogbookTargets targets={targets} title="Logbook requirement" />
+      {step.action && (
+        <Link to="/student/logbook" className="mq-waiting__link">
+          Go to my log book →
+        </Link>
+      )}
+    </div>
+  );
+}
 
 /** The lock code and message on a refused `GET /quizzes/my`, if any. */
 function quizErrorLock(
@@ -100,20 +179,16 @@ function quizErrorLock(
 // ─── Locked state ─────────────────────────────────────────────────────────────
 function LockedCard({
   code,
-  curriculum,
   session,
   message,
+  logbookTargets,
 }: {
   code?: QuizLockCode;
-  curriculum?: MyQuizCurriculumProgress;
   session?: MyQuizSessionRef | null;
   message?: string;
+  logbookTargets?: LogbookTargetsData;
 }) {
-  const percent = curriculum?.percent ?? 0;
-  // An unrecognised or absent code falls back to the curriculum copy, which is
-  // what the only lock reason used to be.
-  const state = LOCK_STATES[code ?? "CURRICULUM_INCOMPLETE"] ??
-    LOCK_STATES.CURRICULUM_INCOMPLETE;
+  const state = (code && LOCK_STATES[code]) || UNKNOWN_LOCK;
 
   return (
     <div className="mq-center-panel">
@@ -129,22 +204,8 @@ function LockedCard({
           </p>
         )}
 
-        {state.showProgress && curriculum && (
-          <div className="mq-progress-wrap">
-            <div className="mq-progress-label">
-              <span>Curriculum Progress</span>
-              <span>
-                {curriculum.approvedSubtopics}/{curriculum.totalSubtopics} approved
-              </span>
-            </div>
-            <div className="mq-progress-track">
-              <div
-                className="mq-progress-fill"
-                style={{ width: `${Math.min(percent, 100)}%` }}
-              />
-            </div>
-            <div className="mq-progress-pct">{percent}%</div>
-          </div>
+        {code === "EVALUATION_NOT_SUBMITTED" && (
+          <WaitingOn targets={logbookTargets} />
         )}
       </div>
     </div>
@@ -250,7 +311,14 @@ function ResultCard({ score, passed }: { score: number; passed: boolean }) {
 // ─── Quiz form ────────────────────────────────────────────────────────────────
 function QuizForm({ quiz }: { quiz: StudentQuiz }) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const { mutate: submit, isPending, data: result } = useSubmitQuiz();
+  const {
+    mutate: submit,
+    isPending,
+    data: result,
+    error: submitError,
+  } = useSubmitQuiz();
+  // A duplicate submit (409) still carries the recorded result.
+  const priorAttempt = quizSubmitAttempt(submitError);
 
   const questions = quiz.questions ?? [];
   const allAnswered =
@@ -268,6 +336,11 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
 
   if (result?.data) {
     return <ResultCard score={result.data.score} passed={result.data.passed} />;
+  }
+  if (priorAttempt) {
+    return (
+      <ResultCard score={priorAttempt.score} passed={priorAttempt.passed} />
+    );
   }
 
   return (
@@ -377,7 +450,7 @@ export default function MyQuiz() {
       ) : quizData.locked || !quizData.quiz ? (
         <LockedCard
           code={quizData.code}
-          curriculum={quizData.curriculum}
+          logbookTargets={quizData.logbookTargets}
           session={quizData.session}
           message={quizData.message}
         />

@@ -225,6 +225,9 @@ export interface UpdateStatusApiResult {
 export interface ProgressCurriculum {
   totalSubtopics: number;
   approvedSubtopics: number;
+  /** Distinct subtopics with a non-draft entry. Absent on older APIs. */
+  submittedSubtopics?: number;
+  /** Approved-based. */
   percent: number;
 }
 
