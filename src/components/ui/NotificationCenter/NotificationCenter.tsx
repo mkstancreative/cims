@@ -5,6 +5,7 @@ import "./NotificationCenter.css";
 import { useNotifications } from "../../../context";
 import type { Notification } from "../../../api/types/notifications";
 import { Bell, Check, CheckCheck, Trash2, XCircle } from "lucide-react";
+import { SkeletonRows } from "../Skeleton/Skeleton";
 import { categoryIcon, categoryLabel } from "../../../helpers/notifications";
 
 function formatDate(dateString: string) {
@@ -154,9 +155,7 @@ export const NotificationCenter: React.FC<{ onClose?: () => void }> = ({
       {/* ── List ── */}
       <div className="nc-list" ref={listRef}>
         {isLoading && notifications.length === 0 && (
-          <div className="nc-loading">
-            <span className="nc-spinner" /> Loading…
-          </div>
+          <SkeletonRows rows={4} label="Loading notifications" />
         )}
 
         {error && notifications.length === 0 && (

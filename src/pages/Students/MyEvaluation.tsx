@@ -1,8 +1,8 @@
 import { ClipboardCheck, MessageSquare } from "lucide-react";
 import { useMyEvaluation } from "../../hooks/useEvaluations";
-import Spinner from "../../components/ui/Spinner/Spinner";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import { GradeBadge } from "../../components/shared/dashboard/DashboardKit";
+import { SkeletonCards } from "../../components/ui/Skeleton/Skeleton";
 import type { EvaluationRatings } from "../../api/types/evaluation";
 
 const RATING_LABELS: Record<keyof EvaluationRatings, string> = {
@@ -117,21 +117,15 @@ export default function MyEvaluation() {
       </div>
 
       {isLoading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: 60 }}>
-          <Spinner
-            size={28}
-            color="var(--color-accent)"
-            text="Loading evaluation…"
-          />
-        </div>
+        <SkeletonCards cards={2} lines={3} label="Loading evaluation" />
       ) : !hasEvaluation ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: 60,
-            color: "var(--color-text-muted)",
-          }}
-        >
+        <div className="me-empty">
+          {/* White card in light mode, like the rest of the page's cards;
+              dark mode keeps it on the page background. */}
+          <style>{`
+            .me-empty{text-align:center;padding:60px;border:1px solid var(--color-border);border-radius:14px;background:var(--color-bg-secondary);box-shadow:0 1px 6px rgba(0,0,0,.04);color:var(--color-text-muted)}
+            [data-theme="dark"] .me-empty{border-color:transparent;background:none;box-shadow:none}
+          `}</style>
           <ClipboardCheck
             size={40}
             style={{ opacity: 0.4, marginBottom: 12 }}

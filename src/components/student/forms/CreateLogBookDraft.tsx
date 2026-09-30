@@ -10,6 +10,7 @@ import type {
 } from "../../../api/types/logbook";
 import type { Curriculum } from "../../../api/types/curriculum";
 import { BookOpen, Pencil } from "lucide-react";
+import { SkeletonLines } from "../../ui/Skeleton/Skeleton";
 import "./CreateLogBookDraft.css";
 
 // ─── Blank entry factory ────────────────────────────────────────────────────
@@ -64,14 +65,11 @@ export default function CreateLogBookDraft({
         isOpen={isOpen}
         onClose={onClose}
         title={isEdit ? `Edit Logbook Entry` : "New Logbook Entry"}
-        subtitle="Loading entry…"
+        subtitle={isEdit ? "Update your logbook activity" : "Record a clinical logbook activity"}
         icon={<Pencil size={16} />}
         size="medium"
       >
-        <div className="lb-loading">
-          <span className="lb-loading-spinner" />
-          Loading entry…
-        </div>
+        <SkeletonLines lines={5} label="Loading entry" />
       </CustomModal>
     );
   }

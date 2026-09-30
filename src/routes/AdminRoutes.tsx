@@ -1,9 +1,9 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
-import Spinner from "../components/ui/Spinner/Spinner";
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 import DashBoardAdmin from "../pages/Admin/DashBoardAdmin";
 import Notifications from "../pages/Shared/Notifications";
+import PageLoader from "../components/ui/PageLoader/PageLoader";
 import UnAssignedStudents from "../pages/Admin/UnAssignedStudents";
 
 const Batches = lazy(() => import("../pages/Admin/Batches"));
@@ -34,22 +34,7 @@ function StudentProgressRedirect() {
 export default function AdminRoutes() {
   return (
     <Suspense
-      fallback={
-        <div
-          style={{
-            height: "60vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Spinner
-            size={30}
-            color="var(--color-accent)"
-            text="Loading module..."
-          />
-        </div>
-      }
+      fallback={<PageLoader inline label="Loading page…" />}
     >
       <Routes>
         <Route index element={<Navigate to="dashboard" replace />} />

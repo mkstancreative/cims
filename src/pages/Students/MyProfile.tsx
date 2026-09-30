@@ -1,4 +1,4 @@
-import { useState, useRef, type FormEvent } from "react";
+import { useId, useState, useRef, type FormEvent } from "react";
 import {
   User,
   Camera,
@@ -7,6 +7,7 @@ import {
   UserCheck,
   ShieldCheck,
   IdCard,
+  ChevronDown,
 } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { useGetMe } from "../../hooks/useAuth";
@@ -19,6 +20,7 @@ import type { UpdateStudentProfilePayload } from "../../api/types/itstudent";
 import "./MyProfile.css";
 import { formatDate } from "../../helpers/utilities";
 import AddButton from "../../components/ui/AddButton/AddButton";
+import { SkeletonCard, SkeletonCards } from "../../components/ui/Skeleton/Skeleton";
 import InternshipStatusBadge from "../../components/ui/StatusBadge/InternshipStatusBadge";
 
 function InfoRow({
@@ -36,22 +38,60 @@ function InfoRow({
   );
 }
 
+// Remembers which profile cards the student folded away.
+const sectionKey = (title: string) => `myProfile.section.${title}`;
+
+// The student's own choice wins; `fallback` applies until they toggle it.
+const readSectionOpen = (title: string, fallback: boolean) => {
+  try {
+    const saved = localStorage.getItem(sectionKey(title));
+    return saved === null ? fallback : saved === "true";
+  } catch {
+    return fallback;
+  }
+};
+
+/** A card section whose header folds its body away. Closed by default. */
 function Section({
   icon,
   title,
+  defaultOpen = false,
   children,
 }: {
   icon: React.ReactNode;
   title: string;
+  defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(() => readSectionOpen(title, defaultOpen));
+  const bodyId = useId();
+
+  const toggle = () =>
+    setOpen((o) => {
+      try {
+        localStorage.setItem(sectionKey(title), String(!o));
+      } catch {
+        // Storage blocked — the toggle still works for this visit.
+      }
+      return !o;
+    });
+
   return (
-    <div className="mp-section-block">
-      <div className="mp-section-header">
+    <div className={`mp-section-block${open ? "" : " is-collapsed"}`}>
+      <button
+        type="button"
+        className="mp-section-header"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-controls={bodyId}
+      >
         {icon}
         <span className="mp-section-title">{title}</span>
+        <ChevronDown size={16} className="mp-section-chevron" />
+      </button>
+      <div id={bodyId} className="mp-section-body" inert={!open}>
+        <div className="mp-section-body__inner">{children}</div>
       </div>
-      {children}
     </div>
   );
 }
@@ -241,7 +281,10 @@ export default function MyProfile() {
         </div>
 
         {isLoading ? (
-          <div className="mp-loading">Loading profile…</div>
+          <div className="mp-grid">
+            <SkeletonCard lines={6} label="Loading profile" />
+            <SkeletonCards cards={3} lines={3} label="Loading profile" />
+          </div>
         ) : (
           <div className="mp-grid">
             {/* ── LEFT: Identity Card ── */}
@@ -357,6 +400,7 @@ export default function MyProfile() {
                 <Section
                   icon={<IdCard size={15} />}
                   title="Personal Details"
+                  defaultOpen
                 >
                   <div className="mp-info-list">
                     <InfoRow label="Gender" value={profile?.gender} />

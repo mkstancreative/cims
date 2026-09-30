@@ -1,0 +1,157 @@
+/* ─── Skeleton loaders ──────────────────────────────────────────────────────
+   Light mode: white cards like the ones they stand in for, with slate
+   placeholder bars and a soft shimmer. Dark mode: the faint overlay. */
+
+/* Always full width: the bars inside have % widths, so a card left to size
+   itself (e.g. centred with auto margins) would collapse to nothing. */
+.skel-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-bg-secondary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.skel-card--header {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+}
+
+.skel-stack,
+.skel-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.skel-page {
+  gap: 20px;
+}
+
+.skel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.skel-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+}
+
+.skel-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.skel-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.skel-row + .skel-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.skel-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Placeholder bars */
+.skel {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(var(--color-slate-rgb), 0.11);
+}
+
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skel-shimmer 1.4s ease-in-out infinite;
+}
+
+.skel-title {
+  width: 38%;
+  height: 14px;
+}
+
+.skel-line {
+  height: 11px;
+}
+
+.skel-line--sm {
+  width: 45%;
+  height: 9px;
+}
+
+.skel-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.skel-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+@keyframes skel-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Dark mode */
+[data-theme="dark"] .skel-card {
+  border-color: transparent;
+  background: var(--color-surface-overlay);
+  box-shadow: none;
+}
+
+[data-theme="dark"] .skel {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .skel::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skel::after {
+    animation: none;
+  }
+}

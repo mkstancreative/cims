@@ -157,6 +157,13 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Loading — sized like the quiz cards, so nothing jumps */
+.mq-loading {
+  width: 100%;
+  max-width: 560px;
+  padding: 32px;
+}
+
 .mq-icon-wrap {
   width: 72px;
   height: 72px;

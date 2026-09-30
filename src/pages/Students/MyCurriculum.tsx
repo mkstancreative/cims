@@ -7,7 +7,7 @@ import {
   Layers,
 } from "lucide-react";
 import { useMyCurriculum } from "../../hooks/useCurriculum";
-import Spinner from "../../components/ui/Spinner/Spinner";
+import { SkeletonCards } from "../../components/ui/Skeleton/Skeleton";
 import type { Curriculum, Topic } from "../../api/types/curriculum";
 
 function TopicRow({ topic, position }: { topic: Topic; position: number }) {
@@ -225,15 +225,7 @@ export default function MyCurriculum() {
       </div>
 
       {isLoading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: 60,
-          }}
-        >
-          <Spinner size={28} color="var(--color-accent)" text="Loading curriculum…" />
-        </div>
+        <SkeletonCards cards={3} lines={3} label="Loading curriculum" />
       ) : curricula.length === 0 ? (
         <div
           style={{

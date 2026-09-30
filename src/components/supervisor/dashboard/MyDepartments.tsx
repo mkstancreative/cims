@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AlertTriangle, ChevronLeft, ChevronRight, ClipboardList } from "lucide-react";
 import { SectionHead } from "../../shared/dashboard/DashboardKit";
 import { useMyDepartments } from "../../../hooks/useSchoolSupervisor";
+import { SkeletonRows } from "../../ui/Skeleton/Skeleton";
 import "./MyDepartments.css";
 
 const LIMIT = 20;
@@ -35,7 +36,7 @@ export default function MyDepartments() {
 
       <div className="md-card">
         {isLoading ? (
-          <p className="md-note">Loading departments…</p>
+          <SkeletonRows rows={3} label="Loading departments" />
         ) : errorStatus(error) === 404 ? (
           <p className="md-note">
             Your supervisor account isn't fully set up yet. Contact an

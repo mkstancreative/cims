@@ -74,9 +74,10 @@ export interface LogBook {
 /** One row in the GET /logbooks list response. */
 export interface LogBookListItem {
   _id: string;
-  curriculum: string;
-  topic: string;
-  subtopic: string;
+  /** `GET /logbooks` sends these populated; kept loose for older shapes. */
+  curriculum: string | LogBookCurriculumRef;
+  topic: string | LogBookTopicRef;
+  subtopic: string | LogBookSubtopicRef;
   notes: string;
   hoursSpent: number;
   date: string;

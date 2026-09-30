@@ -14,6 +14,7 @@ import type { Batch } from "../../../api/types/batch";
 import { formatDateTime } from "../../../helpers/utilities";
 import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import "./BatchForm.css";
+import { SkeletonLines } from "../../ui/Skeleton/Skeleton";
 import "./BatchAnnouncementForm.css";
 
 interface BatchAnnouncementFormProps {
@@ -206,7 +207,7 @@ export default function BatchAnnouncementForm({
         <div className="section-title-divider">Sent history</div>
 
         {loadingHistory ? (
-          <div className="ba-empty">Loading…</div>
+          <SkeletonLines lines={3} label="Loading sent announcements" />
         ) : sends.length === 0 ? (
           <div className="ba-empty">
             No announcements have been sent to this batch yet.

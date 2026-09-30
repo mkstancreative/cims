@@ -1,0 +1,168 @@
+/* ─── Page loader ────────────────────────────────────────────────────────── */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--page-bg, var(--color-bg-primary));
+  animation: page-loader-in 0.2s ease-out;
+}
+
+/* Inside a layout: fill the content area, keep the sidebar and top bar */
+.page-loader--inline {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  min-height: 60vh;
+  background: none;
+}
+
+/* Indeterminate progress bar along the top */
+.page-loader__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(var(--color-primary-rgb), 0.08);
+}
+
+.page-loader--inline .page-loader__bar {
+  position: fixed;
+  z-index: 1500;
+}
+
+.page-loader__bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  border-radius: 0 3px 3px 0;
+  background: var(--gradient-brand-h, var(--color-accent));
+  animation: page-loader-bar 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.page-loader__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Logo in a spinning gradient ring */
+.page-loader__ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+}
+
+.page-loader__ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 4px;
+  /* Brand sweep: clay tail into the accent head */
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(var(--color-secondary-rgb), 0.35) 80deg,
+    var(--color-secondary) 200deg,
+    var(--color-accent) 320deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: page-loader-spin 0.9s linear infinite;
+}
+
+/* Soft halo that breathes behind the logo */
+.page-loader__ring::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+  box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.12);
+  animation: page-loader-pulse 1.8s ease-in-out infinite;
+}
+
+/* The logo is dark line art — keep its disc light in dark mode too */
+[data-theme="dark"] .page-loader__ring::after {
+  background: #f4efec;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.page-loader__logo {
+  position: relative;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.page-loader__label {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+}
+
+@keyframes page-loader-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes page-loader-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes page-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes page-loader-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-loader,
+  .page-loader__ring::after {
+    animation: none;
+  }
+  .page-loader__ring::before {
+    animation-duration: 2.4s;
+  }
+  .page-loader__bar::before {
+    animation-duration: 2.6s;
+  }
+}

@@ -230,29 +230,3 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* ── Edit / loading state ───────────────────────────────────────────────────── */
-.lb-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 60px 20px;
-  font-size: 14px;
-  color: var(--color-text-muted);
-  font-family: var(--font-sans);
-}
-.lb-loading-spinner {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--color-border);
-  border-top-color: var(--color-accent);
-  border-radius: 50%;
-  animation: lb-spin 0.7s linear infinite;
-  flex-shrink: 0;
-}
-@keyframes lb-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}

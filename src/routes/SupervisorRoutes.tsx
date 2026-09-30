@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Spinner from "../components/ui/Spinner/Spinner";
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 
 import AssignedStudents from "../pages/Supervisors/AssignedStudents";
@@ -8,6 +7,7 @@ import DashBoardSupervisor from "../pages/Supervisors/DashBoardSupervisor";
 import StudentLogBooks from "../pages/Supervisors/StudentLogBooks";
 import AssignedStudentLogBookView from "../components/supervisor/views/AssignedStudentLogBookView";
 import StudentsEvaluations from "../pages/Supervisors/StudentsEvaluations";
+import PageLoader from "../components/ui/PageLoader/PageLoader";
 import Notifications from "../pages/Shared/Notifications";
 
 // Attendance is run by admin, coordinator, or the batch's own supervisor —
@@ -18,22 +18,7 @@ const RollCall = lazy(() => import("../pages/Shared/RollCall"));
 export default function SupervisorRoutes() {
   return (
     <Suspense
-      fallback={
-        <div
-          style={{
-            height: "60vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Spinner
-            size={30}
-            color="var(--color-accent)"
-            text="Loading module..."
-          />
-        </div>
-      }
+      fallback={<PageLoader inline label="Loading page…" />}
     >
       <Routes>
         {/* Default → dashboard */}

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Settings as SettingsIcon, Upload } from "lucide-react";
 import Spinner from "../../components/ui/Spinner/Spinner";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
+import { SkeletonCards } from "../../components/ui/Skeleton/Skeleton";
 import type { SystemSettings } from "../../api/types/settings";
 
 const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(
@@ -202,9 +203,7 @@ export default function Settings() {
       </div>
 
       {isLoading ? (
-        <div style={{ padding: 40, display: "flex", justifyContent: "center" }}>
-          <Spinner size={26} color="var(--color-accent)" text="Loading…" />
-        </div>
+        <SkeletonCards cards={2} lines={4} label="Loading settings" />
       ) : (
         <SettingsForm key={settings?.code ?? "new"} settings={settings} />
       )}

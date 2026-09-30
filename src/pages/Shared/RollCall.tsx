@@ -29,6 +29,7 @@ import type {
   QuizSession,
 } from "../../api/types/quizSession";
 import { MAX_ATTENDANCE_RECORDS } from "../../api/types/quizSession";
+import { PageSkeleton } from "../../components/ui/Skeleton/Skeleton";
 import "./RollCall.css";
 
 function refId(ref: unknown): string {
@@ -154,9 +155,7 @@ export default function RollCall() {
   if (isLoading) {
     return (
       <div className="page-container">
-        <div style={{ display: "flex", justifyContent: "center", padding: 60 }}>
-          <Spinner size={28} color="var(--color-accent)" text="Loading roll…" />
-        </div>
+        <PageSkeleton cards={3} label="Loading roll" />
       </div>
     );
   }

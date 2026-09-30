@@ -1,42 +1,31 @@
-/** Full-screen spinner for route-level waits (auth checks, lazy layouts). */
-export default function PageLoader({ label = "Loading…" }: { label?: string }) {
+import "./PageLoader.css";
+
+/**
+ * The app's page loader: an indeterminate progress bar along the top, and the
+ * logo inside a spinning brand ring with a short label. Full-screen for
+ * route-level waits (auth checks, lazy layouts, signing in); `inline` fills
+ * the content area instead, for page-to-page loads inside a layout.
+ */
+export default function PageLoader({
+  label = "Loading…",
+  inline = false,
+}: {
+  label?: string;
+  inline?: boolean;
+}) {
   return (
     <div
+      className={`page-loader${inline ? " page-loader--inline" : ""}`}
       role="status"
       aria-live="polite"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        background: "var(--color-bg-primary)",
-        color: "var(--color-accent)",
-        gap: 10,
-        fontSize: 14,
-        fontFamily: "var(--font-sans, system-ui)",
-      }}
     >
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-        style={{ animation: "page-loader-spin 1s linear infinite" }}
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeDasharray="60"
-          strokeDashoffset="20"
-          strokeLinecap="round"
-        />
-      </svg>
-      <style>{`@keyframes page-loader-spin { to { transform: rotate(360deg); } }`}</style>
-      {label}
+      <div className="page-loader__bar" aria-hidden="true" />
+      <div className="page-loader__center">
+        <div className="page-loader__ring" aria-hidden="true">
+          <img src="/logo.png" alt="" className="page-loader__logo" />
+        </div>
+        <p className="page-loader__label">{label}</p>
+      </div>
     </div>
   );
 }

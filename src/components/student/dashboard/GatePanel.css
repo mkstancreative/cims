@@ -43,9 +43,8 @@
 }
 
 .gate-panel__loading {
+  width: 100%;
   margin-bottom: 24px;
-  color: var(--color-text-muted);
-  font-size: 13.5px;
 }
 
 .gate-panel__details {

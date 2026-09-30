@@ -1,11 +1,11 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Spinner from "../components/ui/Spinner/Spinner";
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 
 import DashBoardStudent from "../pages/Students/DashBoardStudent";
 import LogBook from "../pages/Students/LogBook";
 import MyProfile from "../pages/Students/MyProfile";
+import PageLoader from "../components/ui/PageLoader/PageLoader";
 import Notifications from "../pages/Shared/Notifications";
 
 const MyCurriculum = lazy(() => import("../pages/Students/MyCurriculum"));
@@ -18,18 +18,7 @@ const MyPayments = lazy(() => import("../pages/Students/MyPayments"));
 export default function StudentRoutes() {
   return (
     <Suspense
-      fallback={
-        <div
-          style={{
-            height: "60vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Spinner size={30} color="var(--color-accent)" text="Loading..." />
-        </div>
-      }
+      fallback={<PageLoader inline label="Loading page…" />}
     >
       <Routes>
         <Route index element={<Navigate to="dashboard" replace />} />

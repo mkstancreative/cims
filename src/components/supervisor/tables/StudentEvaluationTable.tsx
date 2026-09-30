@@ -1,12 +1,13 @@
-import type { PendingEvaluationsResponse } from "../../../api/types/evaluation";
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
 import { ABANDONED_HINT, isAbandoned } from "../../../helpers/internship";
 import { ClipboardCheck } from "lucide-react";
-
-// Row shape returned by usePendingEvaluations()
-export type PendingEvaluationRow = PendingEvaluationsResponse["data"][number];
+import {
+  pendingDepartment,
+  pendingStudentName,
+  type PendingEvaluationRow,
+} from "../../../helpers/evaluation";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -19,13 +20,6 @@ interface StudentEvaluationTableProps {
   onLimitChange: (limit: number) => void;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function studentName(row: PendingEvaluationRow): string {
-  const u = row.student?.user;
-  const name = `${u?.firstName ?? ""} ${u?.lastName ?? ""}`.trim();
-  return name || "—";
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -42,12 +36,16 @@ export default function StudentEvaluationTable({
       header: "Student",
       render: (row) => (
         <div>
-          <div className="eval-student-name">{studentName(row)}</div>
+          <div className="eval-student-name">{pendingStudentName(row)}</div>
           <div className="eval-student-reg">
             {row.student?.registrationNumber ?? "—"}
           </div>
         </div>
       ),
+    },
+    {
+      header: "Department",
+      render: (row) => pendingDepartment(row),
     },
     {
       header: "Batch",
@@ -62,7 +60,11 @@ export default function StudentEvaluationTable({
       header: "Action",
       render: (row) =>
         // Closed when a newer internship started — the API refuses evaluation.
-        isAbandoned(row.itStatus) ? (
+        row.needsEvaluation === false || row.schoolSubmitted ? (
+          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
+            Submitted
+          </span>
+        ) : isAbandoned(row.itStatus) ? (
           <span
             style={{ fontSize: 12, color: "var(--color-text-muted)" }}
             title={ABANDONED_HINT}

@@ -10,7 +10,6 @@ import {
   UserPlus,
   GraduationCap,
 } from "lucide-react";
-import Spinner from "../../ui/Spinner/Spinner";
 import ReEnrollForm from "../forms/ReEnrollForm";
 import { useMyRegistrations } from "../../../hooks/useRegistrations";
 import {
@@ -18,6 +17,7 @@ import {
   latestRegistration,
 } from "../../../helpers/registration";
 import { durationLabel } from "../../../helpers/duration";
+import { SkeletonLines } from "../../ui/Skeleton/Skeleton";
 import "./GatePanel.css";
 
 const formatDate = (iso?: string) =>
@@ -125,11 +125,7 @@ export function EnrolmentPendingPanel() {
 
         {isLoading ? (
           <div className="gate-panel__loading">
-            <Spinner
-              size={16}
-              color="var(--color-accent)"
-              text="Loading your registration…"
-            />
+            <SkeletonLines lines={3} label="Loading your registration" />
           </div>
         ) : (
           registration && (

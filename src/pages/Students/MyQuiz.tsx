@@ -15,7 +15,6 @@ import {
   Archive,
 } from "lucide-react";
 import { useMyQuiz, useSubmitQuiz } from "../../hooks/useQuizzes";
-import Spinner from "../../components/ui/Spinner/Spinner";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import type {
   MyQuizCurriculumProgress,
@@ -23,6 +22,7 @@ import type {
   QuizLockCode,
   StudentQuiz,
 } from "../../api/types/quiz";
+import { SkeletonCard } from "../../components/ui/Skeleton/Skeleton";
 import "./MyQuiz.css";
 
 /**
@@ -357,8 +357,8 @@ export default function MyQuiz() {
       </div>
 
       {isLoading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: 60 }}>
-          <Spinner size={28} color="var(--color-accent)" text="Loading quiz…" />
+        <div className="mq-center-panel">
+          <SkeletonCard lines={4} className="mq-loading" label="Loading quiz" />
         </div>
       ) : errorLock ? (
         <LockedCard code={errorLock.code} message={errorLock.message} />

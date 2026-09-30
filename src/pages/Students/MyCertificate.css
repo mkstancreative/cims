@@ -17,6 +17,15 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Loading — sized like the status card it stands in for */
+.cert-loading {
+  width: 100%;
+  max-width: 680px;
+  margin: 20px auto 0;
+  padding: 32px;
+  border-radius: 18px;
+}
+
 .cert-empty-icon {
   width: 64px;
   height: 64px;

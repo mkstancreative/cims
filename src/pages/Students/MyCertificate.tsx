@@ -17,6 +17,7 @@ import { useCertificateStatus } from "../../hooks/useCertificate";
 import { useCertificateDownload } from "../../hooks/useCertificateDownload";
 import { useStudentDashboard } from "../../hooks/useDashboard";
 import type { CertificateStatus } from "../../api/types/certificate";
+import { SkeletonCard } from "../../components/ui/Skeleton/Skeleton";
 import "./MyCertificate.css";
 
 export default function MyCertificate() {
@@ -79,9 +80,7 @@ export default function MyCertificate() {
       </div>
 
       {isLoading ? (
-        <div style={{ padding: 60, display: "flex", justifyContent: "center" }}>
-          <Spinner size={28} color="var(--color-accent)" text="Loading status…" />
-        </div>
+        <SkeletonCard lines={4} className="cert-loading" label="Loading certificate status" />
       ) : !hasRequest ? (
         <div className="cert-empty-state">
           <div className="cert-empty-icon">

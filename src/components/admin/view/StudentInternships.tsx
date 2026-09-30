@@ -23,6 +23,7 @@ import { useStudentProgress } from "../../../hooks/useStudents";
 import { formatDate } from "../../../helpers/utilities";
 import { isAbandoned } from "../../../helpers/internship";
 import type { Internship } from "../../../api/types/internship";
+import { SkeletonRows } from "../../ui/Skeleton/Skeleton";
 import "./StudentInternships.css";
 
 /** formatDate that never throws — "—" for missing / invalid values. */
@@ -323,7 +324,7 @@ export default function StudentInternships({ studentId }: { studentId: string })
       </div>
 
       {isLoading ? (
-        <p className="si-note">Loading internships…</p>
+        <SkeletonRows rows={2} label="Loading internships" />
       ) : isError ? (
         <p className="si-note">Couldn't load this student's internships.</p>
       ) : internships.length === 0 ? (

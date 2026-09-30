@@ -6,6 +6,8 @@ import type {
   StudentEvaluationsResponse,
   CompositeResultsResponse,
   CompositeResultsParams,
+  EvaluationVerifyParams,
+  EvaluationVerifyResponse,
 } from "../types/evaluation";
 
 export const getPendingEvaluations =
@@ -13,6 +15,20 @@ export const getPendingEvaluations =
     const response = await api.get("/evaluations/pending");
     return response.data;
   };
+
+/**
+ * Preflight: every gate a submit would hit — blockers, judgement calls and
+ * notices — without submitting. Supervisors only.
+ */
+export const verifyEvaluation = async (
+  studentId: string,
+  params?: EvaluationVerifyParams,
+): Promise<EvaluationVerifyResponse> => {
+  const response = await api.get(`/evaluations/${studentId}/verify`, {
+    params,
+  });
+  return response.data;
+};
 
 export const submitEvaluation = async (
   studentId: string,

@@ -1,8 +1,20 @@
 import { useState } from "react";
 import { ClipboardList, Download } from "lucide-react";
-import { useCompositeResults } from "../../hooks/useEvaluations";
+import {
+  useCompositeResults,
+  usePendingEvaluations,
+} from "../../hooks/useEvaluations";
+import StudentEvaluationTable from "../../components/supervisor/tables/StudentEvaluationTable";
+import {
+  pendingDepartment,
+  pendingStudentName,
+  type PendingEvaluationRow,
+} from "../../helpers/evaluation";
 import { useModal } from "../../context/ModalContext";
-import type { CompositeResultsParams, Evaluation } from "../../api/types/evaluation";
+import type {
+  CompositeResultsParams,
+  Evaluation,
+} from "../../api/types/evaluation";
 import GeneralTable from "../../components/ui/GeneralTable/GeneralTable";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
 import { GradeBadge } from "../../components/shared/dashboard/DashboardKit";
@@ -65,14 +77,11 @@ function exportToExcel(rows: Evaluation[]) {
     row.finalGrade ?? "—",
   ]);
 
-  const escape = (v: string) =>
-    `"${v.replace(/"/g, '""')}"`;
+  const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
 
   const csv =
     "\uFEFF" + // UTF-8 BOM so Excel reads correctly
-    [headers, ...csvRows]
-      .map((r) => r.map(escape).join(","))
-      .join("\r\n");
+    [headers, ...csvRows].map((r) => r.map(escape).join(",")).join("\r\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -84,8 +93,23 @@ function exportToExcel(rows: Evaluation[]) {
 }
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
+type Tab = "pending" | "results";
+
 export default function StudentsEvaluations() {
-  // ── Filter state ──
+  // Pending first: it's the list the supervisor acts on.
+  const [tab, setTab] = useState<Tab>("pending");
+
+  // ── Pending evaluations ──
+  const { data: pendingData, isLoading: pendingLoading } =
+    usePendingEvaluations();
+  const pendingAll: PendingEvaluationRow[] = pendingData?.data ?? [];
+  const pendingCount = pendingData?.total ?? pendingAll.length;
+  const [pendingSearch, setPendingSearch] = useState("");
+  const [pendingDept, setPendingDept] = useState("");
+  const [pendingBatch, setPendingBatch] = useState("");
+  const [pendingItStatus, setPendingItStatus] = useState("");
+
+  // ── Filter state (results) ──
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [batchId, setBatchId] = useState("");
@@ -104,6 +128,75 @@ export default function StudentsEvaluations() {
   const { data: deptsData } = useMyDepartments({ limit: 100 });
   const deptNames = (deptsData?.data ?? []).map((d) => d.name);
   if (department && !deptNames.includes(department)) deptNames.push(department);
+
+  // ── Pending: filter the loaded list — the endpoint takes no filters ──
+  // Departments: the supervisor's list only holds departments with ACTIVE
+  // students, so add any the pending rows carry (e.g. completed students').
+  const pendingDeptNames = [
+    ...new Set([
+      ...deptNames,
+      ...pendingAll.map(pendingDepartment).filter((d) => d !== "—"),
+    ]),
+  ].sort((a, b) => a.localeCompare(b));
+  const pendingQuery = pendingSearch.trim().toLowerCase();
+  const pendingRows = pendingAll.filter(
+    (row) =>
+      (!pendingQuery ||
+        [pendingStudentName(row), row.student?.registrationNumber ?? ""].some(
+          (v) => v.toLowerCase().includes(pendingQuery),
+        )) &&
+      (!pendingDept || pendingDepartment(row) === pendingDept) &&
+      (!pendingBatch || row.batch?._id === pendingBatch) &&
+      (!pendingItStatus || row.itStatus === pendingItStatus),
+  );
+
+  const pendingFilterSections: FilterSection[] = [
+    {
+      key: "department",
+      label: "Department",
+      options: [
+        { value: "", label: "All Departments" },
+        ...pendingDeptNames.map((d) => ({ value: d, label: d })),
+      ],
+      value: pendingDept,
+      onChange: setPendingDept,
+    },
+    {
+      key: "batch",
+      label: "Batch",
+      options: [
+        { value: "", label: "All Batches" },
+        ...batches.map((b) => ({ value: b._id, label: b.name })),
+      ],
+      value: pendingBatch,
+      onChange: setPendingBatch,
+    },
+    {
+      key: "itStatus",
+      label: "IT Status",
+      options: [
+        { value: "", label: "All IT Statuses" },
+        { value: "placed", label: "Placed" },
+        { value: "active", label: "Active" },
+        { value: "completed", label: "Completed" },
+        { value: "abandoned", label: "Abandoned" },
+      ],
+      value: pendingItStatus,
+      onChange: setPendingItStatus,
+    },
+  ];
+
+  // Clears the filters but keeps the search text.
+  const clearPendingFilters = () => {
+    setPendingDept("");
+    setPendingBatch("");
+    setPendingItStatus("");
+  };
+
+  const resetPending = () => {
+    clearPendingFilters();
+    setPendingSearch("");
+  };
 
   // ── Build params (omit empty values) ──
   const params: CompositeResultsParams = {
@@ -134,6 +227,27 @@ export default function StudentsEvaluations() {
     : null;
 
   // ── Open evaluate modal ──
+  const openEvaluate = (studentId: string, name: string) =>
+    openModal(
+      <SubmitEvaluationForm
+        isOpen
+        onClose={closeModal}
+        studentId={studentId}
+        studentName={name}
+        onSuccess={closeModal}
+      />,
+    );
+
+  const handleEvaluatePending = (row: PendingEvaluationRow) => {
+    const studentId = row.student?._id;
+    if (!studentId) return;
+    const name = pendingStudentName(row);
+    openEvaluate(
+      studentId,
+      name !== "—" ? name : (row.student?.registrationNumber ?? "Student"),
+    );
+  };
+
   const handleEvaluate = (ev: Evaluation) => {
     const s = typeof ev.student === "object" ? ev.student : null;
     const studentId = s?._id;
@@ -145,6 +259,11 @@ export default function StudentsEvaluations() {
         onClose={closeModal}
         studentId={studentId}
         studentName={name}
+        // Evaluate the internship this result belongs to, not whichever is
+        // current now.
+        internshipId={
+          typeof ev.internship === "string" ? ev.internship : undefined
+        }
         onSuccess={closeModal}
       />,
     );
@@ -238,10 +357,23 @@ export default function StudentsEvaluations() {
       header: "Student",
       render: (row) => (
         <div>
-          <div style={{ fontWeight: 600, fontSize: 13, color: "var(--color-text-primary)" }}>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: 13,
+              color: "var(--color-text-primary)",
+            }}
+          >
             {studentName(row)}
           </div>
-          <div style={{ fontSize: 11.5, fontFamily: "monospace", color: "var(--color-text-secondary)", marginTop: 2 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              fontFamily: "monospace",
+              color: "var(--color-text-secondary)",
+              marginTop: 2,
+            }}
+          >
             {studentReg(row)}
           </div>
         </div>
@@ -249,7 +381,7 @@ export default function StudentsEvaluations() {
     },
     {
       header: "Status",
-      render: (row) => row.status ? <StatusBadge status={row.status} /> : "—",
+      render: (row) => (row.status ? <StatusBadge status={row.status} /> : "—"),
     },
     { header: "Total Score", render: (row) => num(row.totalScore) },
     { header: "Quiz Score", render: (row) => num(row.quizScore) },
@@ -271,7 +403,9 @@ export default function StudentsEvaluations() {
             Evaluate
           </button>
         ) : (
-          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>Done</span>
+          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
+            Done
+          </span>
         ),
     },
   ];
@@ -287,55 +421,159 @@ export default function StudentsEvaluations() {
           <div>
             <h2 className="page-title">Student Evaluations</h2>
             <p className="page-sub">
-              Composite results for all evaluated students
+              Evaluate your students and review their composite results
             </p>
           </div>
         </div>
 
-        {/* Export button in header right */}
-        <div className="page-header-right">
-          <button
-            className="eval-export-btn"
-            onClick={() => exportToExcel(rows)}
-            disabled={rows.length === 0 || isLoading}
-            title="Export current page to Excel"
-          >
-            <Download size={14} />
-            Export Excel
-          </button>
-        </div>
+        {/* Export — results tab only */}
+        {tab === "results" && (
+          <div className="page-header-right">
+            <button
+              className="eval-export-btn"
+              onClick={() => exportToExcel(rows)}
+              disabled={rows.length === 0 || isLoading}
+              title="Export current page to Excel"
+            >
+              <Download size={14} />
+              Export Excel
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* ── Search + filters ── */}
-      <div className="filter-wrapper fp-toolbar">
-        <div className="fp-toolbar__row">
-          <div className="fp-toolbar__search">
-            <SearchInput
-              value={search}
-              onChange={(v) => { setSearch(v); setPage(1); }}
-              onClear={() => { setSearch(""); setPage(1); }}
-              placeholder="Search by reg number…"
+      {/* ── Tabs ── */}
+      <div className="eval-tabs" role="tablist" aria-label="Evaluations">
+        <button
+          type="button"
+          role="tab"
+          id="eval-tab-pending"
+          aria-selected={tab === "pending"}
+          aria-controls="eval-panel-pending"
+          className={`eval-tab${tab === "pending" ? " is-active" : ""}`}
+          onClick={() => setTab("pending")}
+        >
+          Pending evaluations
+          {!pendingLoading && (
+            <span className="eval-tab__count">{pendingCount}</span>
+          )}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="eval-tab-results"
+          aria-selected={tab === "results"}
+          aria-controls="eval-panel-results"
+          className={`eval-tab${tab === "results" ? " is-active" : ""}`}
+          onClick={() => setTab("results")}
+        >
+          All results
+        </button>
+      </div>
+
+      {tab === "pending" ? (
+        <div
+          id="eval-panel-pending"
+          role="tabpanel"
+          aria-labelledby="eval-tab-pending"
+          className="eval-panel"
+        >
+          <div className="filter-wrapper fp-toolbar">
+            <div className="fp-toolbar__row">
+              <div className="fp-toolbar__search">
+                <SearchInput
+                  value={pendingSearch}
+                  onChange={setPendingSearch}
+                  onClear={() => setPendingSearch("")}
+                  placeholder="Search by name or reg number…"
+                />
+              </div>
+              <FilterPopover
+                sections={pendingFilterSections}
+                onClearAll={clearPendingFilters}
+              />
+              <ResetButton onClick={resetPending} />
+            </div>
+            <ActiveFilterChips
+              sections={pendingFilterSections}
+              onClearAll={clearPendingFilters}
             />
           </div>
-          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
-          <ResetButton onClick={handleReset} />
-        </div>
-        <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
-      </div>
 
-      {/* ── Table ── */}
-      <div className="table-wrapper">
-        <GeneralTable<Evaluation>
-          columns={columns}
-          data={rows}
-          loading={isLoading}
-          meta={meta}
-          onPageChange={(p) => setPage(p)}
-          onLimitChange={(l) => { setLimit(l); setPage(1); }}
-        />
-      </div>
+          <div className="table-wrapper">
+            <StudentEvaluationTable
+              data={pendingRows}
+              isLoading={pendingLoading}
+              meta={null}
+              onEvaluate={handleEvaluatePending}
+              onPageChange={() => {}}
+              onLimitChange={() => {}}
+            />
+          </div>
+        </div>
+      ) : (
+        <div
+          id="eval-panel-results"
+          role="tabpanel"
+          aria-labelledby="eval-tab-results"
+          className="eval-panel"
+        >
+          {/* ── Search + filters ── */}
+          <div className="filter-wrapper fp-toolbar">
+            <div className="fp-toolbar__row">
+              <div className="fp-toolbar__search">
+                <SearchInput
+                  value={search}
+                  onChange={(v) => {
+                    setSearch(v);
+                    setPage(1);
+                  }}
+                  onClear={() => {
+                    setSearch("");
+                    setPage(1);
+                  }}
+                  placeholder="Search by reg number…"
+                />
+              </div>
+              <FilterPopover
+                sections={filterSections}
+                onClearAll={clearFilters}
+              />
+              <ResetButton onClick={handleReset} />
+            </div>
+            <ActiveFilterChips
+              sections={filterSections}
+              onClearAll={clearFilters}
+            />
+          </div>
+
+          {/* ── Table ── */}
+          <div className="table-wrapper">
+            <GeneralTable<Evaluation>
+              columns={columns}
+              data={rows}
+              loading={isLoading}
+              meta={meta}
+              onPageChange={(p) => setPage(p)}
+              onLimitChange={(l) => {
+                setLimit(l);
+                setPage(1);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       <style>{`
+        .eval-tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--color-border);border-radius:12px;background:var(--color-bg-secondary);width:fit-content;max-width:100%}
+        .eval-tab{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;border:none;border-radius:9px;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--color-text-secondary);cursor:pointer;transition:background .15s,color .15s}
+        .eval-tab:hover{color:var(--color-text-primary);background:var(--color-surface-overlay)}
+        .eval-tab:focus,.eval-tab:active{border:none}
+        .eval-tab:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+        .eval-tab.is-active{background:var(--color-accent);color:var(--color-on-primary)}
+        .eval-tab__count{min-width:20px;padding:0 7px;border-radius:999px;background:var(--color-accent-muted);font-size:12px;line-height:20px;text-align:center;color:var(--color-accent)}
+        .eval-tab.is-active .eval-tab__count{background:var(--color-on-primary);color:var(--color-accent)}
+        .eval-panel{display:flex;flex-direction:column;gap:20px}
         .eval-submit-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1.5px solid var(--color-accent);background:var(--color-accent-muted);color:var(--color-accent);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s,background .15s}
         .eval-submit-btn:hover{background:var(--color-accent);color:#fff}
         .eval-export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--color-primary-hover);background:rgba(var(--color-primary-rgb), .1);color:var(--color-primary-hover);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
