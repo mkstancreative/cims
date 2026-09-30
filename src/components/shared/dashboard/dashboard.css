@@ -176,6 +176,8 @@
   font-weight: 600;
   padding: 3px 7px;
   border-radius: 100px;
+  /* One line — a wrapped chip reads as two labels in narrow cards */
+  white-space: nowrap;
 }
 .db-kpi__trend--up {
   background: rgba(var(--color-primary-rgb), 0.1);
@@ -229,12 +231,17 @@
 }
 
 /* ── Section Heading ─────────────────────────────────────────────────────── */
+/* Section titles sit on a soft primary tint, so each section reads as a
+   labelled band rather than loose text. */
 .db-section-head {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: -8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(var(--color-primary-rgb), 0.12);
 }
+/* White tile so the coloured icon still stands out on the tinted band */
 .db-section-head__icon {
   width: 32px;
   height: 32px;
@@ -242,6 +249,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-bg-secondary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 .db-section-head__title {
   font-family: var(--font-display, "Inter");
@@ -252,6 +262,75 @@
 .db-section-head__sub {
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+/* ── Dashboard layout (student + supervisor) ────────────────────────────────
+   KPIs in one compact row, then a main column beside a 340px sidebar — so
+   no row is left mostly empty. Stacks below 1100px. */
+
+/* Six KPI cards: 6 across when there's room, else 3, else 2, else 1 —
+   always an even split, so no card is left alone on a row. Sized off the KPI
+   area itself (container query), not the window. */
+.db-kpis {
+  container-type: inline-size;
+}
+.db-kpis .db-kpi-grid {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@container (min-width: 300px) {
+  .db-kpis .db-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (min-width: 640px) {
+  .db-kpis .db-kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@container (min-width: 1000px) {
+  .db-kpis .db-kpi-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.db-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+.db-main,
+.db-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+/* Sidebar panels stack, one per row */
+.db-side .db-panels {
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+/* The ring card is narrow here — keep ring and figures side by side, tighter */
+.db-side .db-ring-card {
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .db-layout {
+    grid-template-columns: 1fr;
+  }
+  /* Sidebar cards pair up two-across while there's width for it */
+  .db-side {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    align-items: start;
+  }
+  /* Let wrapped panel groups join the sidebar's grid directly */
+  .db-side .db-panels {
+    display: contents;
+  }
 }
 
 /* ── Info Panel (2-column layout) ────────────────────────────────────────── */

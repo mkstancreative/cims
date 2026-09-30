@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import {
@@ -36,6 +37,49 @@ export const useQuizSessions = (params?: QuizSessionParams) => {
     queryFn: () => getQuizSessions(params),
   });
 };
+
+/** A quiz being sat right now — an UNLOCKED sitting holds it. */
+export interface LiveQuizSitting {
+  sessionId: string;
+  sitting: number;
+  batchName: string;
+}
+
+/**
+ * Quizzes that can't be edited right now: the API refuses to change a quiz
+ * (edit, reorder, deactivate) while any sitting of it is unlocked, so the
+ * admin UI disables those controls instead of letting the save fail.
+ * Keyed by quiz id.
+ */
+export const useLiveQuizSittings = () => {
+  const { data } = useQuizSessions({ status: "unlocked", limit: 100 });
+  return useMemo(() => {
+    const map = new Map<string, LiveQuizSitting>();
+    for (const s of data?.data ?? []) {
+      const quizId = typeof s.quiz === "string" ? s.quiz : s.quiz?._id;
+      if (!quizId) continue;
+      map.set(quizId, {
+        sessionId: s._id,
+        sitting: s.sitting,
+        batchName: typeof s.batch === "string" ? "a batch" : s.batch.name,
+      });
+    }
+    return map;
+  }, [data]);
+};
+
+/** "CIMS BATCH 2 is sitting this quiz right now (sitting 3)…" */
+export function liveSittingReason(live: LiveQuizSitting): string {
+  return `${live.batchName} is sitting this quiz right now (sitting ${live.sitting}). Close that sitting first, then edit.`;
+}
+
+/** True when the API refused a quiz change because a sitting is live. */
+export function isQuizSittingInProgress(err: unknown): boolean {
+  return (
+    (err as { response?: { data?: { code?: string } } })?.response?.data
+      ?.code === "QUIZ_SITTING_IN_PROGRESS"
+  );
+}
 
 export const useQuizSession = (id: string) => {
   return useQuery({

@@ -8,6 +8,7 @@ import type {
   DurationStillLive,
   LifecycleResource,
 } from "../api/types/lifecycle";
+import { isQuizSittingInProgress } from "./useQuizSessions";
 import { LIFECYCLE } from "../helpers/lifecycle";
 
 type ApiError = {
@@ -48,6 +49,10 @@ export const useSetStatus = (resource: LifecycleResource) => {
         );
         return;
       }
+      // A quiz can't be deactivated while it's being sat — refresh which
+      // quizzes are live so the table disables the control.
+      if (isQuizSittingInProgress(err))
+        queryClient.invalidateQueries({ queryKey: ["quiz-sessions"] });
       toast.error(errMsg(err, `Couldn't change the ${noun}'s status.`));
     },
   });

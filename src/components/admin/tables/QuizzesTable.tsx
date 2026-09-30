@@ -5,6 +5,10 @@ import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import ActionDropDown from "../../ui/ActionDropdown/ActionDropDown";
 import { useQuizzes } from "../../../hooks/useQuizzes";
 import type { QuizListItem, QuizParams } from "../../../api/types/quiz";
+import {
+  liveSittingReason,
+  type LiveQuizSitting,
+} from "../../../hooks/useQuizSessions";
 
 interface QuizzesTableProps {
   search?: string;
@@ -19,6 +23,11 @@ interface QuizzesTableProps {
   onToggleStatusRequest: (quiz: QuizListItem) => void;
   /** Permanent delete (preflighted by the dialog). */
   onDeleteRequest: (quiz: QuizListItem) => void;
+  /**
+   * Quizzes with an unlocked sitting — the API refuses to edit, reorder or
+   * deactivate them until it closes, so those controls are disabled here.
+   */
+  liveSittings?: Map<string, LiveQuizSitting>;
 }
 
 export default function QuizzesTable({
@@ -32,6 +41,7 @@ export default function QuizzesTable({
   onEdit,
   onToggleStatusRequest,
   onDeleteRequest,
+  liveSittings,
 }: QuizzesTableProps) {
   const params: QuizParams = {
     page,
@@ -61,9 +71,42 @@ export default function QuizzesTable({
     : null;
 
   const columns: Column<QuizListItem>[] = [
-    { header: "Title", accessor: "title" },
+    {
+      header: "Title",
+      render: (row) => {
+        const live = liveSittings?.get(row._id);
+        return (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              flexWrap: "wrap",
+            }}
+          >
+            {row.title}
+            {live && (
+              <StatusBadge
+                status="active"
+                label="Live sitting"
+                title={liveSittingReason(live)}
+              />
+            )}
+          </span>
+        );
+      },
+    },
     { header: "Questions", render: (row) => row.questionCount },
     { header: "Pass Mark", render: (row) => `${row.passMark}%` },
+    {
+      header: "Time Limit",
+      render: (row) =>
+        row.durationMinutes ? (
+          `${row.durationMinutes} min`
+        ) : (
+          <span style={{ color: "var(--color-text-muted)" }}>None</span>
+        ),
+    },
     {
       header: "Status",
       render: (row) => (
@@ -72,33 +115,47 @@ export default function QuizzesTable({
     },
     {
       header: "Actions",
-      render: (row) => (
-        <ActionDropDown
-          actions={[
-            {
-              label: "View Quiz",
-              icon: <Eye size={13} />,
-              onClick: () => onView(row),
-            },
-            {
-              label: "Edit Quiz",
-              icon: <Pencil size={13} />,
-              onClick: () => onEdit(row),
-            },
-            {
-              label: row.isActive ? "Deactivate" : "Activate",
-              icon: row.isActive ? <Ban size={13} /> : <CheckCircle size={13} />,
-              onClick: () => onToggleStatusRequest(row),
-            },
-            {
-              label: "Delete permanently",
-              icon: <Trash2 size={13} />,
-              onClick: () => onDeleteRequest(row),
-              danger: true,
-            },
-          ]}
-        />
-      ),
+      render: (row) => {
+        const live = liveSittings?.get(row._id);
+        const reason = live ? liveSittingReason(live) : undefined;
+        return (
+          <ActionDropDown
+            actions={[
+              {
+                label: "View Quiz",
+                icon: <Eye size={13} />,
+                onClick: () => onView(row),
+              },
+              {
+                label: live ? "Edit Quiz (being sat)" : "Edit Quiz",
+                icon: <Pencil size={13} />,
+                onClick: () => onEdit(row),
+                disabled: Boolean(live),
+                title: reason,
+              },
+              {
+                label: row.isActive ? "Deactivate" : "Activate",
+                icon: row.isActive ? (
+                  <Ban size={13} />
+                ) : (
+                  <CheckCircle size={13} />
+                ),
+                onClick: () => onToggleStatusRequest(row),
+                // Deactivating mid-sitting is refused; REactivating is always
+                // allowed — it's the repair for an accidental deactivate.
+                disabled: Boolean(live) && row.isActive,
+                title: live && row.isActive ? reason : undefined,
+              },
+              {
+                label: "Delete permanently",
+                icon: <Trash2 size={13} />,
+                onClick: () => onDeleteRequest(row),
+                danger: true,
+              },
+            ]}
+          />
+        );
+      },
     },
   ];
 

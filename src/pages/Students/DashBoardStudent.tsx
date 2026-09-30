@@ -7,7 +7,6 @@ import {
   DashboardError,
 } from "../../components/shared/dashboard/DashboardKit";
 import "../../components/shared/dashboard/dashboard.css";
-import "./DashBoardStudent.css";
 import { StudentMetricsGrid } from "../../components/student/dashboard/StudentMetricsGrid";
 import { QuizAttendanceChip } from "../../components/student/dashboard/QuizAttendanceChip";
 import { ProgressSection } from "../../components/student/dashboard/ProgressSection";
@@ -131,7 +130,7 @@ export default function DashBoardStudent() {
       )}
 
       {/* ── KPIs — one compact row on wide screens ── */}
-      <div className="sd-kpis">
+      <div className="db-kpis">
         <SectionHead
           title="My Progress"
           sub="Real-time training tracking"
@@ -147,12 +146,17 @@ export default function DashBoardStudent() {
       </div>
 
       {/* ── Main column + sidebar; stacks on narrow screens ── */}
-      <div className="sd-layout">
-        <div className="sd-main">
+      <div className="db-layout">
+        <div className="db-main">
           {/* The quiz at a glance — whose move it is, and both grade halves.
               An abandoned internship's quiz is closed; the notice says so. */}
           {itStatus !== "abandoned" && <QuizSummaryCard />}
 
+          <NotificationsSection notifications={notifications} ago={ago} />
+        </div>
+
+        <aside className="db-side">
+          {/* Curriculum ring + evaluation summary, stacked in the sidebar */}
           <ProgressSection
             progress={progress}
             evaluation={evaluation}
@@ -161,10 +165,6 @@ export default function DashBoardStudent() {
             fmt={fmt}
           />
 
-          <NotificationsSection notifications={notifications} ago={ago} />
-        </div>
-
-        <aside className="sd-side">
           <FinalDetailsSection
             batch={batch}
             itStatus={itStatus}

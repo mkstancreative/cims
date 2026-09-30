@@ -5,6 +5,10 @@ import {
   useReorderQuizQuestions,
 } from "../../../hooks/useQuizzes";
 import { ReorderableList } from "../../ui/ReorderableList/ReorderableList";
+import {
+  liveSittingReason,
+  useLiveQuizSittings,
+} from "../../../hooks/useQuizSessions";
 import type { Quiz, QuizQuestion } from "../../../api/types/quiz";
 
 interface QuizViewModalProps {
@@ -21,6 +25,8 @@ export default function QuizViewModal({
   const { data, isLoading } = useQuiz(id);
   const quiz: Quiz | undefined = data?.data;
   const { mutateAsync: reorder } = useReorderQuizQuestions();
+  // Reordering mid-sitting re-points every answer — the API refuses it.
+  const live = useLiveQuizSittings().get(id);
   // Reordering sends question ids; without them (older data) show it read-only.
   const canReorder = Boolean(quiz?.questions.every((q) => q._id));
 
@@ -47,8 +53,9 @@ export default function QuizViewModal({
             <div className="builder-warn" style={infoNote}>
               <Info size={14} />
               <span>
-                Students answer in this order. Drag a question, or use the
-                arrows, to reorder it.
+                {live
+                  ? `${liveSittingReason(live)} Reordering is off until then.`
+                  : "Students answer in this order. Drag a question, or use the arrows, to reorder it."}
               </span>
             </div>
           )}
@@ -59,6 +66,7 @@ export default function QuizViewModal({
               getId={(q) => q._id!}
               getLabel={(q) => `"${q.text}"`}
               multiline
+              disabled={Boolean(live)}
               onReorder={(next) =>
                 reorder({ id, questionIds: next.map((q) => q._id!) })
               }

@@ -14,6 +14,7 @@ import { useModal } from "../../context/ModalContext";
 import type {
   CompositeResultsParams,
   Evaluation,
+  EvaluationStatus,
 } from "../../api/types/evaluation";
 import GeneralTable from "../../components/ui/GeneralTable/GeneralTable";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
@@ -29,6 +30,7 @@ import {
 } from "../../components/ui/FilterPopover/FilterPopover";
 import { useMyBatches } from "../../hooks/useBatches";
 import { useMyDepartments } from "../../hooks/useSchoolSupervisor";
+import { EvaluateFirstNotice } from "../../components/supervisor/EvaluateFirstNotice";
 import type { Batch } from "../../api/types/batch";
 
 // ─── Grade options ─────────────────────────────────────────────────────────────
@@ -113,7 +115,7 @@ export default function StudentsEvaluations() {
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [batchId, setBatchId] = useState("");
-  const [status, setStatus] = useState<"pending" | "completed" | "">("");
+  const [status, setStatus] = useState<EvaluationStatus | "">("");
   const [grade, setGrade] = useState<Grade | "">("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
@@ -285,11 +287,13 @@ export default function StudentsEvaluations() {
       options: [
         { value: "", label: "All Statuses" },
         { value: "pending", label: "Pending" },
+        // Supervisor's half done — waiting on the student's quiz score.
+        { value: "awaiting-quiz", label: "Awaiting quiz" },
         { value: "completed", label: "Completed" },
       ],
       value: status,
       onChange: (v) => {
-        setStatus(v as "pending" | "completed" | "");
+        setStatus(v as EvaluationStatus | "");
         setPage(1);
       },
     },
@@ -381,7 +385,19 @@ export default function StudentsEvaluations() {
     },
     {
       header: "Status",
-      render: (row) => (row.status ? <StatusBadge status={row.status} /> : "—"),
+      render: (row) =>
+        row.status ? (
+          <StatusBadge
+            status={row.status}
+            title={
+              row.status === "awaiting-quiz"
+                ? "Your evaluation is in — waiting on the student's quiz score."
+                : undefined
+            }
+          />
+        ) : (
+          "—"
+        ),
     },
     { header: "Total Score", render: (row) => num(row.totalScore) },
     { header: "Quiz Score", render: (row) => num(row.quizScore) },
@@ -394,7 +410,24 @@ export default function StudentsEvaluations() {
     {
       header: "Action",
       render: (row) =>
-        row.status !== "completed" ? (
+        row.status === "completed" ? (
+          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
+            Done
+          </span>
+        ) : row.status === "awaiting-quiz" ? (
+          // Your half is in. Re-submitting is allowed (it overwrites), so
+          // offer it quietly rather than as the main action.
+          <span className="eval-done-cell">
+            <span>Your part is done</span>
+            <button
+              className="eval-update-btn"
+              onClick={() => handleEvaluate(row)}
+              title="Update your evaluation — this overwrites what you submitted"
+            >
+              Update
+            </button>
+          </span>
+        ) : (
           <button
             className="eval-submit-btn"
             onClick={() => handleEvaluate(row)}
@@ -402,10 +435,6 @@ export default function StudentsEvaluations() {
           >
             Evaluate
           </button>
-        ) : (
-          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
-            Done
-          </span>
         ),
     },
   ];
@@ -441,6 +470,9 @@ export default function StudentsEvaluations() {
           </div>
         )}
       </div>
+
+      {/* The evaluation now opens the quiz — evaluate before the sitting. */}
+      <EvaluateFirstNotice />
 
       {/* ── Tabs ── */}
       <div className="eval-tabs" role="tablist" aria-label="Evaluations">
@@ -575,6 +607,10 @@ export default function StudentsEvaluations() {
         .eval-tab.is-active .eval-tab__count{background:var(--color-on-primary);color:var(--color-accent)}
         .eval-panel{display:flex;flex-direction:column;gap:20px}
         .eval-submit-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1.5px solid var(--color-accent);background:var(--color-accent-muted);color:var(--color-accent);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s,background .15s}
+        .eval-done-cell{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--color-text-muted)}
+        .eval-update-btn{padding:3px 10px;border:1px solid var(--color-border);border-radius:7px;background:var(--color-bg-secondary);font:inherit;font-size:11.5px;font-weight:600;color:var(--color-text-secondary);cursor:pointer}
+        .eval-update-btn:hover{border-color:var(--color-accent-border);color:var(--color-accent)}
+        .eval-update-btn:focus,.eval-update-btn:active{border:1px solid var(--color-border)}
         .eval-submit-btn:hover{background:var(--color-accent);color:#fff}
         .eval-export-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--color-primary-hover);background:rgba(var(--color-primary-rgb), .1);color:var(--color-primary-hover);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
         .eval-export-btn:hover:not(:disabled){background:var(--color-primary-hover);color:#fff}

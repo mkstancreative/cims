@@ -17,7 +17,11 @@ import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import BatchesTable from "../../components/admin/tables/BatchesTable";
 import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
-import SelectFilter from "../../components/ui/SelectFilter/SelectFilter";
+import {
+  ActiveFilterChips,
+  FilterPopover,
+  type FilterSection,
+} from "../../components/ui/FilterPopover/FilterPopover";
 import CustomModal from "../../components/ui/CustomModal/CustomModal";
 import Spinner from "../../components/ui/Spinner/Spinner";
 
@@ -171,6 +175,50 @@ export default function Batches() {
     });
   };
 
+  // Clears the filters but keeps whatever is typed in the search box.
+  const clearFilters = () =>
+    setFilter((prev) => ({
+      ...prev,
+      status: "",
+      session: "",
+      supervisor: "",
+      page: 1,
+    }));
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "status",
+      label: "Status",
+      options: [
+        { value: "", label: "All Status" },
+        { value: "created", label: "Created" },
+        { value: "in_progress", label: "In Progress" },
+        { value: "completed", label: "Completed" },
+        { value: "archived", label: "Archived" },
+      ],
+      value: filter.status,
+      onChange: (v) => setField("status", v as BatchStatus | ""),
+    },
+    {
+      key: "supervisor",
+      label: "Supervisor",
+      options: [
+        { value: "", label: "All Batches" },
+        { value: "assigned", label: "Assigned" },
+        { value: "unassigned", label: "Unassigned" },
+      ],
+      value: filter.supervisor,
+      onChange: (v) => setField("supervisor", v as FilterState["supervisor"]),
+    },
+    {
+      key: "session",
+      label: "Session",
+      input: { placeholder: "e.g. 2023/2024" },
+      value: filter.session,
+      onChange: (v) => setField("session", v),
+    },
+  ];
+
   return (
     <>
       <div className="page-container">
@@ -192,68 +240,20 @@ export default function Batches() {
         </div>
 
         {/* ── Search + filters ── */}
-        <div className="filter-selects-block filter-selects-block--with-search">
-          <div className="filter-search-field">
-            <span className="filter-label">Search</span>
-            <SearchInput
-              value={filter.search}
-              onChange={(val) => setField("search", val)}
-              placeholder="Search by name, session…"
-              onClear={() => setField("search", "")}
-            />
+        <div className="filter-wrapper fp-toolbar">
+          <div className="fp-toolbar__row">
+            <div className="fp-toolbar__search">
+              <SearchInput
+                value={filter.search}
+                onChange={(val) => setField("search", val)}
+                placeholder="Search by name, session…"
+                onClear={() => setField("search", "")}
+              />
+            </div>
+            <FilterPopover sections={filterSections} onClearAll={clearFilters} />
+            <ResetButton onClick={handleReset} />
           </div>
-          <SelectFilter
-            label="Status"
-            options={[
-              { value: "", label: "All Status" },
-              { value: "created", label: "Created" },
-              { value: "in_progress", label: "In Progress" },
-              { value: "completed", label: "Completed" },
-              { value: "archived", label: "Archived" },
-            ]}
-            value={filter.status}
-            onChange={(value) => setField("status", value as BatchStatus | "")}
-            name="status"
-          />
-          <SelectFilter
-            label="Supervisor"
-            options={[
-              { value: "", label: "All Batches" },
-              { value: "assigned", label: "Assigned" },
-              { value: "unassigned", label: "Unassigned" },
-            ]}
-            value={filter.supervisor}
-            onChange={(value) =>
-              setField("supervisor", value as FilterState["supervisor"])
-            }
-            name="supervisor"
-          />
-
-          <div className="filter-container">
-            <label className="filter-label" htmlFor="batch-session-filter">
-              Session
-            </label>
-            <input
-              id="batch-session-filter"
-              className="modal-input"
-              placeholder="e.g. 2023/2024"
-              value={filter.session}
-              onChange={(e) => setField("session", e.target.value)}
-              style={{
-                width: "100%",
-                height: 42,
-                padding: "0 12px",
-                borderRadius: 8,
-                border: "1px solid var(--color-border)",
-                background: "var(--color-bg-secondary)",
-                color: "var(--color-text-primary)",
-                fontSize: 14,
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <ResetButton onClick={handleReset} />
+          <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />
         </div>
 
         <div className="table-wrapper">

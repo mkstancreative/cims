@@ -57,10 +57,18 @@ export const getMyQuiz = async (): Promise<MyQuizResponse> => {
   return response.data;
 };
 
+/**
+ * `token` is the paper's `submitToken` — send it on the AUTOMATIC submit when
+ * the timer runs out (it's what lets a just-late submission through). A
+ * manual submit before the deadline doesn't need it.
+ */
 export const submitQuiz = async (
   id: string,
   payload: SubmitQuizPayload,
+  token?: string | null,
 ): Promise<SubmitQuizResult> => {
-  const response = await api.post(`/quizzes/${id}/submit`, payload);
+  const response = await api.post(`/quizzes/${id}/submit`, payload, {
+    headers: token ? { "x-quiz-token": token } : undefined,
+  });
   return response.data;
 };

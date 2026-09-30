@@ -2,6 +2,13 @@ import type { LogbookTargets } from "./logbook";
 
 // ─── Evaluation Types ─────────────────────────────────────────────────────────
 
+/**
+ * `pending` — the supervisor hasn't submitted. `awaiting-quiz` — the
+ * supervisor's half is done; waiting on the student's quiz score (the
+ * evaluation is what opens the quiz). `completed` — the final grade landed.
+ */
+export type EvaluationStatus = "pending" | "awaiting-quiz" | "completed";
+
 export interface EvaluationRatings {
   professionalism: number;
   technicalCompetence: number;
@@ -116,7 +123,7 @@ export interface EvaluationVerifyReport {
     };
     evaluation: {
       _id: string;
-      status: "pending" | "completed";
+      status: EvaluationStatus;
       totalScore: number | null;
       submittedAt: string | null;
     } | null;
@@ -230,7 +237,7 @@ export interface CompositeResultsParams {
   department?: string;    // case-insensitive department name
   batchId?: string;       // batch _id
   search?: string;        // registration number match
-  status?: "pending" | "completed";
+  status?: EvaluationStatus;
   grade?: "A" | "B" | "C" | "D" | "E" | "F";
   page?: number;
   limit?: number;

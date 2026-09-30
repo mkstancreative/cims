@@ -366,7 +366,6 @@ export default function AdminCertificates() {
 
       <div className="filter-wrapper fp-toolbar">
         <div className="fp-toolbar__row">
-          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
           <div className="fp-toolbar__search">
             <SearchInput
               value={filters.search}
@@ -375,6 +374,7 @@ export default function AdminCertificates() {
               onClear={() => setField("search", "")}
             />
           </div>
+          <FilterPopover sections={filterSections} onClearAll={clearFilters} />
           <ResetButton onClick={handleReset} />
         </div>
         <ActiveFilterChips sections={filterSections} onClearAll={clearFilters} />

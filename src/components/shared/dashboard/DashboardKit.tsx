@@ -200,10 +200,7 @@ export function SectionHead({
   const c = COLOR_MAP[color];
   return (
     <div className="db-section-head">
-      <div
-        className="db-section-head__icon"
-        style={{ background: c.bg, color: c.icon }}
-      >
+      <div className="db-section-head__icon" style={{ color: c.icon }}>
         {icon}
       </div>
       <div>

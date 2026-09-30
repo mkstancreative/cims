@@ -10,6 +10,8 @@ export interface Action {
   onClick?: () => void;
   danger?: boolean;
   disabled?: boolean;
+  /** Tooltip — e.g. why the action is disabled. */
+  title?: string;
 }
 
 interface ActionDropdownProps {
@@ -85,6 +87,7 @@ function ActionDropdown({ actions = [] }: ActionDropdownProps) {
                 key={i}
                 className={`action-item${action.danger ? " danger" : ""}`}
                 disabled={Boolean(action.disabled)}
+                title={action.title}
                 onClick={() => {
                   setOpen(false);
                   if (action.href) {

@@ -41,6 +41,7 @@
 /* Meta row */
 .mq-intro-meta-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
   margin-bottom: 26px;
@@ -141,6 +142,12 @@
 
 .mq-start-btn:active {
   transform: translateY(0);
+}
+
+.mq-start-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 
@@ -417,4 +424,324 @@
   font-size: 12.5px;
   font-weight: 600;
   color: var(--color-text-secondary);
+}
+
+/* ── Quiz timer ────────────────────────────────────────────────────────────
+   Batch-wide countdown. Sticks to the top while the student scrolls the
+   paper; amber under five minutes, red under one. */
+.mq-timer {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+  --mq-timer-rgb: var(--color-primary-rgb);
+  color: rgb(var(--mq-timer-rgb));
+}
+
+.mq-timer--warn {
+  --mq-timer-rgb: 202, 138, 4;
+  border-color: rgba(202, 138, 4, 0.4);
+}
+
+.mq-timer--danger {
+  --mq-timer-rgb: 220, 38, 38;
+  border-color: rgba(220, 38, 38, 0.45);
+  animation: mq-timer-pulse 1s ease-in-out infinite;
+}
+
+.mq-timer__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.mq-timer__value {
+  margin-left: auto;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--mq-timer-rgb));
+}
+
+.mq-timer__track {
+  flex-basis: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--mq-timer-rgb), 0.14);
+}
+
+.mq-timer__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: rgb(var(--mq-timer-rgb));
+  transition: width 0.25s linear;
+}
+
+@keyframes mq-timer-pulse {
+  50% {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+  }
+}
+
+[data-theme="dark"] .mq-timer--warn {
+  --mq-timer-rgb: 250, 204, 21;
+}
+
+[data-theme="dark"] .mq-timer--danger {
+  --mq-timer-rgb: 248, 113, 113;
+}
+
+.mq-timeup-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.08);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .mq-timeup-note {
+  color: #f87171;
+}
+
+/* Intro: time left in this sitting */
+.mq-intro-timeleft {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  color: var(--color-text-secondary);
+}
+
+.mq-intro-timeleft strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.mq-intro-timeleft span {
+  color: var(--color-text-muted);
+}
+
+.mq-intro-timeleft--over {
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+/* Second click needed when some questions are unanswered */
+.modal-submit.mq-submit--confirm {
+  background: #ca8a04;
+  border-color: #ca8a04;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mq-timer--danger {
+    animation: none;
+  }
+}
+
+/* ── One question at a time ─────────────────────────────────────────────── */
+.mq-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-bg-secondary);
+}
+
+.mq-steps__head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.mq-steps__head strong {
+  color: var(--color-text-primary);
+}
+
+.mq-steps__track {
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--color-primary-rgb), 0.12);
+}
+
+.mq-steps__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: width 0.25s ease;
+}
+
+.mq-steps__dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mq-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-secondary);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.mq-dot:hover {
+  border-color: var(--color-accent-border);
+}
+
+/* Beat the global button:focus/:active border */
+.mq-dot:focus,
+.mq-dot:active {
+  border: 1px solid var(--color-border);
+}
+
+.mq-dot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.mq-dot.is-answered,
+.mq-dot.is-answered:focus,
+.mq-dot.is-answered:active {
+  border-color: var(--color-accent-border);
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+}
+
+.mq-dot.is-current,
+.mq-dot.is-current:focus,
+.mq-dot.is-current:active {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+}
+
+/* The question is a fieldset (its legend names the radio group) */
+fieldset.mq-question-card {
+  min-width: 0;
+  margin: 0;
+}
+
+fieldset.mq-question-card > legend {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+fieldset.mq-question-card > .mq-options-list {
+  clear: both;
+}
+
+.mq-nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.mq-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.mq-nav-btn:focus,
+.mq-nav-btn:active {
+  border: 1px solid var(--color-accent-border);
+}
+
+.mq-nav-btn:hover:not(:disabled) {
+  background: var(--color-accent-muted);
+}
+
+.mq-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mq-nav-btn--next,
+.mq-nav-btn--next:focus,
+.mq-nav-btn--next:active {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+}
+
+.mq-nav-btn--next:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.mq-nav-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.mq-all-done {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.mq-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.mq-link:hover {
+  text-decoration: underline;
+}
+
+.mq-link:focus,
+.mq-link:active {
+  border: none;
 }

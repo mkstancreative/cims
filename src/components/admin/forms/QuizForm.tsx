@@ -119,6 +119,10 @@ function QuizFormInner({ isOpen, onClose, editing }: QuizFormInnerProps) {
   const [title, setTitle] = useState(editing?.title ?? "");
   const [description, setDescription] = useState(editing?.description ?? "");
   const [passMark, setPassMark] = useState(editing?.passMark ?? 50);
+  // Time limit in minutes; blank = untimed.
+  const [duration, setDuration] = useState(
+    editing?.durationMinutes ? String(editing.durationMinutes) : "",
+  );
   const [questions, setQuestions] = useState<DraftQuestion[]>(() =>
     editing?.questions.length
       ? editing.questions.map((q) => ({
@@ -201,6 +205,18 @@ function QuizFormInner({ isOpen, onClose, editing }: QuizFormInnerProps) {
       setError("Pass mark must be between 0 and 100.");
       return;
     }
+    const durationMinutes = duration.trim() === "" ? null : Number(duration);
+    if (
+      durationMinutes !== null &&
+      (!Number.isInteger(durationMinutes) ||
+        durationMinutes < 1 ||
+        durationMinutes > 480)
+    ) {
+      setError(
+        "Time limit must be a whole number of minutes from 1 to 480, or blank for no limit.",
+      );
+      return;
+    }
     const built = buildQuestions(questions);
     if ("error" in built) {
       setError(built.error);
@@ -212,6 +228,12 @@ function QuizFormInner({ isOpen, onClose, editing }: QuizFormInnerProps) {
       // Editing sends "" so a description can be cleared; creating omits it.
       description: editing ? description.trim() : description.trim() || undefined,
       passMark,
+      // Editing sends null to clear a limit; creating omits it when blank.
+      ...(editing
+        ? { durationMinutes }
+        : durationMinutes !== null
+          ? { durationMinutes }
+          : {}),
       questions: built.questions,
     };
 
@@ -306,6 +328,32 @@ function QuizFormInner({ isOpen, onClose, editing }: QuizFormInnerProps) {
             onChange={(e) => setPassMark(Number(e.target.value))}
             required
           />
+        </div>
+        <div className="form-group builder-field--narrow">
+          <label className="modal-label" htmlFor="quiz-duration">
+            Time Limit (minutes)
+          </label>
+          <input
+            id="quiz-duration"
+            type="number"
+            min={1}
+            max={480}
+            step={1}
+            className="modal-input"
+            placeholder="No limit"
+            value={duration}
+            onChange={(e) => {
+              setDuration(e.target.value);
+              if (error) setError("");
+            }}
+          />
+          <span className="builder-hint">
+            Blank = untimed. The clock starts for the whole batch when a sitting
+            is unlocked
+            {editing?.durationMinutes
+              ? " — changing it won't move a sitting that's already unlocked."
+              : "."}
+          </span>
         </div>
 
         <div className="builder-toolbar">

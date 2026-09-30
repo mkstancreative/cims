@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FileQuestion,
   Lock,
@@ -14,7 +14,10 @@ import {
   UserX,
   Archive,
   Hourglass,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { useAuth } from "../../context/useAuth";
 import { Link } from "react-router-dom";
 import {
   quizSubmitAttempt,
@@ -23,10 +26,16 @@ import {
   useSubmitQuiz,
 } from "../../hooks/useQuizzes";
 import { useMyQuizSession } from "../../hooks/useQuizSessions";
+import {
+  formatCountdown,
+  newestTimer,
+  useQuizCountdown,
+} from "../../hooks/useQuizCountdown";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import type {
   MyQuizSessionRef,
   QuizLockCode,
+  QuizTimer,
   StudentQuiz,
 } from "../../api/types/quiz";
 import { SkeletonCard } from "../../components/ui/Skeleton/Skeleton";
@@ -231,12 +240,19 @@ interface QuizIntro {
 function QuizIntroCard({
   intro,
   session,
+  timer,
   onStart,
 }: {
   intro: QuizIntro;
   session?: { sitting: number; status: string; present?: boolean } | null;
+  /** From the summary — no paper. Drives the time left and Start/Resume. */
+  timer?: QuizTimer | null;
   onStart: () => void;
 }) {
+  const { timed, secondsLeft, expired, durationMinutes } =
+    useQuizCountdown(timer);
+  // The clock runs from unlock either way — resuming grants no fresh time.
+  const resuming = Boolean(timer?.startedAt);
   return (
     <div className="mq-center-panel">
       <div className="mq-intro-card">
@@ -277,6 +293,13 @@ function QuizIntroCard({
             </span>
           </div>
           <div className="mq-intro-meta-item">
+            <Clock size={16} className="mq-intro-meta-icon" />
+            <span className="mq-intro-meta-label">Time Limit</span>
+            <span className="mq-intro-meta-value">
+              {durationMinutes ? `${durationMinutes} min` : "None"}
+            </span>
+          </div>
+          <div className="mq-intro-meta-item">
             <BookOpen size={16} className="mq-intro-meta-icon" />
             <span className="mq-intro-meta-label">Type</span>
             <span className="mq-intro-meta-value">MCQ</span>
@@ -289,8 +312,14 @@ function QuizIntroCard({
           <ul className="mq-intro-instr-list">
             <li>
               <CheckCircle size={13} />
-              Answer all questions before submitting
+              Answer every question you can — unanswered ones score zero
             </li>
+            {durationMinutes ? (
+              <li>
+                <CheckCircle size={13} />
+                When time runs out, your answers are submitted automatically
+              </li>
+            ) : null}
             <li>
               <CheckCircle size={13} />
               Each question has one correct answer
@@ -306,9 +335,28 @@ function QuizIntroCard({
           </ul>
         </div>
 
-        <button type="button" className="mq-start-btn" onClick={onStart}>
+        {/* Batch-wide clock: it started when the sitting was unlocked. */}
+        {timed && secondsLeft !== null && !expired && (
+          <p className="mq-intro-timeleft">
+            <Clock size={14} /> Time left for this sitting:{" "}
+            <strong>{formatCountdown(secondsLeft)}</strong>
+            {resuming && <span> · the clock kept running while you were away</span>}
+          </p>
+        )}
+        {timed && expired && (
+          <p className="mq-intro-timeleft mq-intro-timeleft--over">
+            <Clock size={14} /> The time for this sitting has run out.
+          </p>
+        )}
+
+        <button
+          type="button"
+          className="mq-start-btn"
+          onClick={onStart}
+          disabled={timed && expired}
+        >
           <PlayCircle size={18} />
-          Start Quiz
+          {resuming ? "Resume Quiz" : "Start Quiz"}
         </button>
       </div>
     </div>
@@ -339,8 +387,133 @@ function ResultCard({ score, passed }: { score: number; passed: boolean }) {
 }
 
 // ─── Quiz form ────────────────────────────────────────────────────────────────
-function QuizForm({ quiz }: { quiz: StudentQuiz }) {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+/**
+ * In-progress answers live in localStorage, keyed by the signed-in user's id
+ * and the quiz — so they survive a reload or a closed tab (the clock keeps
+ * running regardless), and one student never sees another's on a shared
+ * computer. Keyed on the account id rather than the access token, which is
+ * refreshed during a session and would orphan the saved answers.
+ */
+interface SavedProgress {
+  answers: Record<number, number>;
+  current: number;
+}
+
+const progressKey = (userId: string, quizId: string) =>
+  `quiz-progress:${userId}:${quizId}`;
+
+function readProgress(userId: string, quizId: string): SavedProgress {
+  try {
+    const raw = JSON.parse(
+      localStorage.getItem(progressKey(userId, quizId)) ?? "null",
+    );
+    if (raw && typeof raw === "object" && raw.answers) {
+      return { answers: raw.answers, current: Number(raw.current) || 0 };
+    }
+  } catch {
+    // Unreadable or blocked — start fresh.
+  }
+  return { answers: {}, current: 0 };
+}
+
+/** The submit error is past the deadline — too late, never retry. */
+function isTimeElapsed(err: unknown): boolean {
+  return (
+    (err as { response?: { data?: { code?: string } } })?.response?.data
+      ?.code === "QUIZ_TIME_ELAPSED"
+  );
+}
+
+/**
+ * The countdown bar — batch-wide, from the sitting's unlock. Amber under five
+ * minutes, red under one; a screen reader hears those two moments, not every
+ * second.
+ */
+function QuizTimerBar({
+  secondsLeft,
+  durationMinutes,
+}: {
+  secondsLeft: number;
+  durationMinutes: number;
+}) {
+  const total = durationMinutes * 60;
+  const pct = total > 0 ? Math.min(100, (secondsLeft / total) * 100) : 0;
+  const tone =
+    secondsLeft <= 60 ? "danger" : secondsLeft <= 300 ? "warn" : "ok";
+  const announce =
+    secondsLeft <= 60
+      ? "Less than one minute left."
+      : secondsLeft <= 300
+        ? "Five minutes left."
+        : "";
+  return (
+    <div className={`mq-timer mq-timer--${tone}`}>
+      <Clock size={16} />
+      <span className="mq-timer__label">Time remaining</span>
+      <strong className="mq-timer__value" role="timer">
+        {formatCountdown(secondsLeft)}
+      </strong>
+      <span className="mq-timer__track" aria-hidden="true">
+        <span style={{ width: `${pct}%` }} />
+      </span>
+      <span className="sr-only" aria-live="polite">
+        {announce}
+      </span>
+    </div>
+  );
+}
+
+/** Past the deadline, and the automatic submit didn't make it in. */
+function TimeUpCard({ message }: { message?: string }) {
+  return (
+    <div className="mq-center-panel">
+      <div className="mq-locked-card">
+        <div className="mq-icon-wrap amber">
+          <Clock size={30} />
+        </div>
+        <h3 className="mq-card-title">Time&apos;s Up</h3>
+        <p className="mq-card-desc">
+          {message ||
+            "The time limit for this sitting has passed, so the quiz can no longer be submitted."}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The paper, one question at a time. Previous / Next move through it, the
+ * numbered strip jumps anywhere (answered ones are filled), and progress is
+ * saved per user so nothing is lost on a reload.
+ */
+function QuizForm({
+  quiz,
+  timer,
+  submitToken,
+  passMark,
+}: {
+  quiz: StudentQuiz;
+  /** The paper may omit it; the summary carries it. */
+  passMark?: number;
+  /** The freshest server reading (paper or summary). */
+  timer?: QuizTimer | null;
+  /** Kept for the whole attempt; sent only on the automatic submit. */
+  submitToken?: string | null;
+}) {
+  const { user } = useAuth();
+  const userId = user?.id ?? "anon";
+  const questions = quiz.questions ?? [];
+  const lastIndex = Math.max(0, questions.length - 1);
+
+  const [saved] = useState(() => readProgress(userId, quiz._id));
+  const [answers, setAnswers] = useState<Record<number, number>>(
+    saved.answers,
+  );
+  const [current, setCurrent] = useState(() =>
+    Math.min(saved.current, lastIndex),
+  );
+  // Two-step submit when some questions are unanswered.
+  const [confirmPartial, setConfirmPartial] = useState(false);
   const {
     mutate: submit,
     isPending,
@@ -349,19 +522,74 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
   } = useSubmitQuiz();
   // A duplicate submit (409) still carries the recorded result.
   const priorAttempt = quizSubmitAttempt(submitError);
+  const timeElapsed = isTimeElapsed(submitError);
 
-  const questions = quiz.questions ?? [];
-  const allAnswered =
-    questions.length > 0 && questions.every((_, i) => answers[i] !== undefined);
+  const { timed, secondsLeft, expired, durationMinutes } =
+    useQuizCountdown(timer);
+
+  const answeredCount = questions.filter((_, i) => answers[i] !== undefined)
+    .length;
+  const unanswered = questions.length - answeredCount;
+
+  // Save on every change.
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        progressKey(userId, quiz._id),
+        JSON.stringify({ answers, current }),
+      );
+    } catch {
+      // Storage blocked — progress just won't survive a reload.
+    }
+  }, [answers, current, userId, quiz._id]);
+
+  const clearSaved = () => {
+    try {
+      localStorage.removeItem(progressKey(userId, quiz._id));
+    } catch {
+      // ignore
+    }
+  };
+
+  // The attempt is over one way or another — drop the saved progress.
+  const finished = Boolean(result?.data || priorAttempt || timeElapsed);
+  useEffect(() => {
+    if (finished) clearSaved();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished]);
+
+  // Every question, -1 for unanswered — the server scores against the
+  // quiz's own list, so this is exact either way.
+  const buildPayload = () => ({
+    answers: questions.map((_, questionIndex) => ({
+      questionIndex,
+      selectedOptionIndex: answers[questionIndex] ?? -1,
+    })),
+  });
 
   const handleSubmit = () => {
-    const payload = {
-      answers: questions.map((_, questionIndex) => ({
-        questionIndex,
-        selectedOptionIndex: answers[questionIndex],
-      })),
-    };
-    submit({ id: quiz._id, payload });
+    if (unanswered > 0 && !confirmPartial) {
+      setConfirmPartial(true);
+      return;
+    }
+    submit({ id: quiz._id, payload: buildPayload() });
+  };
+
+  // Time's up → submit automatically, ONCE, with the token. Never retried: a
+  // late 400 retried is still late, and a 409 means it's already in.
+  const autoFired = useRef(false);
+  useEffect(() => {
+    if (!timed || !expired || autoFired.current) return;
+    if (result || submitError || isPending) return;
+    autoFired.current = true;
+    submit({ id: quiz._id, payload: buildPayload(), token: submitToken });
+    // buildPayload reads current answers — intentionally not a dep.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timed, expired, result, submitError, isPending]);
+
+  const goTo = (i: number) => {
+    setCurrent(Math.max(0, Math.min(lastIndex, i)));
+    setConfirmPartial(false);
   };
 
   if (result?.data) {
@@ -372,9 +600,36 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
       <ResultCard score={priorAttempt.score} passed={priorAttempt.passed} />
     );
   }
+  if (timeElapsed) {
+    return (
+      <TimeUpCard
+        message={
+          (submitError as { response?: { data?: { message?: string } } })
+            ?.response?.data?.message
+        }
+      />
+    );
+  }
+
+  const locked = timed && expired;
+  const q = questions[current];
+  const isLast = current === lastIndex;
 
   return (
     <div className="mq-form-wrap">
+      {timed && secondsLeft !== null && durationMinutes !== null && (
+        <QuizTimerBar
+          secondsLeft={secondsLeft}
+          durationMinutes={durationMinutes}
+        />
+      )}
+
+      {locked && (
+        <div className="mq-timeup-note" role="status">
+          <Clock size={15} /> Time&apos;s up — submitting your answers…
+        </div>
+      )}
+
       {/* Quiz header */}
       <div className="mq-quiz-header">
         <h3 className="mq-quiz-title">{quiz.title}</h3>
@@ -382,20 +637,59 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
           <p className="mq-quiz-desc">{quiz.description}</p>
         )}
         <p className="mq-quiz-meta">
-          {questions.length} questions · Pass mark: {quiz.passMark}
+          {questions.length} questions
+          {(quiz.passMark ?? passMark) != null
+            ? ` · Pass mark: ${quiz.passMark ?? passMark}`
+            : ""}
+          {durationMinutes ? ` · ${durationMinutes} min time limit` : ""}
         </p>
       </div>
 
-      {/* Questions */}
-      {questions.map((q, qi) => (
-        <div key={q._id ?? qi} className="mq-question-card">
-          <p className="mq-question-text">
-            <span className="mq-question-num">Q{qi + 1}.</span>
+      {/* Where you are, and a jump to any question */}
+      <div className="mq-steps">
+        <div className="mq-steps__head">
+          <span>
+            Question <strong>{current + 1}</strong> of {questions.length}
+          </span>
+          <span>{answeredCount} answered</span>
+        </div>
+        <div className="mq-steps__track" aria-hidden="true">
+          <span
+            style={{
+              width: `${questions.length ? ((current + 1) / questions.length) * 100 : 0}%`,
+            }}
+          />
+        </div>
+        <nav className="mq-steps__dots" aria-label="Questions">
+          {questions.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`mq-dot${i === current ? " is-current" : ""}${
+                answers[i] !== undefined ? " is-answered" : ""
+              }`}
+              onClick={() => goTo(i)}
+              aria-label={`Question ${i + 1}${
+                answers[i] !== undefined ? ", answered" : ", not answered"
+              }`}
+              aria-current={i === current ? "step" : undefined}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* The current question */}
+      {q && (
+        <fieldset className="mq-question-card" key={q._id ?? current}>
+          <legend className="mq-question-text">
+            <span className="mq-question-num">Q{current + 1}.</span>
             {q.text}
-          </p>
+          </legend>
           <div className="mq-options-list">
             {q.options.map((opt, oi) => {
-              const selected = answers[qi] === oi;
+              const selected = answers[current] === oi;
               return (
                 <label
                   key={oi}
@@ -403,34 +697,68 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
                 >
                   <input
                     type="radio"
-                    name={`q-${qi}`}
+                    name={`q-${current}`}
                     checked={selected}
-                    onChange={() =>
-                      setAnswers((prev) => ({ ...prev, [qi]: oi }))
-                    }
+                    disabled={locked || isPending}
+                    onChange={() => {
+                      setAnswers((prev) => ({ ...prev, [current]: oi }));
+                      setConfirmPartial(false);
+                    }}
                   />
                   {opt}
                 </label>
               );
             })}
           </div>
-        </div>
-      ))}
+        </fieldset>
+      )}
 
-      {/* Submit row */}
-      <div className="mq-submit-row">
-        <span className="mq-answered-count">
-          {Object.keys(answers).length}/{questions.length} answered
-        </span>
+      {/* Previous / Next — Submit on the last question */}
+      <div className="mq-nav-row">
         <button
           type="button"
-          className="modal-submit"
-          disabled={!allAnswered || isPending}
-          onClick={handleSubmit}
+          className="mq-nav-btn"
+          onClick={() => goTo(current - 1)}
+          disabled={current === 0 || isPending}
         >
-          {isPending ? "Submitting…" : "Submit Quiz"}
+          <ChevronLeft size={16} /> Previous
         </button>
+
+        {isLast ? (
+          <button
+            type="button"
+            className={`modal-submit${confirmPartial ? " mq-submit--confirm" : ""}`}
+            disabled={isPending || locked || questions.length === 0}
+            onClick={handleSubmit}
+          >
+            {isPending
+              ? "Submitting…"
+              : confirmPartial
+                ? `Submit with ${unanswered} unanswered?`
+                : "Submit Quiz"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="mq-nav-btn mq-nav-btn--next"
+            onClick={() => goTo(current + 1)}
+            disabled={isPending}
+          >
+            Next <ChevronRight size={16} />
+          </button>
+        )}
       </div>
+
+      {/* Submit from anywhere once everything is answered */}
+      {!isLast && unanswered === 0 && (
+        <p className="mq-all-done">
+          All questions answered —{" "}
+          <button type="button" className="mq-link" onClick={() => goTo(lastIndex)}>
+            go to the last question to submit
+          </button>
+          .
+        </p>
+      )}
     </div>
   );
 }
@@ -505,7 +833,15 @@ export default function MyQuiz() {
             message={paper?.message}
           />
         );
-      return <QuizForm quiz={paper.quiz as StudentQuiz} />;
+      return (
+        <QuizForm
+          quiz={paper.quiz as StudentQuiz}
+          // The newer reading wins — the summary re-syncs every minute.
+          timer={newestTimer(paper.timer, summary?.timer)}
+          submitToken={paper.submitToken}
+          passMark={summary?.quiz?.passMark}
+        />
+      );
     }
 
     // ── Before Start: summary + sitting, no questions ──
@@ -536,6 +872,7 @@ export default function MyQuiz() {
         <QuizIntroCard
           intro={intro}
           session={sessionChip}
+          timer={summary?.timer}
           onStart={() => setStarted(true)}
         />
       );

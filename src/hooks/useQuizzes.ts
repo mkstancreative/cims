@@ -10,6 +10,7 @@ import {
   getMyQuizSummary,
   submitQuiz,
 } from "../api/services/quiz";
+import { isQuizSittingInProgress } from "./useQuizSessions";
 import type {
   QuizParams,
   QuizResponse,
@@ -96,8 +97,12 @@ export const useUpdateQuiz = () => {
       queryClient.invalidateQueries({ queryKey: ["quizzes"] });
       toast.success("Quiz updated successfully!");
     },
-    onError: (err: unknown) =>
-      toast.error(getErrMsg(err, "Failed to update quiz.")),
+    onError: (err: unknown) => {
+      // Refused mid-sitting: the message names the batch and the fix.
+      if (isQuizSittingInProgress(err))
+        queryClient.invalidateQueries({ queryKey: ["quiz-sessions"] });
+      toast.error(getErrMsg(err, "Failed to update quiz."));
+    },
   });
 };
 
@@ -115,8 +120,11 @@ export const useReorderQuizQuestions = () => {
       );
       if (res.warning) toast.warn(res.warning, { autoClose: 10000 });
     },
-    onError: (err: unknown) =>
-      toast.error(getErrMsg(err, "Failed to reorder questions.")),
+    onError: (err: unknown) => {
+      if (isQuizSittingInProgress(err))
+        queryClient.invalidateQueries({ queryKey: ["quiz-sessions"] });
+      toast.error(getErrMsg(err, "Failed to reorder questions."));
+    },
   });
 };
 
@@ -144,8 +152,16 @@ export function quizSubmitAttempt(
 export const useSubmitQuiz = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: SubmitQuizPayload }) =>
-      submitQuiz(id, payload),
+    mutationFn: ({
+      id,
+      payload,
+      token,
+    }: {
+      id: string;
+      payload: SubmitQuizPayload;
+      /** Only on the automatic submit when time runs out. */
+      token?: string | null;
+    }) => submitQuiz(id, payload, token),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["quizzes", "my"] });
       queryClient.invalidateQueries({ queryKey: ["my-evaluation"] });

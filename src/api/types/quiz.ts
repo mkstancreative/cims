@@ -16,6 +16,8 @@ export interface Quiz {
   description?: string;
   questions: QuizQuestion[];
   passMark: number;
+  /** Time limit in whole minutes (1–480); null / absent = untimed. */
+  durationMinutes?: number | null;
   isActive: boolean;
   createdBy?: string;
   createdAt?: string;
@@ -33,6 +35,7 @@ export interface QuizListItem {
   title: string;
   description?: string;
   passMark: number;
+  durationMinutes?: number | null;
   isActive: boolean;
   createdAt?: string;
   questionCount: number;
@@ -50,6 +53,11 @@ export interface CreateQuizPayload {
   title: string;
   description?: string;
   passMark: number;
+  /**
+   * Whole minutes, 1–480. Omit to leave what's stored; `null` clears it back
+   * to untimed. Changing it never moves an already-unlocked sitting's clock.
+   */
+  durationMinutes?: number | null;
   questions: Array<{
     /**
      * Echo it back on every question you're keeping. `PUT /quizzes/:id`
@@ -171,6 +179,12 @@ export interface MyQuizResponse {
     alreadySubmitted?: boolean;
     score?: number;
     passed?: boolean;
+    timer?: QuizTimer;
+    /**
+     * Keep for the whole attempt; required on the automatic submit when time
+     * runs out (accepted up to 2 minutes past the deadline). null = untimed.
+     */
+    submitToken?: string | null;
   };
 }
 
@@ -185,11 +199,14 @@ export interface SubmitQuizPayload {
 export interface SubmitQuizError {
   success: false;
   message: string;
-  code?: QuizLockCode;
+  /** Lock codes, or QUIZ_TIME_ELAPSED — past the deadline (never retry). */
+  code?: QuizLockCode | "QUIZ_TIME_ELAPSED";
   data?: {
     curriculum?: MyQuizCurriculumProgress;
     /** On a 409 ALREADY_SUBMITTED — the recorded result, to show the score. */
     attempt?: { score?: number; passed?: boolean; [key: string]: unknown };
+    /** On a 400 QUIZ_TIME_ELAPSED. */
+    timer?: QuizTimer;
   };
 }
 
@@ -242,6 +259,8 @@ export interface QuizSummaryData {
     passed: boolean;
     submittedAt: string;
     answered: number;
+    /** Landed after the deadline on a valid token. */
+    autoSubmitted?: boolean;
   } | null;
   /** locked only — same codes as `/quizzes/my`, plus the gate's data. */
   lock: {
@@ -253,9 +272,33 @@ export interface QuizSummaryData {
   } | null;
   /** A ready-to-render sentence saying whose move it is. */
   nextStep: string;
+  timer?: QuizTimer;
 }
 
 export interface QuizSummaryResponse {
   success: boolean;
   data: QuizSummaryData;
+}
+
+// ─── Quiz timer ──────────────────────────────────────────────────────────────
+//
+// Batch-wide: the clock starts when the sitting is UNLOCKED, not when a
+// student opens the paper. Same shape on `/quizzes/my` and the summary.
+
+export interface QuizTimer {
+  /** null = untimed; render no countdown (not zero). */
+  durationMinutes: number | null;
+  unlockedAt: string | null;
+  expiresAt: string | null;
+  /**
+   * Server-computed, clamped at 0, null when untimed. Drive the countdown
+   * from this against `performance.now()` — never from `expiresAt` and the
+   * device clock.
+   */
+  secondsRemaining: number | null;
+  expired: boolean;
+  /** For measuring clock skew. */
+  serverTime: string;
+  /** First paper fetch by this student. null → "Start", set → "Resume". */
+  startedAt: string | null;
 }

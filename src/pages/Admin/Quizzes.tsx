@@ -11,6 +11,7 @@ import QuizForm from "../../components/admin/forms/QuizForm";
 import QuizzesTable from "../../components/admin/tables/QuizzesTable";
 import QuizViewModal from "../../components/admin/view/QuizViewModal";
 import { useModal } from "../../context/ModalContext";
+import { useLiveQuizSittings } from "../../hooks/useQuizSessions";
 import type { QuizListItem } from "../../api/types/quiz";
 
 interface FilterState {
@@ -21,6 +22,8 @@ interface FilterState {
 }
 
 export default function Quizzes() {
+  // Quizzes being sat right now can't be edited — disable, don't let it fail.
+  const liveSittings = useLiveQuizSittings();
   const { openModal, closeModal } = useModal();
 
   const [filters, setFilters] = useState<FilterState>({
@@ -116,6 +119,7 @@ export default function Quizzes() {
           onLimitChange={(l) => setField("limit", l)}
           onView={openView}
           onEdit={openEdit}
+          liveSittings={liveSittings}
           onToggleStatusRequest={(q) => setStatusTarget(asTarget(q))}
           onDeleteRequest={(q) => setDeleteTarget(asTarget(q))}
         />

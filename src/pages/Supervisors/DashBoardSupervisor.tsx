@@ -20,6 +20,7 @@ import {
 import "../../components/shared/dashboard/dashboard.css";
 import { useAuth } from "../../context/useAuth";
 import MyDepartments from "../../components/supervisor/dashboard/MyDepartments";
+import { EvaluateFirstNotice } from "../../components/supervisor/EvaluateFirstNotice";
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function DashBoardSupervisor() {
@@ -48,7 +49,6 @@ export default function DashBoardSupervisor() {
   const activeRate =
     totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 100) : 0;
 
-
   const firstName = user?.firstName ?? "Supervisor";
   const initials =
     `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase();
@@ -69,8 +69,11 @@ export default function DashBoardSupervisor() {
         gradient="var(--color-primary)"
       />
 
-      {/* ── Student KPIs ───────────────────────────────────────────────────── */}
-      <div>
+      {/* The evaluation now opens the quiz — say so where it's acted on. */}
+      <EvaluateFirstNotice showLink />
+
+      {/* ── Student KPIs — one compact row on wide screens ──────────────── */}
+      <div className="db-kpis">
         <SectionHead
           title="Student Overview"
           sub={`${totalStudents} students across all statuses`}
@@ -137,156 +140,157 @@ export default function DashBoardSupervisor() {
         </div>
       </div>
 
-      {/* ── Rings ───────────────────────────────────────────────────────────── */}
-      <div className="db-panels">
-        {/* Active rate ring */}
-        <div className="db-ring-card">
-          <div className="db-ring-card__ring">
-            <ProgressRing
-              pct={activeRate}
-              color={activeRate >= 70 ? "var(--color-primary)" : "#f59e0b"}
-            />
-            <div className="db-ring-card__inner">
-              <span className="db-ring-card__pct">{activeRate}%</span>
-              <span className="db-ring-card__pct-lbl">active</span>
-            </div>
-          </div>
-          <div className="db-ring-card__info">
-            <div className="db-ring-card__title">Student Activity Rate</div>
-            <div className="db-ring-card__rows">
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Total Assigned</span>
-                <span className="db-ring-card__row-val">{totalStudents}</span>
-              </div>
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Placed</span>
-                <span
-                  className="db-ring-card__row-val"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  {stu?.placed ?? 0}
-                </span>
-              </div>
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Active</span>
-                <span
-                  className="db-ring-card__row-val"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  {stu?.active ?? 0}
-                </span>
-              </div>
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Completed</span>
-                <span
-                  className="db-ring-card__row-val"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  {completedStudents}
-                </span>
-              </div>
-              <div className="db-ring-card__row">
-                <span className="db-ring-card__row-lbl">Abandoned</span>
-                <span
-                  className="db-ring-card__row-val"
-                  style={{ color: "var(--color-text-muted)" }}
-                  title="Closed when a newer internship started."
-                >
-                  {abandonedStudents}
-                </span>
-              </div>
-            </div>
-          </div>
+      {/* ── Main column + sidebar; stacks on narrow screens ───────────── */}
+      <div className="db-layout">
+        <div className="db-main">
+          {/* My departments — live counts, linking through to the filtered
+              student list. */}
+          <MyDepartments />
+
+          <InfoPanel
+            title="Student Breakdown"
+            sub="All statuses at a glance"
+            icon={<Users size={16} />}
+            iconColor="primary"
+            rows={[
+              { label: "Total Assigned", value: totalStudents },
+              { label: "Placed", value: stu?.placed ?? 0 },
+              { label: "Active (Interning)", value: stu?.active ?? 0 },
+              { label: "Completed", value: completedStudents },
+              { label: "Abandoned", value: abandonedStudents },
+              { label: "Needing Evaluation", value: needingEval },
+            ]}
+          />
         </div>
 
-      </div>
+        <aside className="db-side">
+          <div className="db-ring-card">
+            <div className="db-ring-card__ring">
+              <ProgressRing
+                pct={activeRate}
+                color={activeRate >= 70 ? "var(--color-primary)" : "#f59e0b"}
+              />
+              <div className="db-ring-card__inner">
+                <span className="db-ring-card__pct">{activeRate}%</span>
+                <span className="db-ring-card__pct-lbl">active</span>
+              </div>
+            </div>
+            <div className="db-ring-card__info">
+              <div className="db-ring-card__title">Student Activity Rate</div>
+              <div className="db-ring-card__rows">
+                <div className="db-ring-card__row">
+                  <span className="db-ring-card__row-lbl">Total Assigned</span>
+                  <span className="db-ring-card__row-val">{totalStudents}</span>
+                </div>
+                <div className="db-ring-card__row">
+                  <span className="db-ring-card__row-lbl">Placed</span>
+                  <span
+                    className="db-ring-card__row-val"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    {stu?.placed ?? 0}
+                  </span>
+                </div>
+                <div className="db-ring-card__row">
+                  <span className="db-ring-card__row-lbl">Active</span>
+                  <span
+                    className="db-ring-card__row-val"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    {stu?.active ?? 0}
+                  </span>
+                </div>
+                <div className="db-ring-card__row">
+                  <span className="db-ring-card__row-lbl">Completed</span>
+                  <span
+                    className="db-ring-card__row-val"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    {completedStudents}
+                  </span>
+                </div>
+                <div className="db-ring-card__row">
+                  <span className="db-ring-card__row-lbl">Abandoned</span>
+                  <span
+                    className="db-ring-card__row-val"
+                    style={{ color: "var(--color-text-muted)" }}
+                    title="Closed when a newer internship started."
+                  >
+                    {abandonedStudents}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      {/* ── Info Panels ─────────────────────────────────────────────────────── */}
-      <div className="db-panels">
-        <InfoPanel
-          title="Student Breakdown"
-          sub="All statuses at a glance"
-          icon={<Users size={16} />}
-          iconColor="primary"
-          rows={[
-            { label: "Total Assigned", value: totalStudents },
-            { label: "Placed", value: stu?.placed ?? 0 },
-            { label: "Active (Interning)", value: stu?.active ?? 0 },
-            { label: "Completed", value: completedStudents },
-            { label: "Abandoned", value: abandonedStudents },
-            { label: "Needing Evaluation", value: needingEval },
-          ]}
-        />
-        <InfoPanel
-          title="Logbook Summary"
-          sub="Review queue"
-          icon={<BookOpen size={16} />}
-          iconColor="info"
-          rows={[
-            {
-              label: "Pending Review",
-              value: (
-                <span
-                  style={{
-                    color:
-                      pendingLogbooks > 0
-                        ? "#f59e0b"
-                        : "var(--color-text-muted)",
-                    fontWeight: 600,
-                  }}
-                >
-                  {pendingLogbooks}
-                </span>
-              ),
-            },
-          ]}
-        />
-        <InfoPanel
-          title="My Quick Stats"
-          sub="Your supervision summary"
-          icon={<UserCheck size={16} />}
-          iconColor="primary"
-          rows={[
-            { label: "Students Assigned", value: totalStudents },
-            { label: "Active / Placed", value: activeStudents },
-            {
-              label: "Needing Evaluation",
-              value: (
-                <span
-                  style={{
-                    color: needingEval > 0 ? "#f59e0b" : "inherit",
-                    fontWeight: 600,
-                  }}
-                >
-                  {needingEval}
-                </span>
-              ),
-            },
-            {
-              label: "Logbooks To Review",
-              value: (
-                <span
-                  style={{
-                    color: pendingLogbooks > 0 ? "#ef4444" : "inherit",
-                    fontWeight: 600,
-                  }}
-                >
-                  {pendingLogbooks}
-                </span>
-              ),
-            },
-            {
-              label: "Pending Evaluations",
-              value: d?.pendingEvaluations?.length ?? 0,
-            },
-            { label: "Unread Notifications", value: unreadNotifs },
-          ]}
-        />
-      </div>
+          <InfoPanel
+            title="Logbook Summary"
+            sub="Review queue"
+            icon={<BookOpen size={16} />}
+            iconColor="info"
+            rows={[
+              {
+                label: "Pending Review",
+                value: (
+                  <span
+                    style={{
+                      color:
+                        pendingLogbooks > 0
+                          ? "#f59e0b"
+                          : "var(--color-text-muted)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {pendingLogbooks}
+                  </span>
+                ),
+              },
+            ]}
+          />
 
-      {/* ── My departments — live counts, linking through to the filtered
-          student list. Replaces the dashboard's departmentBreakdown. ── */}
-      <MyDepartments />
+          <InfoPanel
+            title="My Quick Stats"
+            sub="Your supervision summary"
+            icon={<UserCheck size={16} />}
+            iconColor="primary"
+            rows={[
+              { label: "Students Assigned", value: totalStudents },
+              { label: "Active / Placed", value: activeStudents },
+              {
+                label: "Needing Evaluation",
+                value: (
+                  <span
+                    style={{
+                      color: needingEval > 0 ? "#f59e0b" : "inherit",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {needingEval}
+                  </span>
+                ),
+              },
+              {
+                label: "Logbooks To Review",
+                value: (
+                  <span
+                    style={{
+                      color: pendingLogbooks > 0 ? "#ef4444" : "inherit",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {pendingLogbooks}
+                  </span>
+                ),
+              },
+              {
+                label: "Pending Evaluations",
+                value: d?.pendingEvaluations?.length ?? 0,
+              },
+              { label: "Unread Notifications", value: unreadNotifs },
+            ]}
+          />
+        </aside>
+      </div>
     </div>
   );
 }
