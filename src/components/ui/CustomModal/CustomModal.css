@@ -201,7 +201,8 @@
   padding: 0 14px;
   border-radius: 10px;
   border: 1px solid var(--color-accent-border);
-  background: var(--color-bg-primary);
+  /* White in light mode, like the cards; dark mode keeps the deeper tone */
+  background-color: var(--color-bg-secondary);
   font-size: 14px;
   color: var(--color-text-primary) !important;
   color-scheme: light;
@@ -231,7 +232,12 @@ select.modal-input {
 
 select.modal-input option {
   color: var(--color-text-primary);
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
+}
+
+[data-theme="dark"] .modal-input,
+[data-theme="dark"] select.modal-input option {
+  background-color: var(--color-bg-primary);
 }
 
 textarea.modal-input {

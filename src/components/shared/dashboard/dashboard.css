@@ -394,17 +394,29 @@
   flex-direction: column;
   gap: 10px;
 }
+/* White cards in light mode, like the rest of the dashboard; dark mode
+   keeps the faint overlay. */
 .db-notif-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: var(--color-surface-overlay);
+  background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  transition: background 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 .db-notif-item:hover {
+  border-color: var(--color-accent-border);
+}
+[data-theme="dark"] .db-notif-item {
+  background: var(--color-surface-overlay);
+  box-shadow: none;
+}
+[data-theme="dark"] .db-notif-item:hover {
   background: var(--color-surface-overlay-hover);
 }
 .db-notif-dot {

@@ -13,6 +13,8 @@ import {
   Users,
   UserCheck,
   UserX,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 import {
   useQuizSession,
@@ -25,6 +27,7 @@ import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
 import { useAuth } from "../../context/useAuth";
 import type {
+  NotEvaluatedStudent,
   QuizAttendanceRecord,
   QuizSession,
 } from "../../api/types/quizSession";
@@ -96,6 +99,19 @@ export default function RollCall() {
   const { mutate: close, isPending: closing } = useCloseQuizSession();
 
   const [confirmClose, setConfirmClose] = useState(false);
+  /**
+   * Present students the unlock reported as still locked out — their
+   * supervisor hasn't evaluated them. Advisory: the unlock went through, but
+   * this is the last moment anyone can act before they sit down to a locked
+   * paper.
+   */
+  const [notEvaluated, setNotEvaluated] = useState<NotEvaluatedStudent[]>([]);
+  const notEvaluatedIds = new Set(notEvaluated.map((n) => n.internship));
+
+  const handleUnlock = () =>
+    unlock(id, {
+      onSuccess: (res) => setNotEvaluated(res?.data?.notEvaluated ?? []),
+    });
 
   /**
    * Unsaved marks only, keyed on internship id like the API. Everything else
@@ -221,6 +237,41 @@ export default function RollCall() {
         </div>
       )}
 
+      {notEvaluated.length > 0 && (
+        <div className="rc-alert" role="alert">
+          <AlertTriangle size={18} />
+          <div className="rc-alert__body">
+            <strong>
+              {notEvaluated.length} present student
+              {notEvaluated.length === 1 ? " can't" : "s can't"} open the quiz
+              yet
+            </strong>
+            <p>
+              Their supervisor hasn't submitted an evaluation, so the quiz stays
+              locked for them until they do. Everyone else can sit it now.
+            </p>
+            <ul>
+              {notEvaluated.map((n) => (
+                <li key={n.internship}>
+                  {n.name ?? "Student"}
+                  {n.registrationNumber && (
+                    <span> · {n.registrationNumber}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button
+            type="button"
+            className="rc-alert__close"
+            onClick={() => setNotEvaluated([])}
+            aria-label="Dismiss"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {status === "closed" && (
         <div className="rc-banner rc-banner--warn">
           <Info size={14} />
@@ -313,7 +364,7 @@ export default function RollCall() {
           <button
             type="button"
             className="rc-btn rc-btn--unlock"
-            onClick={() => unlock(id)}
+            onClick={handleUnlock}
             // The API refuses an unlock with nobody present; disabling here
             // says why before they find out the hard way.
             disabled={unlocking || presentCount === 0 || dirty}
@@ -368,7 +419,18 @@ export default function RollCall() {
                   {initials(studentName(record))}
                 </span>
                 <div className="rc-row-body">
-                  <div className="rc-name">{studentName(record)}</div>
+                  <div className="rc-name">
+                    {studentName(record)}
+                    {notEvaluatedIds.has(key) && (
+                      <StatusBadge
+                        status="awaiting"
+                        label="Not evaluated"
+                        tone="amber"
+                        title="Their supervisor hasn't submitted an evaluation, so the quiz is locked for them."
+                        className="rc-name__badge"
+                      />
+                    )}
+                  </div>
                   <div className="rc-meta">
                     {studentRegNumber(record)}
                     {record.markedAt

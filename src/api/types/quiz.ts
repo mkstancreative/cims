@@ -203,3 +203,59 @@ export interface SubmitQuizResult {
     evaluationFinalized: boolean;
   };
 }
+
+// ─── Quiz summary (`GET /quizzes/my/summary`) ────────────────────────────────
+//
+// Dashboard-shaped and safe anywhere: never contains questions or options.
+// Always 200 — locks and "no quiz" are states, not errors.
+
+export type QuizSummaryState = "no_quiz" | "locked" | "available" | "submitted";
+
+export interface QuizSummaryData {
+  internshipId: string;
+  itStatus: string;
+  batch: { _id: string; name: string; session: string } | null;
+  /** Ships in every state — the quiz is only half the final grade. */
+  grade: {
+    /** pending / awaiting-quiz / completed */
+    evaluationStatus: string | null;
+    evaluationSubmitted: boolean;
+    supervisorScore: number | null;
+    quizScore: number | null;
+    finalScore: number | null;
+    finalGrade: string | null;
+  };
+  state: QuizSummaryState;
+  quiz: {
+    _id: string;
+    title: string;
+    description: string | null;
+    totalQuestions: number;
+    totalPoints: number;
+    /** Informational — the score feeds the grade, not the pass flag. */
+    passMark: number;
+  } | null;
+  /** submitted only. `answered` is a COUNT; answers are never returned. */
+  attempt: {
+    _id: string;
+    score: number;
+    passed: boolean;
+    submittedAt: string;
+    answered: number;
+  } | null;
+  /** locked only — same codes as `/quizzes/my`, plus the gate's data. */
+  lock: {
+    code: QuizLockCode;
+    message: string;
+    curriculum?: MyQuizCurriculumProgress;
+    session?: MyQuizSessionRef | null;
+    logbookTargets?: LogbookTargets;
+  } | null;
+  /** A ready-to-render sentence saying whose move it is. */
+  nextStep: string;
+}
+
+export interface QuizSummaryResponse {
+  success: boolean;
+  data: QuizSummaryData;
+}

@@ -650,12 +650,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--color-surface-overlay);
-  border: 1px solid var(--color-surface-border);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0 14px;
   height: 38px;
   min-width: 220px;
+}
+[data-theme="dark"] .dash-table-search {
+  background: var(--color-surface-overlay);
+  border-color: var(--color-surface-border);
 }
 .dash-table-search input {
   background: none;

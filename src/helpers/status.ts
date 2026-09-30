@@ -26,6 +26,7 @@ const TONES: Record<string, StatusTone> = {
   enrolled: "green",
   admitted: "green",
   unlocked: "green",
+  available: "green",
 
   // Done
   completed: "teal",
@@ -45,6 +46,8 @@ const TONES: Record<string, StatusTone> = {
   awaiting: "amber",
   applied: "amber",
   new: "amber",
+  locked: "amber",
+  "awaiting-quiz": "amber",
   warning: "amber",
 
   // Needs attention
@@ -76,6 +79,7 @@ const TONES: Record<string, StatusTone> = {
   disabled: "grey",
   read: "grey",
   refunded: "grey",
+  no_quiz: "grey",
 };
 
 /** The tone a status renders in. */

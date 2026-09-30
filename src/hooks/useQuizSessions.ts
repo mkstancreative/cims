@@ -101,7 +101,12 @@ export const useUnlockQuizSession = () => {
     mutationFn: unlockQuizSession,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["quiz-sessions"] });
-      toast.success(data?.message ?? "Quiz unlocked for the students present.");
+      // Some present students may still be locked out (no evaluation yet) —
+      // the unlock proceeds, but it's not an unqualified success.
+      const blocked = data?.data?.notEvaluated?.length ?? 0;
+      const msg = data?.message ?? "Quiz unlocked for the students present.";
+      if (blocked > 0) toast.warning(msg);
+      else toast.success(msg);
     },
     onError: (err: unknown) =>
       toast.error(getErrMsg(err, "Failed to unlock the quiz.")),

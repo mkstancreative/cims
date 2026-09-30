@@ -7,6 +7,7 @@ import type {
   MarkAttendancePayload,
   MarkAttendanceResponse,
   MyQuizSessionResponse,
+  UnlockQuizSessionResponse,
 } from "../types/quizSession";
 
 export const getQuizSessions = async (
@@ -44,7 +45,9 @@ export const markQuizAttendance = async ({
 };
 
 /** Makes the quiz live for the students marked present, and notifies them. */
-export const unlockQuizSession = async (id: string) => {
+export const unlockQuizSession = async (
+  id: string,
+): Promise<UnlockQuizSessionResponse> => {
   const response = await api.patch(`/quiz-sessions/${id}/unlock`);
   return response.data;
 };

@@ -19,8 +19,10 @@ import { Link } from "react-router-dom";
 import {
   quizSubmitAttempt,
   useMyQuiz,
+  useMyQuizSummary,
   useSubmitQuiz,
 } from "../../hooks/useQuizzes";
+import { useMyQuizSession } from "../../hooks/useQuizSessions";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import type {
   MyQuizSessionRef,
@@ -213,14 +215,28 @@ function LockedCard({
 }
 
 // ─── Quiz intro / landing card ────────────────────────────────────────────────
+/** What the intro shows — never the paper itself. */
+interface QuizIntro {
+  title: string;
+  description?: string | null;
+  totalQuestions?: number;
+  passMark?: number;
+}
+
+/**
+ * The landing card, built only from `/quiz-sessions/my` and
+ * `/quizzes/my/summary` — neither carries questions. The paper is fetched
+ * when the student presses Start, not before.
+ */
 function QuizIntroCard({
-  quiz,
+  intro,
+  session,
   onStart,
 }: {
-  quiz: StudentQuiz;
+  intro: QuizIntro;
+  session?: { sitting: number; status: string; present?: boolean } | null;
   onStart: () => void;
 }) {
-  const questions = quiz.questions ?? [];
   return (
     <div className="mq-center-panel">
       <div className="mq-intro-card">
@@ -229,9 +245,19 @@ function QuizIntroCard({
           <FileQuestion size={32} />
         </div>
 
-        <h2 className="mq-intro-title">{quiz.title}</h2>
-        {quiz.description && (
-          <p className="mq-intro-desc">{quiz.description}</p>
+        <h2 className="mq-intro-title">{intro.title}</h2>
+        {intro.description && (
+          <p className="mq-intro-desc">{intro.description}</p>
+        )}
+
+        {session && (
+          <p className="mq-session-chip">
+            Sitting {session.sitting}
+            <StatusBadge status={session.status} />
+            {session.present && (
+              <StatusBadge status="present" label="Marked present" />
+            )}
+          </p>
         )}
 
         {/* Meta grid */}
@@ -239,12 +265,16 @@ function QuizIntroCard({
           <div className="mq-intro-meta-item">
             <HelpCircle size={16} className="mq-intro-meta-icon" />
             <span className="mq-intro-meta-label">Questions</span>
-            <span className="mq-intro-meta-value">{questions.length}</span>
+            <span className="mq-intro-meta-value">
+              {intro.totalQuestions ?? "—"}
+            </span>
           </div>
           <div className="mq-intro-meta-item">
             <Target size={16} className="mq-intro-meta-icon" />
             <span className="mq-intro-meta-label">Pass Mark</span>
-            <span className="mq-intro-meta-value">{quiz.passMark}</span>
+            <span className="mq-intro-meta-value">
+              {intro.passMark ?? "—"}
+            </span>
           </div>
           <div className="mq-intro-meta-item">
             <BookOpen size={16} className="mq-intro-meta-icon" />
@@ -407,11 +437,123 @@ function QuizForm({ quiz }: { quiz: StudentQuiz }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function MyQuiz() {
-  const { data, isLoading, error } = useMyQuiz();
-  const [started, setStarted] = useState(false);
+  // Before Start: question-free sources only.
+  const {
+    data: summaryResp,
+    isLoading: summaryLoading,
+    isError: summaryFailed,
+  } = useMyQuizSummary();
+  const { data: sessionResp, isLoading: sessionLoading } = useMyQuizSession();
+  const summary = summaryResp?.data;
+  const mySession = sessionResp?.data;
 
-  const quizData = data?.data;
-  const errorLock = quizErrorLock(error);
+  // The paper (questions) is fetched only once the student presses Start.
+  const [started, setStarted] = useState(false);
+  const {
+    data: paperResp,
+    isLoading: paperLoading,
+    error: paperError,
+  } = useMyQuiz(started);
+  const paper = paperResp?.data;
+  const errorLock = quizErrorLock(paperError);
+
+  const sessionChip = mySession?.session
+    ? {
+        sitting: mySession.session.sitting,
+        status: mySession.session.status,
+        present: mySession.present,
+      }
+    : null;
+
+  const intro: QuizIntro | null = summary?.quiz
+    ? {
+        title: summary.quiz.title,
+        description: summary.quiz.description,
+        totalQuestions: summary.quiz.totalQuestions,
+        passMark: summary.quiz.passMark,
+      }
+    : mySession?.session?.quiz
+      ? { title: mySession.session.quiz.title }
+      : null;
+
+  // Summary unavailable (older API): fall back to the sitting alone.
+  const fallbackAvailable =
+    summaryFailed &&
+    mySession?.session?.status === "unlocked" &&
+    Boolean(mySession.present);
+
+  const body = (() => {
+    // ── After Start: the paper ──
+    if (started) {
+      if (paperLoading)
+        return (
+          <div className="mq-center-panel">
+            <SkeletonCard lines={4} className="mq-loading" label="Loading your quiz" />
+          </div>
+        );
+      if (errorLock)
+        return <LockedCard code={errorLock.code} message={errorLock.message} />;
+      if (paper?.alreadySubmitted)
+        return <ResultCard score={paper.score ?? 0} passed={paper.passed ?? false} />;
+      // A gate can close between the summary and Start — show the lock.
+      if (!paper || paper.locked || !paper.quiz)
+        return (
+          <LockedCard
+            code={paper?.code}
+            logbookTargets={paper?.logbookTargets}
+            session={paper?.session}
+            message={paper?.message}
+          />
+        );
+      return <QuizForm quiz={paper.quiz as StudentQuiz} />;
+    }
+
+    // ── Before Start: summary + sitting, no questions ──
+    if (summaryLoading || sessionLoading)
+      return (
+        <div className="mq-center-panel">
+          <SkeletonCard lines={4} className="mq-loading" label="Loading quiz" />
+        </div>
+      );
+
+    if (summary?.state === "submitted" && summary.attempt)
+      return (
+        <ResultCard score={summary.attempt.score} passed={summary.attempt.passed} />
+      );
+
+    if (summary?.state === "locked" && summary.lock)
+      return (
+        <LockedCard
+          code={summary.lock.code}
+          logbookTargets={summary.lock.logbookTargets}
+          session={summary.lock.session ?? mySession?.session ?? null}
+          message={summary.lock.message}
+        />
+      );
+
+    if ((summary?.state === "available" || fallbackAvailable) && intro)
+      return (
+        <QuizIntroCard
+          intro={intro}
+          session={sessionChip}
+          onStart={() => setStarted(true)}
+        />
+      );
+
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          padding: 60,
+          color: "var(--color-text-muted)",
+        }}
+      >
+        {summary?.nextStep ??
+          mySession?.message ??
+          "No quiz is available for you at the moment."}
+      </div>
+    );
+  })();
 
   return (
     <div className="page-container">
@@ -429,36 +571,7 @@ export default function MyQuiz() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="mq-center-panel">
-          <SkeletonCard lines={4} className="mq-loading" label="Loading quiz" />
-        </div>
-      ) : errorLock ? (
-        <LockedCard code={errorLock.code} message={errorLock.message} />
-      ) : !quizData ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: 60,
-            color: "var(--color-text-muted)",
-          }}
-        >
-          No quiz is available for you at the moment.
-        </div>
-      ) : quizData.alreadySubmitted ? (
-        <ResultCard score={quizData.score ?? 0} passed={quizData.passed ?? false} />
-      ) : quizData.locked || !quizData.quiz ? (
-        <LockedCard
-          code={quizData.code}
-          logbookTargets={quizData.logbookTargets}
-          session={quizData.session}
-          message={quizData.message}
-        />
-      ) : !started ? (
-        <QuizIntroCard quiz={quizData.quiz as StudentQuiz} onStart={() => setStarted(true)} />
-      ) : (
-        <QuizForm quiz={quizData.quiz as StudentQuiz} />
-      )}
+      {body}
     </div>
   );
 }

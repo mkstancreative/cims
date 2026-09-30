@@ -121,3 +121,27 @@ export interface MyQuizSessionResponse {
 
 /** Max records the API accepts in one attendance call. */
 export const MAX_ATTENDANCE_RECORDS = 1000;
+
+/** A present student who still can't open the quiz — not yet evaluated. */
+export interface NotEvaluatedStudent {
+  internship: string;
+  student: string;
+  registrationNumber?: string;
+  name?: string;
+}
+
+/**
+ * `PATCH /quiz-sessions/:id/unlock`. `notEvaluated` is advisory — the unlock
+ * proceeds, but those students will find the quiz locked until their
+ * supervisor submits an evaluation. Empty is the good case.
+ */
+export interface UnlockQuizSessionResponse {
+  success: boolean;
+  message?: string;
+  data?: {
+    sessionId: string;
+    status: QuizSessionStatus;
+    summary?: { total: number; present: number; absent: number };
+    notEvaluated?: NotEvaluatedStudent[];
+  };
+}

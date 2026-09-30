@@ -9,7 +9,7 @@
   padding: 6px 36px 6px 10px;
   border-radius: 10px;
   border: 1px solid var(--color-border);
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
@@ -20,6 +20,10 @@
     border-color 0.15s,
     box-shadow 0.15s;
   user-select: none;
+}
+
+[data-theme="dark"] .msp-trigger {
+  background: var(--color-bg-primary);
 }
 
 .msp-trigger--open,

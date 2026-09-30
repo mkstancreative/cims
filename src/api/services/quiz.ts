@@ -8,6 +8,7 @@ import type {
   ReorderQuizQuestionsResponse,
   QuizParams,
   MyQuizResponse,
+  QuizSummaryResponse,
   SubmitQuizPayload,
   SubmitQuizResult,
 } from "../types/quiz";
@@ -42,6 +43,12 @@ export const reorderQuizQuestions = async ({
     `/quizzes/${id}/questions/reorder`,
     { questionIds },
   );
+  return response.data;
+};
+
+/** Dashboard overview — no questions ever, so safe to poll and show anywhere. */
+export const getMyQuizSummary = async (): Promise<QuizSummaryResponse> => {
+  const response = await api.get("/quizzes/my/summary");
   return response.data;
 };
 

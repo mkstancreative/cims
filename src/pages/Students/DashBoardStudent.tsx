@@ -7,6 +7,7 @@ import {
   DashboardError,
 } from "../../components/shared/dashboard/DashboardKit";
 import "../../components/shared/dashboard/dashboard.css";
+import "./DashBoardStudent.css";
 import { StudentMetricsGrid } from "../../components/student/dashboard/StudentMetricsGrid";
 import { QuizAttendanceChip } from "../../components/student/dashboard/QuizAttendanceChip";
 import { ProgressSection } from "../../components/student/dashboard/ProgressSection";
@@ -16,6 +17,7 @@ import { PaymentRequiredPanel } from "../../components/student/dashboard/Payment
 import { EnrolmentPendingPanel } from "../../components/student/dashboard/EnrolmentPendingPanel";
 import { AbandonedNotice } from "../../components/student/dashboard/AbandonedNotice";
 import LogbookTargets from "../../components/shared/LogbookTargets/LogbookTargets";
+import { QuizSummaryCard } from "../../components/student/dashboard/QuizSummaryCard";
 import { fmt, ago } from "../../helpers/utilities";
 import {
   apiErrorMessage,
@@ -128,7 +130,8 @@ export default function DashBoardStudent() {
         <QuizAttendanceChip />
       )}
 
-      <div>
+      {/* ── KPIs — one compact row on wide screens ── */}
+      <div className="sd-kpis">
         <SectionHead
           title="My Progress"
           sub="Real-time training tracking"
@@ -143,30 +146,41 @@ export default function DashBoardStudent() {
         />
       </div>
 
-      {/* The tier's minimum counts SUBTOPICS — the cards above count entries.
-          Nothing renders when the batch has no requirement. */}
-      <LogbookTargets
-        targets={progress.logbookTargets}
-        title="Logbook requirement"
-        unreachableNote="Your batch asks for more logbook subtopics than its curriculum has, so it can't be met yet. Please let your coordinator know."
-      />
+      {/* ── Main column + sidebar; stacks on narrow screens ── */}
+      <div className="sd-layout">
+        <div className="sd-main">
+          {/* The quiz at a glance — whose move it is, and both grade halves.
+              An abandoned internship's quiz is closed; the notice says so. */}
+          {itStatus !== "abandoned" && <QuizSummaryCard />}
 
-      <ProgressSection
-        progress={progress}
-        evaluation={evaluation}
-        startDate={progress.startDate}
-        endDate={progress.endDate}
-        fmt={fmt}
-      />
+          <ProgressSection
+            progress={progress}
+            evaluation={evaluation}
+            startDate={progress.startDate}
+            endDate={progress.endDate}
+            fmt={fmt}
+          />
 
-      <FinalDetailsSection
-        batch={batch}
-        itStatus={itStatus}
-        supervisor={supervisor}
-        fmt={fmt}
-      />
+          <NotificationsSection notifications={notifications} ago={ago} />
+        </div>
 
-      <NotificationsSection notifications={notifications} ago={ago} />
+        <aside className="sd-side">
+          <FinalDetailsSection
+            batch={batch}
+            itStatus={itStatus}
+            supervisor={supervisor}
+            fmt={fmt}
+          />
+
+          {/* The tier's minimum counts SUBTOPICS — the KPI cards count
+              entries. Nothing renders when the batch has no requirement. */}
+          <LogbookTargets
+            targets={progress.logbookTargets}
+            title="Logbook requirement"
+            unreachableNote="Your batch asks for more logbook subtopics than its curriculum has, so it can't be met yet. Please let your coordinator know."
+          />
+        </aside>
+      </div>
     </div>
   );
 }

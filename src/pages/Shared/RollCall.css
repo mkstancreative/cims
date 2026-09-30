@@ -421,3 +421,80 @@
     justify-content: center;
   }
 }
+
+/* ── Unlocked, but some present students still can't open it ─────────── */
+.rc-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(202, 138, 4, 0.35);
+  border-left: 4px solid #ca8a04;
+  border-radius: 12px;
+  background: rgba(202, 138, 4, 0.1);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.rc-alert > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #ca8a04;
+}
+
+.rc-alert__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rc-alert__body strong {
+  display: block;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.rc-alert__body p {
+  margin: 2px 0 6px;
+}
+
+.rc-alert__body ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.rc-alert__body li {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.rc-alert__body li span {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.rc-alert__close {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.rc-alert__close:hover {
+  background: var(--color-surface-overlay);
+  color: var(--color-text-primary);
+}
+
+.rc-alert__close:focus,
+.rc-alert__close:active {
+  border: none;
+}
+
+.rc-name__badge {
+  margin-left: 8px;
+}

@@ -7,6 +7,7 @@ import {
   updateQuiz,
   reorderQuizQuestions,
   getMyQuiz,
+  getMyQuizSummary,
   submitQuiz,
 } from "../api/services/quiz";
 import type {
@@ -35,10 +36,36 @@ export const useQuiz = (id: string) => {
   });
 };
 
-export const useMyQuiz = () => {
+/**
+ * The student's quiz overview for the dashboard. Safe to poll — it never
+ * carries the paper — so it refreshes while the student waits on a sitting.
+ */
+export const useMyQuizSummary = (enabled = true) => {
+  return useQuery({
+    queryKey: ["quizzes", "my", "summary"],
+    queryFn: getMyQuizSummary,
+    enabled,
+    refetchInterval: 60_000,
+    retry: (count, err) => {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      return !(status && status >= 400 && status < 500) && count < 2;
+    },
+  });
+};
+
+/**
+ * The quiz PAPER — questions and options. Only fetch it once the student
+ * presses Start (`enabled`); everything shown before that comes from the
+ * question-free `/quiz-sessions/my` and `/quizzes/my/summary`.
+ */
+export const useMyQuiz = (enabled = true) => {
   return useQuery({
     queryKey: ["quizzes", "my"],
     queryFn: getMyQuiz,
+    enabled,
+    // Never refetch the paper behind the student's back mid-quiz.
+    refetchOnWindowFocus: false,
     // A 400 (e.g. INTERNSHIP_ABANDONED) is an answer, not a blip — don't retry.
     retry: (count, err) => {
       const status = (err as { response?: { status?: number } })?.response

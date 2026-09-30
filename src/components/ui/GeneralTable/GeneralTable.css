@@ -250,7 +250,7 @@
   padding: 0 10px;
   border-radius: 8px;
   border: 1px solid var(--color-accent-border);
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
   color: var(--color-text-primary);
   font-size: 12.5px;
   cursor: pointer;
@@ -259,6 +259,10 @@
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
+}
+
+[data-theme="dark"] .page-size-select {
+  background: var(--color-bg-primary);
 }
 
 .page-size-select:focus {
