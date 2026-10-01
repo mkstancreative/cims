@@ -206,18 +206,77 @@ export interface PendingEvaluationsResponse {
   }>;
 }
 
+// ─── My evaluation (`GET /evaluations/my-evaluation`) ─────────────────────────
+//
+// Built around the two halves of the grade. (Replaces the old
+// `{ evaluation, summary }` — those keys are gone.)
+
+/** One rubric criterion. Rendered from the array — never hardcode the keys. */
+export interface RubricCriterion {
+  key: string;
+  label: string;
+  /** null = not assessed yet. Never coalesce to 0. */
+  score: number | null;
+  max: number;
+  percent: number | null;
+}
+
+export type LetterGrade = "A" | "B" | "C" | "D" | "E" | "F";
+
+export interface MyEvaluation {
+  internshipId: string;
+  itStatus: "placed" | "active" | "completed" | "abandoned";
+  batch: { _id: string; name: string; session: string } | null;
+  status: EvaluationStatus;
+  isComplete: boolean;
+  /** Ready-to-render: what's outstanding and whose move it is. */
+  nextStep: string;
+  supervisorAssessment: {
+    submitted: boolean;
+    submittedAt: string | null;
+    /** The supervisor's name, or null if unresolvable. */
+    assessedBy: string | null;
+    score: number | null;
+    maxScore: number;
+    comments: string | null;
+    breakdown: RubricCriterion[];
+  };
+  quiz: {
+    scored: boolean;
+    score: number | null;
+    maxScore: number;
+    submittedAt: string | null;
+  };
+  finalGrade: {
+    available: boolean;
+    score: number | null;
+    grade: LetterGrade | null;
+    formula: string;
+    components: {
+      label: string;
+      score: number | null;
+      weightPercent: number;
+      received: boolean;
+    }[];
+  };
+  /** Only while awaiting the quiz half; null otherwise. */
+  projection: {
+    basedOn: string;
+    quizScoreNeededFor: {
+      grade: string;
+      /** Lowest quiz mark reaching the grade; null when out of reach. */
+      quizScore: number | null;
+      reachable: boolean;
+      /** Already secured whatever they score (quizScore 0). */
+      guaranteed: boolean;
+    }[];
+  } | null;
+  gradeScale: { grade: string; minScore: number }[];
+}
+
 export interface MyEvaluationResponse {
   success: boolean;
-  data: {
-    evaluation: Evaluation | null;
-    summary: {
-      hasEvaluation: boolean;
-      status?: string;
-      isComplete?: boolean;
-      finalScore?: number;
-      finalGrade?: string;
-    };
-  };
+  data: MyEvaluation;
 }
 
 export interface StudentEvaluationsResponse {

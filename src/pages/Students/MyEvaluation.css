@@ -1,0 +1,390 @@
+/* ─── My Evaluation ─────────────────────────────────────────────────────── */
+.mev-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.mev-main,
+.mev-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+@media (max-width: 1000px) {
+  .mev-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mev-card {
+  padding: 20px 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .mev-card {
+  background: var(--color-bg-primary);
+}
+
+.mev-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mev-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.mev-card__title svg {
+  color: var(--color-accent);
+}
+
+.mev-card__sub {
+  margin: 6px 0 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.mev-card__score {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.mev-card__score small,
+.mev-crit__row strong small,
+.mev-part__value small,
+.mev-status__result-score small {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.mev-card__score em,
+.mev-crit__row em,
+.mev-part__value em {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* ── Status ── */
+.mev-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-left: 4px solid var(--color-accent);
+}
+
+.mev-status--awaiting-quiz {
+  border-left-color: #ca8a04;
+}
+
+.mev-status--completed {
+  border-left-color: #0d9488;
+}
+
+.mev-status__main {
+  flex: 1;
+  min-width: 240px;
+}
+
+.mev-status__next {
+  margin: 10px 0 4px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+
+.mev-status__batch {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+
+.mev-status__result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--color-accent-muted);
+}
+
+.mev-status__result-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.mev-status__result-score {
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+/* ── Projection ── */
+.mev-projection {
+  border-color: rgba(202, 138, 4, 0.35);
+}
+
+.mev-targets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mev-target {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.mev-target__grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--color-accent-muted);
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+/* Stacked: a small label over the number, so narrow tiles never wrap mid-phrase */
+.mev-target__need {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.mev-target__need small {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.mev-target__need strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+/* "Already achieved" / "Out of reach" are phrases, not numbers */
+.mev-target.is-secured .mev-target__need,
+.mev-target.is-out .mev-target__need {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+/* Already secured whatever they score */
+.mev-target.is-secured {
+  border-color: rgba(22, 163, 74, 0.35);
+  background: rgba(22, 163, 74, 0.07);
+  color: #15803d;
+}
+
+.mev-target.is-secured .mev-target__grade {
+  background: rgba(22, 163, 74, 0.15);
+  color: #15803d;
+}
+
+/* Out of reach even with 100 */
+.mev-target.is-out {
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .mev-target.is-secured,
+[data-theme="dark"] .mev-target.is-secured .mev-target__grade {
+  color: #4ade80;
+}
+
+/* ── Composition ── */
+.mev-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mev-part {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+}
+
+.mev-part.is-in {
+  border-style: solid;
+}
+
+.mev-part__label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.mev-part__label small {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.mev-part__value {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+/* ── Rubric ── */
+.mev-rubric {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mev-crit__row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.mev-crit__row strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.mev-crit__track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--color-primary-rgb), 0.1);
+}
+
+.mev-crit__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gradient-brand-h, var(--color-accent));
+  transition: width 0.6s ease;
+}
+
+/* Not assessed — an outline, not an empty bar that reads as zero */
+.mev-crit__track.is-empty {
+  border: 1px dashed var(--color-border);
+  background: none;
+}
+
+.mev-comments {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.mev-comments__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.mev-comments__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+/* ── Grade scale ── */
+.mev-scale {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mev-scale__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+}
+
+.mev-scale__item strong {
+  font-size: 16px;
+  color: var(--color-text-primary);
+}
+
+.mev-scale__item.is-current {
+  border-color: var(--color-accent);
+  background: var(--color-accent-muted);
+}
+
+.mev-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+}

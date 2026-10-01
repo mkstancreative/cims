@@ -1,104 +1,236 @@
-import { ClipboardCheck, MessageSquare } from "lucide-react";
+import {
+  CheckCircle2,
+  ClipboardCheck,
+  Clock,
+  MessageSquare,
+  Target,
+  UserCheck,
+} from "lucide-react";
 import { useMyEvaluation } from "../../hooks/useEvaluations";
 import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
 import { GradeBadge } from "../../components/shared/dashboard/DashboardKit";
 import { SkeletonCards } from "../../components/ui/Skeleton/Skeleton";
-import type { EvaluationRatings } from "../../api/types/evaluation";
+import { formatDate } from "../../helpers/utilities";
+import type { MyEvaluation as MyEvaluationData } from "../../api/types/evaluation";
+import "./MyEvaluation.css";
 
-const RATING_LABELS: Record<keyof EvaluationRatings, string> = {
-  professionalism: "Professionalism",
-  technicalCompetence: "Technical Competence",
-  communication: "Communication",
-  initiative: "Initiative",
+const STATUS_LABEL: Record<string, string> = {
+  pending: "Awaiting supervisor",
+  "awaiting-quiz": "Awaiting quiz",
+  completed: "Completed",
 };
 
-function RatingBar({ label, value }: { label: string; value: number }) {
-  const pct = Math.min((value / 5) * 100, 100);
+// ─── Status + final result ────────────────────────────────────────────────────
+function StatusCard({ ev }: { ev: MyEvaluationData }) {
+  const { finalGrade } = ev;
   return (
-    <div style={{ marginBottom: 12 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: 13,
-          marginBottom: 5,
-        }}
-      >
-        <span style={{ color: "var(--color-text-muted)" }}>{label}</span>
-        <span style={{ fontWeight: 700 }}>{value}/5</span>
-      </div>
-      <div
-        style={{
-          height: 8,
-          borderRadius: 5,
-          background: "var(--color-surface-overlay)",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${pct}%`,
-            background: "var(--gradient-brand-h)",
-            borderRadius: 5,
-            transition: "width .6s ease",
-          }}
+    <section className={`mev-card mev-status mev-status--${ev.status}`}>
+      <div className="mev-status__main">
+        <StatusBadge
+          status={ev.status}
+          label={STATUS_LABEL[ev.status] ?? undefined}
         />
+        {/* Server-written: what's outstanding and whose move it is. */}
+        <p className="mev-status__next">{ev.nextStep}</p>
+        {ev.batch && (
+          <p className="mev-status__batch">
+            {ev.batch.name} · {ev.batch.session}
+          </p>
+        )}
       </div>
-    </div>
+      {finalGrade.available && finalGrade.score !== null && (
+        <div className="mev-status__result">
+          <span className="mev-status__result-label">Final result</span>
+          <span className="mev-status__result-score">
+            {finalGrade.score}
+            <small>/100</small>
+          </span>
+          {finalGrade.grade && <GradeBadge grade={finalGrade.grade} />}
+        </div>
+      )}
+    </section>
   );
 }
 
-function StatTile({
-  label,
-  value,
-  accent,
+// ─── What they still need on the quiz ─────────────────────────────────────────
+function ProjectionCard({
+  projection,
 }: {
-  label: string;
-  value: React.ReactNode;
-  accent?: string;
+  projection: NonNullable<MyEvaluationData["projection"]>;
 }) {
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 150,
-        background: "var(--color-bg-secondary)",
-        border: "1px solid var(--color-border)",
-        borderRadius: 14,
-        padding: "18px 20px",
-      }}
-    >
-      <div
-        style={{
-          fontSize: 12,
-          color: "var(--color-text-muted)",
-          marginBottom: 6,
-          textTransform: "uppercase",
-          letterSpacing: 0.4,
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontSize: 28,
-          fontWeight: 800,
-          color: accent ?? "var(--color-text-primary)",
-        }}
-      >
-        {value}
-      </div>
-    </div>
+    <section className="mev-card mev-projection">
+      <h3 className="mev-card__title">
+        <Target size={16} /> What you need on the quiz
+      </h3>
+      <p className="mev-card__sub">
+        Based on {projection.basedOn}. The lowest quiz score that reaches each
+        grade:
+      </p>
+      <ul className="mev-targets">
+        {projection.quizScoreNeededFor.map((t) => (
+          <li
+            key={t.grade}
+            className={`mev-target${
+              t.guaranteed ? " is-secured" : !t.reachable ? " is-out" : ""
+            }`}
+          >
+            <span className="mev-target__grade">{t.grade}</span>
+            <span className="mev-target__need">
+              {t.guaranteed ? (
+                <>
+                  <CheckCircle2 size={14} /> Already achieved
+                </>
+              ) : !t.reachable ? (
+                "Out of reach"
+              ) : (
+                <>
+                  <small>Score at least</small>
+                  <strong>{t.quizScore}</strong>
+                </>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
-export default function MyEvaluation() {
-  const { data, isLoading } = useMyEvaluation();
+// ─── How the final grade is made ──────────────────────────────────────────────
+function CompositionCard({ ev }: { ev: MyEvaluationData }) {
+  const { finalGrade } = ev;
+  return (
+    <section className="mev-card">
+      <h3 className="mev-card__title">How your final grade is worked out</h3>
+      <p className="mev-card__sub">{finalGrade.formula}</p>
+      <ul className="mev-parts">
+        {finalGrade.components.map((c) => (
+          <li key={c.label} className={`mev-part${c.received ? " is-in" : ""}`}>
+            <span className="mev-part__label">
+              {c.label}
+              <small>{c.weightPercent}% of your grade</small>
+            </span>
+            <span className="mev-part__value">
+              {c.received && c.score !== null ? (
+                <>
+                  {c.score}
+                  <small>/100</small>
+                </>
+              ) : (
+                <em>
+                  <Clock size={13} /> Not in yet
+                </em>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
-  const evaluation = data?.data?.evaluation;
-  const summary = data?.data?.summary;
-  const hasEvaluation = summary?.hasEvaluation && evaluation;
+// ─── Supervisor's assessment, criterion by criterion ─────────────────────────
+function AssessmentCard({ ev }: { ev: MyEvaluationData }) {
+  const a = ev.supervisorAssessment;
+  return (
+    <section className="mev-card">
+      <div className="mev-card__head">
+        <h3 className="mev-card__title">
+          <UserCheck size={16} /> Supervisor assessment
+        </h3>
+        <span className="mev-card__score">
+          {a.score !== null ? (
+            <>
+              {a.score}
+              <small>/{a.maxScore}</small>
+            </>
+          ) : (
+            <em>Not submitted yet</em>
+          )}
+        </span>
+      </div>
+      {a.submitted && (
+        <p className="mev-card__sub">
+          {a.assessedBy ? `By ${a.assessedBy}` : "By your supervisor"}
+          {a.submittedAt ? ` · ${formatDate(a.submittedAt)}` : ""}
+        </p>
+      )}
+
+      {/* From the server's rubric — criteria can change without a client
+          release. A null score is "not assessed", never zero. */}
+      <ul className="mev-rubric">
+        {a.breakdown.map((c) => (
+          <li key={c.key} className="mev-crit">
+            <div className="mev-crit__row">
+              <span>{c.label}</span>
+              {c.score !== null ? (
+                <strong>
+                  {c.score}
+                  <small>/{c.max}</small>
+                </strong>
+              ) : (
+                <em>Not assessed</em>
+              )}
+            </div>
+            <div
+              className={`mev-crit__track${c.score === null ? " is-empty" : ""}`}
+              role={c.score !== null ? "progressbar" : undefined}
+              aria-label={c.score !== null ? c.label : undefined}
+              aria-valuenow={c.score ?? undefined}
+              aria-valuemin={c.score !== null ? 0 : undefined}
+              aria-valuemax={c.score !== null ? c.max : undefined}
+            >
+              {c.percent !== null && <span style={{ width: `${c.percent}%` }} />}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {a.comments && (
+        <div className="mev-comments">
+          <p className="mev-comments__head">
+            <MessageSquare size={14} /> Comments
+          </p>
+          <p className="mev-comments__text">{a.comments}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Grade scale ──────────────────────────────────────────────────────────────
+function GradeScale({ ev }: { ev: MyEvaluationData }) {
+  const current = ev.finalGrade.available ? ev.finalGrade.grade : null;
+  return (
+    <section className="mev-card">
+      <h3 className="mev-card__title">Grade scale</h3>
+      <ul className="mev-scale">
+        {ev.gradeScale.map((g) => (
+          <li
+            key={g.grade}
+            className={`mev-scale__item${g.grade === current ? " is-current" : ""}`}
+            aria-current={g.grade === current ? "true" : undefined}
+          >
+            <strong>{g.grade}</strong>
+            <span>{g.minScore > 0 ? `${g.minScore}+` : `below ${nextMin(ev, g.grade)}`}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** The lowest band's upper edge — the next grade's minimum. */
+function nextMin(ev: MyEvaluationData, grade: string): number {
+  const i = ev.gradeScale.findIndex((g) => g.grade === grade);
+  return ev.gradeScale[i - 1]?.minScore ?? 0;
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default function MyEvaluation() {
+  const { data, isLoading, isError } = useMyEvaluation();
+  const ev = data?.data;
 
   return (
     <div className="page-container">
@@ -110,129 +242,33 @@ export default function MyEvaluation() {
           <div>
             <h2 className="page-title">My Evaluation</h2>
             <p className="page-sub">
-              Your final training assessment and supervisor ratings
+              Your supervisor&apos;s assessment, your quiz, and your final grade
             </p>
           </div>
         </div>
       </div>
 
       {isLoading ? (
-        <SkeletonCards cards={2} lines={3} label="Loading evaluation" />
-      ) : !hasEvaluation ? (
-        <div className="me-empty">
-          {/* White card in light mode, like the rest of the page's cards;
-              dark mode keeps it on the page background. */}
-          <style>{`
-            .me-empty{text-align:center;padding:60px;border:1px solid var(--color-border);border-radius:14px;background:var(--color-bg-secondary);box-shadow:0 1px 6px rgba(0,0,0,.04);color:var(--color-text-muted)}
-            [data-theme="dark"] .me-empty{border-color:transparent;background:none;box-shadow:none}
-          `}</style>
-          <ClipboardCheck
-            size={40}
-            style={{ opacity: 0.4, marginBottom: 12 }}
-          />
-          <p>
-            Your evaluation has not been completed yet. Results will appear here
-            once your supervisor and assessment are finalized.
-          </p>
+        <SkeletonCards cards={3} lines={3} label="Loading evaluation" />
+      ) : isError || !ev ? (
+        <div className="mev-card mev-empty">
+          <ClipboardCheck size={36} />
+          <p>We couldn&apos;t load your evaluation. Please try again later.</p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          {/* Summary tiles */}
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <StatTile
-              label="Final Score"
-              value={evaluation.finalScore ?? summary?.finalScore ?? "—"}
-              accent="var(--color-primary)"
-            />
-            <StatTile
-              label="Final Grade"
-              value={
-                evaluation.finalGrade || summary?.finalGrade ? (
-                  <GradeBadge
-                    grade={(evaluation.finalGrade ?? summary?.finalGrade)!}
-                  />
-                ) : (
-                  "—"
-                )
-              }
-            />
-            <StatTile
-              label="Quiz Score"
-              value={evaluation.quizScore ?? "—"}
-              accent="var(--color-primary)"
-            />
-            <StatTile
-              label="Status"
-              value={<StatusBadge status={evaluation.status} />}
-            />
+        <div className="mev-layout">
+          <div className="mev-main">
+            <StatusCard ev={ev} />
+            {/* Most actionable while waiting on the quiz. */}
+            {ev.status === "awaiting-quiz" && ev.projection && (
+              <ProjectionCard projection={ev.projection} />
+            )}
+            <AssessmentCard ev={ev} />
           </div>
-
-          {/* Ratings breakdown */}
-          {evaluation.ratings && (
-            <div
-              style={{
-                background: "var(--color-bg-secondary)",
-                border: "1px solid var(--color-border)",
-                borderRadius: 16,
-                padding: 22,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  marginBottom: 16,
-                  color: "var(--color-text-primary)",
-                }}
-              >
-                Supervisor Ratings
-              </h3>
-              {(
-                Object.keys(RATING_LABELS) as Array<keyof EvaluationRatings>
-              ).map((key) => (
-                <RatingBar
-                  key={key}
-                  label={RATING_LABELS[key]}
-                  value={evaluation.ratings?.[key] ?? 0}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Comments */}
-          {evaluation.comments && (
-            <div
-              style={{
-                background: "var(--color-bg-secondary)",
-                border: "1px solid var(--color-border)",
-                borderRadius: 16,
-                padding: 22,
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  marginBottom: 12,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  color: "var(--color-text-primary)",
-                }}
-              >
-                <MessageSquare size={16} /> Supervisor Comments
-              </h3>
-              <p
-                style={{
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                  color: "var(--color-text-muted)",
-                }}
-              >
-                {evaluation.comments}
-              </p>
-            </div>
-          )}
+          <aside className="mev-side">
+            <CompositionCard ev={ev} />
+            <GradeScale ev={ev} />
+          </aside>
         </div>
       )}
     </div>
