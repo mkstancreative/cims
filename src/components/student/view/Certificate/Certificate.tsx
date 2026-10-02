@@ -89,8 +89,9 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
       .filter(Boolean)
       .join(" / ");
 
-    // Points at the public verification page for this certificate.
-    const qrValue = `${window.location.origin}/certificates/verify/${encodeURIComponent(
+    // The public verification page, with the number as a query parameter —
+    // numbers contain slashes (FMC/2026/…), which don't survive in a path.
+    const qrValue = `${window.location.origin}/certificates/verify?certificateNumber=${encodeURIComponent(
       certificateNumber ?? "",
     )}`;
 

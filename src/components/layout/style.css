@@ -152,15 +152,26 @@
   gap: 0;
 }
 .dash-nav-item:hover {
-  background: var(--color-bg-secondary);
+  background: rgba(var(--color-primary-rgb), 0.08);
   color: var(--color-text-primary);
 }
-.dash-nav-item--active {
-  background: var(--color-bg-secondary);
-  color: var(--color-accent);
+/* The current page: a solid brand fill (navy in light, clay in dark) */
+.dash-nav-item--active,
+.dash-nav-item--active:hover {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
 }
 .dash-nav-item--active .dash-nav-item__icon {
-  color: var(--color-accent);
+  color: #fff;
+}
+/* A group whose sub-page is current: a tint, so only the page itself is solid */
+.dash-nav-item--parent-active,
+.dash-nav-item--parent-active:hover {
+  background: rgba(var(--color-primary-rgb), 0.12);
+  color: var(--color-primary);
+  font-weight: 600;
 }
 .dash-nav-item__icon {
   display: flex;
@@ -215,18 +226,21 @@
   flex-shrink: 0;
 }
 .dash-submenu-item:hover {
-  background: var(--color-bg-secondary);
+  background: rgba(var(--color-primary-rgb), 0.08);
   color: var(--color-accent);
 }
 .dash-submenu-item:hover::before {
   opacity: 1;
 }
-.dash-submenu-item--active {
-  color: var(--color-accent);
-  background: var(--color-bg-secondary);
+.dash-submenu-item--active,
+.dash-submenu-item--active:hover {
+  color: #fff;
+  background: var(--color-primary);
+  font-weight: 600;
 }
 .dash-submenu-item--active::before {
   opacity: 1;
+  background: currentColor;
 }
 
 /* sidebar footer */

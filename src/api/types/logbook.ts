@@ -1,11 +1,7 @@
 // ─── LogBook Types ────────────────────────────────────────────────────────────
 
 export type LogBookStatus =
-  | "draft"
-  | "submitted"
-  | "approved"
-  | "rejected"
-  | "needs_revision";
+  "draft" | "submitted" | "approved" | "rejected" | "needs_revision";
 
 // ─── Curriculum references on an entry ────────────────────────────────────────
 // The API may return these expanded or as raw ids — read them through the
@@ -144,6 +140,10 @@ export interface LogBookParams {
   search?: string;
   weekNumber?: number | string;
   status?: LogBookStatus | "";
+  /** A past internship's logbooks (My Internships → View Logbooks). Without
+   *  these the list is the current internship's. */
+  internshipId?: string;
+  batchId?: string;
 }
 export interface FraudCheckResponse {
   success: boolean;

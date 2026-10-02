@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Briefcase, Eye, RefreshCw, Star } from "lucide-react";
+import {
+  BookOpen,
+  Briefcase,
+  ClipboardCheck,
+  RefreshCw,
+  Star,
+} from "lucide-react";
 import GeneralTable from "../../components/ui/GeneralTable/GeneralTable";
 import InternshipStatusBadge from "../../components/ui/StatusBadge/InternshipStatusBadge";
+import ActionDropDown from "../../components/ui/ActionDropdown/ActionDropDown";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
 import { useMyInternshipHistory } from "../../hooks/useInternships";
 import { formatDate } from "../../helpers/utilities";
@@ -58,11 +65,15 @@ function batchId(batch: Internship["batch"]): string | undefined {
 export default function MyInternships() {
   const navigate = useNavigate();
 
-  // Each internship's evaluation — supervisor assessment, quiz, final grade.
-  const openEvaluation = (row: Internship) => {
+  // Both pages take the internship in the path and its batch as a query, so
+  // the API returns that internship's records, not just the current one's.
+  const openInternshipPage = (
+    row: Internship,
+    page: "evaluation" | "logbooks",
+  ) => {
     const b = batchId(row.batch);
     navigate(
-      `/student/internships/${row._id}/evaluation${b ? `?batchId=${b}` : ""}`,
+      `/student/internships/${row._id}/${page}${b ? `?batchId=${b}` : ""}`,
     );
   };
 
@@ -104,16 +115,22 @@ export default function MyInternships() {
       render: (row) => <InternshipStatusBadge status={row.itStatus} />,
     },
     {
-      header: "Evaluation",
+      header: "Actions",
       render: (row) => (
-        <button
-          type="button"
-          className="table-view-btn"
-          onClick={() => openEvaluation(row)}
-          title="View this internship's evaluation"
-        >
-          <Eye size={14} /> View
-        </button>
+        <ActionDropDown
+          actions={[
+            {
+              label: "View Evaluation",
+              icon: <ClipboardCheck size={13} />,
+              onClick: () => openInternshipPage(row, "evaluation"),
+            },
+            {
+              label: "View Logbooks",
+              icon: <BookOpen size={13} />,
+              onClick: () => openInternshipPage(row, "logbooks"),
+            },
+          ]}
+        />
       ),
     },
   ];

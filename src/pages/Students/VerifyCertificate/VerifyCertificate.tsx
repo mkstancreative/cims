@@ -19,8 +19,9 @@ const VerifyCertificate = () => {
   const [searchParams] = useSearchParams();
   const params = useParams();
 
-  // Try to get from path (splat) or fallback to query param
-  const certNumber = params["*"] || searchParams.get("certificateNumber");
+  // The QR code passes ?certificateNumber=…; older printed codes used the
+  // path (/certificates/verify/<number>), which still works.
+  const certNumber = searchParams.get("certificateNumber") || params["*"];
 
   const {
     data: resp,

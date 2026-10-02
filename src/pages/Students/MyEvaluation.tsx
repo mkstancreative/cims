@@ -1,4 +1,9 @@
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -183,7 +188,9 @@ function AssessmentCard({ ev }: { ev: MyEvaluationData }) {
               aria-valuemin={c.score !== null ? 0 : undefined}
               aria-valuemax={c.score !== null ? c.max : undefined}
             >
-              {c.percent !== null && <span style={{ width: `${c.percent}%` }} />}
+              {c.percent !== null && (
+                <span style={{ width: `${c.percent}%` }} />
+              )}
             </div>
           </li>
         ))}
@@ -215,7 +222,11 @@ function GradeScale({ ev }: { ev: MyEvaluationData }) {
             aria-current={g.grade === current ? "true" : undefined}
           >
             <strong>{g.grade}</strong>
-            <span>{g.minScore > 0 ? `${g.minScore}+` : `below ${nextMin(ev, g.grade)}`}</span>
+            <span>
+              {g.minScore > 0
+                ? `${g.minScore}+`
+                : `below ${nextMin(ev, g.grade)}`}
+            </span>
           </li>
         ))}
       </ul>
@@ -237,6 +248,7 @@ function nextMin(ev: MyEvaluationData, grade: string): number {
  */
 export default function MyEvaluation() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { internshipId } = useParams<{ internshipId: string }>();
   const [searchParams] = useSearchParams();
   const batchId = searchParams.get("batchId") ?? undefined;
@@ -271,9 +283,15 @@ export default function MyEvaluation() {
           <button
             type="button"
             className="dash-btn dash-btn--ghost"
-            onClick={() => navigate("/student/internships")}
+            // Back to wherever they came from (My Internships, or that
+            // internship's logbooks); opened directly, to My Internships.
+            onClick={() =>
+              location.key !== "default"
+                ? navigate(-1)
+                : navigate("/student/internships")
+            }
           >
-            <ArrowLeft size={15} /> My Internships
+            <ArrowLeft size={15} /> Back
           </button>
         </div>
       </div>

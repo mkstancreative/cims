@@ -1,7 +1,13 @@
 import { useState } from "react";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useModal } from "../../context/ModalContext";
 import type { LogBookListItem, LogBookStatus } from "../../api/types/logbook";
-import { BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, ClipboardCheck } from "lucide-react";
 import SearchInput from "../../components/ui/SearchInput/SearchInput";
 import ResetButton from "../../components/ui/ResetButton/ResetButton";
 import ConfirmModal from "../../components/ui/ConfirmModal/ConfirmModal";
@@ -11,7 +17,10 @@ import LogBookTable from "../../components/student/tables/LogBookTable";
 import CreateLogBookDraft from "../../components/student/forms/CreateLogBookDraft";
 import LogBookView from "../../components/student/view/LogBookView";
 import { useDeleteLogBook } from "../../hooks/useLogBooks";
-import { useCurrentInternshipAbandoned } from "../../hooks/useInternships";
+import {
+  useCurrentInternshipAbandoned,
+  useMyInternshipHistory,
+} from "../../hooks/useInternships";
 import { AbandonedNotice } from "../../components/student/dashboard/AbandonedNotice";
 import { formatDate } from "../../helpers/utilities";
 
@@ -28,8 +37,42 @@ const STATUS_OPTIONS = [
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+/**
+ * The student's logbook. At `/student/logbook` it's the current internship's;
+ * at `/student/internships/:internshipId/logbooks?batchId=…` (from My
+ * Internships) it's that internship's — read-only unless it's the current one.
+ */
 export default function LogBook() {
   const { openModal, closeModal } = useModal();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { internshipId } = useParams<{ internshipId: string }>();
+  const [searchParams] = useSearchParams();
+  const batchId = searchParams.get("batchId") ?? undefined;
+
+  // Which internship this is, from the (cached) history list.
+  const { data: historyResp } = useMyInternshipHistory();
+  const internship = internshipId
+    ? historyResp?.data?.find((i) => i._id === internshipId)
+    : undefined;
+  const batch =
+    internship?.batch && typeof internship.batch !== "string"
+      ? internship.batch
+      : undefined;
+  const isPast = Boolean(internshipId) && !internship?.isCurrent;
+  const isCompleted = internship?.itStatus === "completed";
+
+  // Back to wherever they came from (My Internships, or the evaluation);
+  // opened directly, there's no in-app history, so go to My Internships.
+  const goBack = () =>
+    location.key !== "default"
+      ? navigate(-1)
+      : navigate("/student/internships");
+
+  const openEvaluation = () =>
+    navigate(
+      `/student/internships/${internshipId}/evaluation${batchId ? `?batchId=${batchId}` : ""}`,
+    );
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -43,7 +86,8 @@ export default function LogBook() {
   const { mutate: remove, isPending: deleting } = useDeleteLogBook();
   // An abandoned internship's logbooks are locked server-side — hide the
   // actions rather than let them fail.
-  const locked = useCurrentInternshipAbandoned();
+  const abandoned = useCurrentInternshipAbandoned();
+  const locked = abandoned || isPast;
 
   const confirmDelete = () => {
     if (deleteTarget) {
@@ -87,18 +131,37 @@ export default function LogBook() {
             <div>
               <h2 className="page-title">Log Book</h2>
               <p className="page-sub">
-                Record and manage your daily IT training activities
+                {internshipId
+                  ? batch
+                    ? `${batch.name}${batch.session ? ` · ${batch.session}` : ""} — daily IT training entries`
+                    : "Daily IT training entries for this internship"
+                  : "Record and manage your daily IT training activities"}
               </p>
             </div>
           </div>
-          {!locked && (
-            <div className="page-header-right">
-              <AddButton text="New Entry" onClick={openCreate} />
-            </div>
-          )}
+          <div className="page-header-right">
+            {internshipId && (
+              <button
+                type="button"
+                className="dash-btn dash-btn--ghost"
+                onClick={goBack}
+              >
+                <ArrowLeft size={15} /> Back
+              </button>
+            )}
+            {/* A finished internship has a final evaluation to look at. */}
+            {internshipId && isCompleted && (
+              <AddButton
+                text="View Evaluation"
+                icon={<ClipboardCheck size={15} />}
+                onClick={openEvaluation}
+              />
+            )}
+            {!locked && <AddButton text="New Entry" onClick={openCreate} />}
+          </div>
         </div>
 
-        {locked && (
+        {abandoned && !isPast && (
           <AbandonedNotice what="Its logbooks are locked — you can view them, but not add, edit or submit." />
         )}
 
@@ -148,6 +211,8 @@ export default function LogBook() {
             onEdit={openEdit}
             onDeleteRequest={setDeleteTarget}
             readOnly={locked}
+            internshipId={internshipId}
+            batchId={batchId}
           />
         </div>
       </div>

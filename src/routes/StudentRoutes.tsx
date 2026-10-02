@@ -17,9 +17,7 @@ const MyPayments = lazy(() => import("../pages/Students/MyPayments"));
 
 export default function StudentRoutes() {
   return (
-    <Suspense
-      fallback={<PageLoader inline label="Loading page…" />}
-    >
+    <Suspense fallback={<PageLoader inline label="Loading page…" />}>
       <Routes>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashBoardStudent />} />
@@ -32,6 +30,11 @@ export default function StudentRoutes() {
         <Route
           path="internships/:internshipId/evaluation"
           element={<MyEvaluation />}
+        />
+        {/* Each internship's logbooks — past ones read-only. */}
+        <Route
+          path="internships/:internshipId/logbooks"
+          element={<LogBook />}
         />
         <Route
           path="evaluation"
