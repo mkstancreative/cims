@@ -263,7 +263,7 @@ const Register = () => {
           toast.success(
             "This registration is already paid. Please sign in to continue.",
           );
-          navigate("/", { replace: true });
+          navigate("/login", { replace: true });
           return;
         }
 
@@ -717,7 +717,7 @@ const Register = () => {
 
           <p className="auth-register">
             Already have an account?{" "}
-            <Link to="/" className="auth-link">
+            <Link to="/login" className="auth-link">
               Sign in
             </Link>
           </p>

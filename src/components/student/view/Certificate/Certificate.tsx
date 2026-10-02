@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import "./Certificate.css";
 import { useSettings } from "../../../../hooks/useSettings";
 import { programFullName } from "../../../../helpers/programConstants";
+import { resolveAsset } from "../../../../helpers/assets";
 
 interface CertificateProps {
   studentName: string;
@@ -33,17 +34,6 @@ function longDate(value?: string): string | null {
         month: "long",
         year: "numeric",
       });
-}
-
-/** A Settings asset path → an absolute URL on the API host. */
-function resolveAsset(path?: string | null): string | null {
-  if (!path) return null;
-  if (/^https?:\/\//.test(path)) return path;
-  const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(
-    /\/api(\/v\d+)?\/?$/,
-    "",
-  );
-  return `${apiBase}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
 /**

@@ -184,7 +184,7 @@ const VerifyCertificate = () => {
               <ExternalLink size={14} /> fpno.edu.ng
             </a>
             <Link to="/" className="vc-hero-link">
-              <ShieldCheck size={14} /> SIWES Portal
+              <ShieldCheck size={14} /> CIMS Portal
             </Link>
           </div>
         </section>

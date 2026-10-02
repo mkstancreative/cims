@@ -117,7 +117,7 @@ export default function ResetPassword() {
             <button
               type="button"
               className="submit-button"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/login")}
             >
               Return to Login
             </button>

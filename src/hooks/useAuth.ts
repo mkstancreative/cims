@@ -146,7 +146,7 @@ export const useLogoutUser = () => {
       clearPendingRegistration();
       clearSelectedInternship();
       queryClient.clear();
-      navigate("/", { replace: true });
+      navigate("/login", { replace: true });
     },
   });
 };

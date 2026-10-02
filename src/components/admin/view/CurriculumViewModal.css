@@ -1,0 +1,15 @@
+/* ─── Curriculum view: one card per topic ─────────────────────────────────
+   White on light mode, so the cards stand off the modal's warm background;
+   dark mode keeps the deeper panel tone. */
+.cv-topic {
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .cv-topic {
+  background: var(--color-bg-primary);
+  box-shadow: none;
+}

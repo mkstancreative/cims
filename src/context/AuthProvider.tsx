@@ -65,7 +65,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       toast.info(reason || "Your session has expired. Please log in again.", {
         toastId: "session-expired", // prevent duplicates
       });
-      navigate("/", { replace: true });
+      navigate("/login", { replace: true });
     };
     window.addEventListener("siwes:session-expired", handleExpired);
     return () =>

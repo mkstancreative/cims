@@ -238,7 +238,7 @@ const PendingPayment = () => {
               style={{ width: "100%" }}
               onClick={() => {
                 clearPendingRegistration();
-                navigate("/", { replace: true });
+                navigate("/login", { replace: true });
               }}
             >
               Back to Sign In

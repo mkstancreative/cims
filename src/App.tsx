@@ -5,6 +5,7 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import ResetPassword from "./components/auth/ResetPassword";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ScrollToTop from "./routes/ScrollToTop";
 import AuthProvider from "./context/AuthProvider";
 import { ModalProvider } from "./context/ModalProvider";
 import { NotificationsProvider } from "./context";
@@ -23,6 +24,7 @@ const VerifyCertificate = lazy(
   () => import("./pages/Students/VerifyCertificate/VerifyCertificate"),
 );
 const NotFound = lazy(() => import("./pages/NotFound/NotFound"));
+const Landing = lazy(() => import("./pages/Landing/Landing"));
 
 const GlobalAuthModals = () => {
   const { user, setAuth } = useAuth();
@@ -40,6 +42,7 @@ const GlobalAuthModals = () => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <GlobalAuthModals />
         <NotificationsProvider>
@@ -48,7 +51,8 @@ function App() {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* ── Public ───────────────────────────────────────────────── */}
-                <Route path="/" element={<Login />} />
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route
                   path="/registrations/verify"

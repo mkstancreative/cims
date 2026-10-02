@@ -13,7 +13,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   if (isLoading) return <PageLoader label="Authenticating…" />;
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {

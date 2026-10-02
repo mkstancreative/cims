@@ -6,7 +6,6 @@ import {
   Trash2,
   UserPlus,
   BookOpen,
-  HelpCircle,
   Megaphone,
 } from "lucide-react";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
@@ -276,24 +275,6 @@ export default function BatchesTable({
               label: "Edit",
               icon: <Edit2 size={13} />,
               onClick: () => onEdit(row),
-              disabled: row.status === "archived",
-            },
-            {
-              label: "Assign Supervisor",
-              icon: <UserPlus size={13} />,
-              onClick: () => onAssignSupervisor(row),
-              disabled: row.status === "archived",
-            },
-            {
-              label: "Assign Curriculum",
-              icon: <BookOpen size={13} />,
-              onClick: () => onManageCurricula(row),
-              disabled: row.status === "archived",
-            },
-            {
-              label: "Manage Quiz",
-              icon: <HelpCircle size={13} />,
-              onClick: () => onAssignQuiz(row),
               disabled: row.status === "archived",
             },
             {

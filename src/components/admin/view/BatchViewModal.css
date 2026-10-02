@@ -42,7 +42,8 @@
   padding: 12px 14px;
   border-radius: 10px;
   border: 1px solid var(--color-border);
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
 }
 
 .bv-stat strong {
@@ -61,12 +62,18 @@
 .bv-details {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 24px;
+  gap: 10px;
   margin: 0;
 }
 
+/* Each detail is a light card, like the stat and supervisor cards */
 .bv-details > div {
   min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
 }
 
 .bv-details dt {
@@ -99,8 +106,18 @@
   padding: 14px 16px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-sm);
   color: var(--color-accent);
+}
+
+/* Light mode uses white cards; dark mode keeps the deeper panel tone so they
+   still stand off the modal. */
+[data-theme="dark"] .bv-stat,
+[data-theme="dark"] .bv-details > div,
+[data-theme="dark"] .bv-sup:not(.bv-sup--none):not(.bv-sup--inactive) {
+  background: var(--color-bg-primary);
+  box-shadow: none;
 }
 
 .bv-sup > svg {
