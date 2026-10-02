@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { Sun, Moon, ChevronDown, LogOut, Menu } from "lucide-react";
 import { useTheme } from "../../context/useTheme";
 import { useLogoutUser } from "../../hooks/useAuth";
@@ -12,6 +12,9 @@ type TopBarProps = {
   userRole?: string;
   collapsed?: boolean;
   onMobileMenuToggle?: () => void;
+  /** Role-specific controls before the theme toggle (e.g. the student's
+   *  internship switcher). */
+  actions?: ReactNode;
 };
 
 export default function TopBar({
@@ -21,6 +24,7 @@ export default function TopBar({
   userInitials = "U",
   userRole = "User",
   onMobileMenuToggle,
+  actions,
 }: TopBarProps) {
   const { isDark, toggleTheme } = useTheme();
   const { mutate: logout, isPending: loggingOut } = useLogoutUser();
@@ -81,6 +85,8 @@ export default function TopBar({
 
       {/* Right: actions */}
       <div className="dash-topbar__right">
+        {actions}
+
         {/* Theme toggle */}
         <button
           id="theme-toggle-btn"

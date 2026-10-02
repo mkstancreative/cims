@@ -1,9 +1,4 @@
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -242,21 +237,15 @@ function nextMin(ev: MyEvaluationData, grade: string): number {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 /**
- * One internship's evaluation, reached from My Internships →
- * `/student/internships/:internshipId/evaluation?batchId=…`. Both ids go to
- * the API so the right internship is shown, not just the current one.
+ * The selected internship's evaluation (top-bar switcher), reached from My
+ * Internships, the logbook and the dashboard. `useMyEvaluation` sends the
+ * selected internship's ids, so a past one shows its own result.
  */
 export default function MyEvaluation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { internshipId } = useParams<{ internshipId: string }>();
-  const [searchParams] = useSearchParams();
-  const batchId = searchParams.get("batchId") ?? undefined;
 
-  const { data, isLoading, isError, error } = useMyEvaluation({
-    ...(internshipId && { internshipId }),
-    ...(batchId && { batchId }),
-  });
+  const { data, isLoading, isError, error } = useMyEvaluation();
   const ev = data?.data;
   // The server's own message (e.g. no internship resolves) is safe to show.
   const errorMessage = (

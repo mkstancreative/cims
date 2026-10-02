@@ -1,12 +1,13 @@
 import { api } from "./api";
+import type { InternshipScope } from "../types/internship";
 import type {
   UpdateStudentProfilePayload,
   UploadPassportPayload,
   GetStudentProgressResponse,
 } from "../types/itstudent";
 
-export const dashboardStats = async () => {
-  const response = await api.get("/students/dashboard");
+export const dashboardStats = async (scope?: InternshipScope) => {
+  const response = await api.get("/students/dashboard", { params: scope });
   return response.data;
 };
 

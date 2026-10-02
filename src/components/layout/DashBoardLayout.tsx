@@ -14,12 +14,15 @@ type DashBoardLayoutProps = {
   children?: ReactNode;
   pageTitle?: string;
   breadcrumb?: string[];
+  /** Extra top-bar controls for this area (see TopBar `actions`). */
+  topbarActions?: ReactNode;
 };
 
 export default function DashBoardLayout({
   children,
   pageTitle,
   breadcrumb,
+  topbarActions,
 }: DashBoardLayoutProps) {
   const { user } = useAuth();
 
@@ -98,6 +101,7 @@ export default function DashBoardLayout({
           userRole={userRole}
           collapsed={collapsed}
           onMobileMenuToggle={toggleMobile}
+          actions={topbarActions}
         />
         {/* Page content */}
         <main className="dash-content">{children}</main>

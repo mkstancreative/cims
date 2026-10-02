@@ -1,4 +1,5 @@
 import { api } from "./api";
+import type { InternshipScope } from "../types/internship";
 import type {
   QuizSessionListResponse,
   QuizSessionDetailResponse,
@@ -59,7 +60,9 @@ export const closeQuizSession = async (id: string) => {
 };
 
 /** Student-facing: their own attendance only, never the roll. */
-export const getMyQuizSession = async (): Promise<MyQuizSessionResponse> => {
-  const response = await api.get("/quiz-sessions/my");
+export const getMyQuizSession = async (
+  scope?: InternshipScope,
+): Promise<MyQuizSessionResponse> => {
+  const response = await api.get("/quiz-sessions/my", { params: scope });
   return response.data;
 };

@@ -45,6 +45,15 @@ export interface InternshipStudentRef {
   };
 }
 
+/**
+ * Query params that scope a student request to one internship. Empty means
+ * the current internship — the API's default.
+ */
+export interface InternshipScope {
+  internshipId?: string;
+  batchId?: string;
+}
+
 export interface Internship {
   _id: string;
   student: string | InternshipStudentRef;

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useInternshipScope } from "../context/useInternship";
 import {
   getQuizSessions,
   getQuizSession,
@@ -91,9 +92,10 @@ export const useQuizSession = (id: string) => {
 
 /** The student's own attendance for the current sitting, if any. */
 export const useMyQuizSession = () => {
+  const scope = useInternshipScope();
   return useQuery({
-    queryKey: ["quiz-sessions", "my"],
-    queryFn: getMyQuizSession,
+    queryKey: ["quiz-sessions", "my", scope],
+    queryFn: () => getMyQuizSession(scope),
   });
 };
 

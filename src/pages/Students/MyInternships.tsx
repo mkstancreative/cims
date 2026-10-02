@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  ArrowLeftRight,
   BookOpen,
   Briefcase,
   ClipboardCheck,
+  Eye,
   RefreshCw,
   Star,
 } from "lucide-react";
@@ -12,28 +14,17 @@ import InternshipStatusBadge from "../../components/ui/StatusBadge/InternshipSta
 import ActionDropDown from "../../components/ui/ActionDropdown/ActionDropDown";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
 import { useMyInternshipHistory } from "../../hooks/useInternships";
-import { formatDate } from "../../helpers/utilities";
 import type {
   Internship,
-  InternshipBatchRef,
   InternshipSupervisorRef,
 } from "../../api/types/internship";
+import { useSelectedInternship } from "../../context/useInternship";
+import {
+  internshipBatch,
+  internshipPeriod,
+  internshipSession,
+} from "../../helpers/internship";
 import ReEnrollForm from "../../components/student/forms/ReEnrollForm";
-
-function batchName(batch: Internship["batch"]): string {
-  if (!batch) return "—";
-  if (typeof batch === "string") return batch;
-  return batch.name ?? "—";
-}
-
-function batchSession(internship: Internship): string {
-  if (internship.session) return internship.session;
-  const batch = internship.batch;
-  if (batch && typeof batch !== "string") {
-    return (batch as InternshipBatchRef).session ?? "—";
-  }
-  return "—";
-}
 
 function supervisorName(supervisor: Internship["supervisor"]): string {
   if (!supervisor || typeof supervisor === "string") return "—";
@@ -44,37 +35,15 @@ function supervisorName(supervisor: Internship["supervisor"]): string {
   return s.staffId ?? "—";
 }
 
-function periodText(internship: Internship): string {
-  const period =
-    internship.itPeriod ??
-    (internship.batch && typeof internship.batch !== "string"
-      ? (internship.batch as InternshipBatchRef).itPeriod
-      : undefined);
-  if (!period?.startDate) return "—";
-  return `${formatDate(period.startDate)} – ${
-    period.endDate ? formatDate(period.endDate) : "—"
-  }`;
-}
-
-/** The batch's id, whether the batch arrives populated or as a bare id. */
-function batchId(batch: Internship["batch"]): string | undefined {
-  if (!batch) return undefined;
-  return typeof batch === "string" ? batch : batch._id;
-}
-
 export default function MyInternships() {
   const navigate = useNavigate();
 
-  // Both pages take the internship in the path and its batch as a query, so
-  // the API returns that internship's records, not just the current one's.
-  const openInternshipPage = (
-    row: Internship,
-    page: "evaluation" | "logbooks",
-  ) => {
-    const b = batchId(row.batch);
-    navigate(
-      `/student/internships/${row._id}/${page}${b ? `?batchId=${b}` : ""}`,
-    );
+  // Viewing an internship's pages selects it in the top-bar switcher, so
+  // every student page then shows that internship's records.
+  const { selected, select } = useSelectedInternship();
+  const openInternshipPage = (row: Internship, path: string) => {
+    select(row._id);
+    navigate(path);
   };
 
   const { data, isLoading } = useMyInternshipHistory();
@@ -86,7 +55,9 @@ export default function MyInternships() {
       header: "Batch",
       render: (row) => (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontWeight: 600 }}>{batchName(row.batch)}</span>
+          <span style={{ fontWeight: 600 }}>
+            {internshipBatch(row)?.name ?? "—"}
+          </span>
           {row.isCurrent && (
             <span
               style={{
@@ -104,11 +75,29 @@ export default function MyInternships() {
               <Star size={10} fill="var(--color-primary)" /> Current
             </span>
           )}
+          {/* The one the student pages are showing, when it's a past one */}
+          {!row.isCurrent && row._id === selected?._id && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#a16207",
+                background: "rgba(202, 138, 4, .14)",
+                padding: "2px 7px",
+                borderRadius: 20,
+              }}
+            >
+              <Eye size={10} /> Viewing
+            </span>
+          )}
         </span>
       ),
     },
-    { header: "Session", render: (row) => batchSession(row) },
-    { header: "IT Period", render: (row) => periodText(row) },
+    { header: "Session", render: (row) => internshipSession(row) ?? "—" },
+    { header: "IT Period", render: (row) => internshipPeriod(row) },
     { header: "Supervisor", render: (row) => supervisorName(row.supervisor) },
     {
       header: "Status",
@@ -122,12 +111,18 @@ export default function MyInternships() {
             {
               label: "View Evaluation",
               icon: <ClipboardCheck size={13} />,
-              onClick: () => openInternshipPage(row, "evaluation"),
+              onClick: () => openInternshipPage(row, "/student/evaluation"),
             },
             {
               label: "View Logbooks",
               icon: <BookOpen size={13} />,
-              onClick: () => openInternshipPage(row, "logbooks"),
+              onClick: () => openInternshipPage(row, "/student/logbook"),
+            },
+            {
+              label: "Switch to this internship",
+              icon: <ArrowLeftRight size={13} />,
+              onClick: () => openInternshipPage(row, "/student/dashboard"),
+              disabled: row._id === selected?._id,
             },
           ]}
         />

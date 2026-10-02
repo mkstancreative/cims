@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useModal } from "../../context/ModalContext";
 import type { LogBookListItem, LogBookStatus } from "../../api/types/logbook";
 import { ArrowLeft, BookOpen, ClipboardCheck } from "lucide-react";
@@ -17,10 +12,8 @@ import LogBookTable from "../../components/student/tables/LogBookTable";
 import CreateLogBookDraft from "../../components/student/forms/CreateLogBookDraft";
 import LogBookView from "../../components/student/view/LogBookView";
 import { useDeleteLogBook } from "../../hooks/useLogBooks";
-import {
-  useCurrentInternshipAbandoned,
-  useMyInternshipHistory,
-} from "../../hooks/useInternships";
+import { useSelectedInternship } from "../../context/useInternship";
+import { internshipLabel, isAbandoned } from "../../helpers/internship";
 import { AbandonedNotice } from "../../components/student/dashboard/AbandonedNotice";
 import { formatDate } from "../../helpers/utilities";
 
@@ -38,29 +31,16 @@ const STATUS_OPTIONS = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 /**
- * The student's logbook. At `/student/logbook` it's the current internship's;
- * at `/student/internships/:internshipId/logbooks?batchId=…` (from My
- * Internships) it's that internship's — read-only unless it's the current one.
+ * The selected internship's logbook (top-bar switcher; the current internship
+ * by default). A past or abandoned internship's entries are read-only.
  */
 export default function LogBook() {
   const { openModal, closeModal } = useModal();
   const navigate = useNavigate();
   const location = useLocation();
-  const { internshipId } = useParams<{ internshipId: string }>();
-  const [searchParams] = useSearchParams();
-  const batchId = searchParams.get("batchId") ?? undefined;
-
-  // Which internship this is, from the (cached) history list.
-  const { data: historyResp } = useMyInternshipHistory();
-  const internship = internshipId
-    ? historyResp?.data?.find((i) => i._id === internshipId)
-    : undefined;
-  const batch =
-    internship?.batch && typeof internship.batch !== "string"
-      ? internship.batch
-      : undefined;
-  const isPast = Boolean(internshipId) && !internship?.isCurrent;
-  const isCompleted = internship?.itStatus === "completed";
+  const { selected, isCurrent, readOnly: locked } = useSelectedInternship();
+  const isPast = !isCurrent;
+  const isCompleted = selected?.itStatus === "completed";
 
   // Back to wherever they came from (My Internships, or the evaluation);
   // opened directly, there's no in-app history, so go to My Internships.
@@ -69,10 +49,7 @@ export default function LogBook() {
       ? navigate(-1)
       : navigate("/student/internships");
 
-  const openEvaluation = () =>
-    navigate(
-      `/student/internships/${internshipId}/evaluation${batchId ? `?batchId=${batchId}` : ""}`,
-    );
+  const openEvaluation = () => navigate("/student/evaluation");
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -84,10 +61,8 @@ export default function LogBook() {
   );
 
   const { mutate: remove, isPending: deleting } = useDeleteLogBook();
-  // An abandoned internship's logbooks are locked server-side — hide the
-  // actions rather than let them fail.
-  const abandoned = useCurrentInternshipAbandoned();
-  const locked = abandoned || isPast;
+  // A current-but-abandoned internship is locked server-side too.
+  const abandoned = isCurrent && isAbandoned(selected?.itStatus);
 
   const confirmDelete = () => {
     if (deleteTarget) {
@@ -131,16 +106,14 @@ export default function LogBook() {
             <div>
               <h2 className="page-title">Log Book</h2>
               <p className="page-sub">
-                {internshipId
-                  ? batch
-                    ? `${batch.name}${batch.session ? ` · ${batch.session}` : ""} — daily IT training entries`
-                    : "Daily IT training entries for this internship"
+                {isPast && selected
+                  ? `${internshipLabel(selected)} — daily IT training entries`
                   : "Record and manage your daily IT training activities"}
               </p>
             </div>
           </div>
           <div className="page-header-right">
-            {internshipId && (
+            {isPast && (
               <button
                 type="button"
                 className="dash-btn dash-btn--ghost"
@@ -150,7 +123,7 @@ export default function LogBook() {
               </button>
             )}
             {/* A finished internship has a final evaluation to look at. */}
-            {internshipId && isCompleted && (
+            {isCompleted && (
               <AddButton
                 text="View Evaluation"
                 icon={<ClipboardCheck size={15} />}
@@ -161,7 +134,7 @@ export default function LogBook() {
           </div>
         </div>
 
-        {abandoned && !isPast && (
+        {abandoned && (
           <AbandonedNotice what="Its logbooks are locked — you can view them, but not add, edit or submit." />
         )}
 
@@ -211,8 +184,6 @@ export default function LogBook() {
             onEdit={openEdit}
             onDeleteRequest={setDeleteTarget}
             readOnly={locked}
-            internshipId={internshipId}
-            batchId={batchId}
           />
         </div>
       </div>

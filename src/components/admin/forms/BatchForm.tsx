@@ -155,6 +155,23 @@ function BatchFormInner({ isOpen, onClose, editing }: BatchFormInnerProps) {
   const set = (field: "name" | "session" | "weeks", value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
+  // Picking a duration fills in the weeks: the tier's length when it's fixed,
+  // otherwise its minimum. Weeks already typed stay if they fit the new tier.
+  const setDuration = (durationId: string) =>
+    setForm((prev) => {
+      const tier = durations.find((d) => d._id === durationId);
+      const typed = Number(prev.weeks);
+      const keep =
+        tier && prev.weeks !== "" && Number.isInteger(typed)
+          ? isWeeksInRange(typed, tier)
+          : false;
+      return {
+        ...prev,
+        durationId,
+        weeks: tier && !keep ? String(tier.minWeeks) : prev.weeks,
+      };
+    });
+
   const setItPeriod = (field: "name" | "startDate", value: string) =>
     setForm((prev) => ({
       ...prev,
@@ -281,9 +298,7 @@ function BatchFormInner({ isOpen, onClose, editing }: BatchFormInnerProps) {
           <select
             className="modal-input"
             value={form.durationId}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, durationId: e.target.value }))
-            }
+            onChange={(e) => setDuration(e.target.value)}
             required
             disabled={loadingDurations || periodLocked}
           >

@@ -20,3 +20,19 @@ export function batchQuizTitle(
   if (typeof q !== "string" && q.title) return q.title;
   return lookup.get(batchQuizId(batch)!) ?? "Unknown quiz";
 }
+
+/**
+ * The names of a batch's linked curricula, in the batch's order. Each link's
+ * `curriculum` may arrive populated or as a bare id — ids are named from a
+ * lookup of loaded curricula.
+ */
+export function batchCurriculumNames(
+  batch: Batch,
+  lookup: Map<string, string>,
+): string[] {
+  return (batch.curricula ?? []).map(({ curriculum }) =>
+    typeof curriculum === "string"
+      ? (lookup.get(curriculum) ?? "Unknown curriculum")
+      : curriculum.name,
+  );
+}

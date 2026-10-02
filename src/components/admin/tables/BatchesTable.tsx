@@ -23,8 +23,21 @@ import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import { durationLabel, formatPrice } from "../../../helpers/duration";
 import { fmt } from "../../../helpers/utilities";
 import { useQuizzes } from "../../../hooks/useQuizzes";
-import { batchQuizTitle } from "../../../helpers/batchQuiz";
+import {
+  batchCurriculumNames,
+  batchQuizTitle,
+} from "../../../helpers/batchQuiz";
+import { useCurricula } from "../../../hooks/useCurriculum";
 import { supervisorName } from "../../../helpers/batchSupervisor";
+
+/**
+ * The first word, with "…" when there's more (`more`: e.g. further
+ * curricula). Keeps the cell narrow; the tooltip has everything.
+ */
+const shortText = (text: string, more = false) => {
+  const words = text.trim().split(/\s+/);
+  return words.length > 1 || more ? `${words[0]}…` : words[0];
+};
 
 interface BatchesTableProps {
   search?: string;
@@ -44,7 +57,6 @@ interface BatchesTableProps {
   onAnnounce: (batch: Batch) => void;
   onDeleteRequest: (batch: Batch) => void;
 }
-
 
 export default function BatchesTable({
   search,
@@ -81,6 +93,12 @@ export default function BatchesTable({
     (quizzesResp?.data ?? []).map((q) => [q._id, q.title]),
   );
 
+  // Names curricula that batches carry as a bare id.
+  const { data: curriculaResp } = useCurricula({ limit: 100 });
+  const curriculumNames = new Map(
+    (curriculaResp?.data ?? []).map((c) => [c._id, c.name]),
+  );
+
   const { mutate: activate } = useActivateBatch();
   const { mutate: archive } = useArchiveBatch();
 
@@ -93,15 +111,15 @@ export default function BatchesTable({
 
   const meta: TableMeta | null =
     data && !filtering
-    ? {
-        page: data.page,
-        pages: data.pages,
-        count: data.total,
-        limit,
-        hasPrev: data.page > 1,
-        hasNext: data.page < data.pages,
-      }
-    : null;
+      ? {
+          page: data.page,
+          pages: data.pages,
+          count: data.total,
+          limit,
+          hasPrev: data.page > 1,
+          hasNext: data.page < data.pages,
+        }
+      : null;
 
   const columns: Column<Batch>[] = [
     {
@@ -117,7 +135,6 @@ export default function BatchesTable({
         </button>
       ),
     },
-    { header: "Session", accessor: "session" },
     {
       header: "Status",
       render: (row) => <StatusBadge status={row.status} />,
@@ -170,7 +187,18 @@ export default function BatchesTable({
       header: "Supervisor",
       render: (row) => {
         const name = supervisorName(row.supervisor);
-        if (name) return name;
+        if (name)
+          return (
+            <button
+              type="button"
+              className="bt-quiz"
+              onClick={() => onAssignSupervisor(row)}
+              disabled={row.status === "archived"}
+              title={`${name} — change supervisor`}
+            >
+              {shortText(name)}
+            </button>
+          );
         // Unassigned means nobody reviews these students' logbooks — make it
         // an action, not a dash.
         return (
@@ -195,9 +223,41 @@ export default function BatchesTable({
             className={`bt-quiz${title ? "" : " bt-quiz--none"}`}
             onClick={() => onAssignQuiz(row)}
             disabled={row.status === "archived"}
-            title={title ? "Change or reuse this quiz" : "Assign a quiz"}
+            title={
+              title ? `${title} — change or reuse this quiz` : "Assign a quiz"
+            }
           >
-            {title ?? "Not assigned"}
+            {title ? shortText(title) : "Not assigned"}
+          </button>
+        );
+      },
+    },
+    {
+      header: "Curriculum",
+      render: (row) => {
+        const names = batchCurriculumNames(row, curriculumNames);
+        // No curriculum means students have nothing to log against — make it
+        // an action, like an unassigned supervisor.
+        if (names.length === 0)
+          return (
+            <button
+              type="button"
+              className="bt-assign-sup"
+              onClick={() => onManageCurricula(row)}
+              disabled={row.status === "archived"}
+            >
+              <BookOpen size={12} /> Assign curriculum
+            </button>
+          );
+        return (
+          <button
+            type="button"
+            className="bt-quiz"
+            onClick={() => onManageCurricula(row)}
+            disabled={row.status === "archived"}
+            title={`${names.join(", ")} — add, remove or reorder`}
+          >
+            {shortText(names[0], names.length > 1)}
           </button>
         );
       },
@@ -225,7 +285,7 @@ export default function BatchesTable({
               disabled: row.status === "archived",
             },
             {
-              label: "Curricula",
+              label: "Assign Curriculum",
               icon: <BookOpen size={13} />,
               onClick: () => onManageCurricula(row),
               disabled: row.status === "archived",

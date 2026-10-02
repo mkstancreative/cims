@@ -1,5 +1,6 @@
 import { CheckCircle2, TrendingUp } from "lucide-react";
 import { useStudentDashboard } from "../../hooks/useDashboard";
+import { useSelectedInternship } from "../../context/useInternship";
 import {
   SectionHead,
   DashboardSkeleton,
@@ -27,14 +28,13 @@ import {
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function DashBoardStudent() {
   const { data: dashResp, isLoading, error } = useStudentDashboard();
+  const { isCurrent } = useSelectedInternship();
 
   if (isLoading) return <DashboardSkeleton cards={6} wide />;
 
   // Unpaid registration fee: the API refuses dashboard data, so offer payment.
   if (isPaymentRequiredError(error))
-    return (
-      <PaymentRequiredPanel message={apiErrorMessage(error, "")} />
-    );
+    return <PaymentRequiredPanel message={apiErrorMessage(error, "")} />;
 
   // Paid but not placed in a batch yet — show where their registration stands.
   if (isNoInternshipError(error)) return <EnrolmentPendingPanel />;
@@ -123,10 +123,11 @@ export default function DashBoardStudent() {
       />
 
       {/* `isCurrent` isn't "live" — a current internship can be abandoned. */}
-      {itStatus === "abandoned" ? (
+      {/* A past internship's sitting is over — the chip is for today's. */}
+      {itStatus === "abandoned" && isCurrent ? (
         <AbandonedNotice what="Its logbooks, quiz and evaluation are closed." />
       ) : (
-        <QuizAttendanceChip />
+        isCurrent && <QuizAttendanceChip />
       )}
 
       {/* ── KPIs — one compact row on wide screens ── */}

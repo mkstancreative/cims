@@ -1,4 +1,8 @@
-import type { Internship } from "../api/types/internship";
+import type {
+  Internship,
+  InternshipBatchRef,
+} from "../api/types/internship";
+import { formatDate } from "./utilities";
 
 export function studentName(it: Internship): string {
   if (it.student && typeof it.student === "object") {
@@ -44,4 +48,37 @@ export function abandonedNotice(count?: number): string | null {
   return count === 1
     ? "1 student's earlier internship was closed as abandoned."
     : `${count} students' earlier internships were closed as abandoned.`;
+}
+
+// ─── A student's own internships (history / switcher) ─────────────────────────
+
+/** The internship's batch when it arrives populated. */
+export function internshipBatch(it: Internship): InternshipBatchRef | undefined {
+  return it.batch && typeof it.batch === "object" ? it.batch : undefined;
+}
+
+/** The batch's id, whether the batch arrives populated or as a bare id. */
+export function internshipBatchId(it: Internship): string | undefined {
+  if (!it.batch) return undefined;
+  return typeof it.batch === "string" ? it.batch : it.batch._id;
+}
+
+export function internshipSession(it: Internship): string | undefined {
+  return it.session ?? internshipBatch(it)?.session;
+}
+
+/** "New Batch · 2025/2026" — how an internship is named to its student. */
+export function internshipLabel(it: Internship): string {
+  const name = internshipBatch(it)?.name ?? "Internship";
+  const session = internshipSession(it);
+  return session ? `${name} · ${session}` : name;
+}
+
+/** "1 Aug 2026 – 30 Sep 2026", or "—" with no period. */
+export function internshipPeriod(it: Internship): string {
+  const period = it.itPeriod ?? internshipBatch(it)?.itPeriod;
+  if (!period?.startDate) return "—";
+  return `${formatDate(period.startDate)} – ${
+    period.endDate ? formatDate(period.endDate) : "—"
+  }`;
 }

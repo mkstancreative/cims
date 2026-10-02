@@ -26,6 +26,7 @@ import {
   useSubmitQuiz,
 } from "../../hooks/useQuizzes";
 import { useMyQuizSession } from "../../hooks/useQuizSessions";
+import { useSelectedInternship } from "../../context/useInternship";
 import {
   formatCountdown,
   newestTimer,
@@ -288,9 +289,7 @@ function QuizIntroCard({
           <div className="mq-intro-meta-item">
             <Target size={16} className="mq-intro-meta-icon" />
             <span className="mq-intro-meta-label">Pass Mark</span>
-            <span className="mq-intro-meta-value">
-              {intro.passMark ?? "—"}
-            </span>
+            <span className="mq-intro-meta-value">{intro.passMark ?? "—"}</span>
           </div>
           <div className="mq-intro-meta-item">
             <Clock size={16} className="mq-intro-meta-icon" />
@@ -340,7 +339,9 @@ function QuizIntroCard({
           <p className="mq-intro-timeleft">
             <Clock size={14} /> Time left for this sitting:{" "}
             <strong>{formatCountdown(secondsLeft)}</strong>
-            {resuming && <span> · the clock kept running while you were away</span>}
+            {resuming && (
+              <span> · the clock kept running while you were away</span>
+            )}
           </p>
         )}
         {timed && expired && (
@@ -379,7 +380,9 @@ function ResultCard({ score, passed }: { score: number; passed: boolean }) {
           {score}
         </div>
         <span className={`mq-result-verdict ${passed ? "passed" : "failed"}`}>
-          {passed ? "You met the pass mark." : "You did not meet the pass mark."}
+          {passed
+            ? "You met the pass mark."
+            : "You did not meet the pass mark."}
         </span>
       </div>
     </div>
@@ -506,9 +509,7 @@ function QuizForm({
   const lastIndex = Math.max(0, questions.length - 1);
 
   const [saved] = useState(() => readProgress(userId, quiz._id));
-  const [answers, setAnswers] = useState<Record<number, number>>(
-    saved.answers,
-  );
+  const [answers, setAnswers] = useState<Record<number, number>>(saved.answers);
   const [current, setCurrent] = useState(() =>
     Math.min(saved.current, lastIndex),
   );
@@ -527,8 +528,9 @@ function QuizForm({
   const { timed, secondsLeft, expired, durationMinutes } =
     useQuizCountdown(timer);
 
-  const answeredCount = questions.filter((_, i) => answers[i] !== undefined)
-    .length;
+  const answeredCount = questions.filter(
+    (_, i) => answers[i] !== undefined,
+  ).length;
   const unanswered = questions.length - answeredCount;
 
   // Save on every change.
@@ -633,9 +635,7 @@ function QuizForm({
       {/* Quiz header */}
       <div className="mq-quiz-header">
         <h3 className="mq-quiz-title">{quiz.title}</h3>
-        {quiz.description && (
-          <p className="mq-quiz-desc">{quiz.description}</p>
-        )}
+        {quiz.description && <p className="mq-quiz-desc">{quiz.description}</p>}
         <p className="mq-quiz-meta">
           {questions.length} questions
           {(quiz.passMark ?? passMark) != null
@@ -753,7 +753,11 @@ function QuizForm({
       {!isLast && unanswered === 0 && (
         <p className="mq-all-done">
           All questions answered —{" "}
-          <button type="button" className="mq-link" onClick={() => goTo(lastIndex)}>
+          <button
+            type="button"
+            className="mq-link"
+            onClick={() => goTo(lastIndex)}
+          >
             go to the last question to submit
           </button>
           .
@@ -765,6 +769,8 @@ function QuizForm({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function MyQuiz() {
+  // A past internship's quiz can be looked at, never taken.
+  const { readOnly } = useSelectedInternship();
   // Before Start: question-free sources only.
   const {
     data: summaryResp,
@@ -816,13 +822,19 @@ export default function MyQuiz() {
       if (paperLoading)
         return (
           <div className="mq-center-panel">
-            <SkeletonCard lines={4} className="mq-loading" label="Loading your quiz" />
+            <SkeletonCard
+              lines={4}
+              className="mq-loading"
+              label="Loading your quiz"
+            />
           </div>
         );
       if (errorLock)
         return <LockedCard code={errorLock.code} message={errorLock.message} />;
       if (paper?.alreadySubmitted)
-        return <ResultCard score={paper.score ?? 0} passed={paper.passed ?? false} />;
+        return (
+          <ResultCard score={paper.score ?? 0} passed={paper.passed ?? false} />
+        );
       // A gate can close between the summary and Start — show the lock.
       if (!paper || paper.locked || !paper.quiz)
         return (
@@ -854,7 +866,10 @@ export default function MyQuiz() {
 
     if (summary?.state === "submitted" && summary.attempt)
       return (
-        <ResultCard score={summary.attempt.score} passed={summary.attempt.passed} />
+        <ResultCard
+          score={summary.attempt.score}
+          passed={summary.attempt.passed}
+        />
       );
 
     if (summary?.state === "locked" && summary.lock)
@@ -865,6 +880,24 @@ export default function MyQuiz() {
           session={summary.lock.session ?? mySession?.session ?? null}
           message={summary.lock.message}
         />
+      );
+
+    if (
+      (summary?.state === "available" || fallbackAvailable) &&
+      intro &&
+      readOnly
+    )
+      return (
+        <div
+          style={{
+            textAlign: "center",
+            padding: 60,
+            color: "var(--color-text-muted)",
+          }}
+        >
+          This quiz belongs to an internship that has ended, so it can no longer
+          be taken.
+        </div>
       );
 
     if ((summary?.state === "available" || fallbackAvailable) && intro)

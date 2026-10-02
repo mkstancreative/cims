@@ -12,10 +12,21 @@ import {
 } from "../api/services/certificate";
 import { toast } from "react-toastify";
 
-export const useCertificateStatus = (internshipId?: string) => {
+/**
+ * One internship's certificate request. Pass the id: without it the API
+ * answers with the student's latest request, whichever internship it's for.
+ */
+export const useCertificateStatus = (internshipId?: string, enabled = true) => {
   return useQuery({
     queryKey: ["certificate-status", internshipId],
     queryFn: () => getCertificateStatus(internshipId),
+    enabled,
+    // 404 is "no request for this internship yet" — an answer, not a blip.
+    retry: (count, err) => {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      return !(status && status >= 400 && status < 500) && count < 2;
+    },
   });
 };
 

@@ -31,7 +31,11 @@ export const useCertificateDownload = () => {
   );
   const { mutate: fetchCertData } = useGetMyCertificate();
 
-  const handleDownloadCert = async (canDownload: boolean) => {
+  /** `internshipId`: whose certificate — the selected internship's. */
+  const handleDownloadCert = async (
+    canDownload: boolean,
+    internshipId?: string,
+  ) => {
     if (!canDownload) {
       toast.warning("Certificate is not ready for download yet.");
       return;
@@ -39,7 +43,7 @@ export const useCertificateDownload = () => {
 
     setDownloadingCert(true);
 
-    fetchCertData(undefined, {
+    fetchCertData(internshipId, {
       onSuccess: (res) => {
         if (res.success) {
           setCertData(res.data);

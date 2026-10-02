@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { clearSelectedInternship } from "../context/InternshipContextValue";
 import {
   loginUser,
   googleLogin,
@@ -55,6 +56,8 @@ const useLoginSuccess = () => {
     // storeTokens handles the missing one; the session simply cannot renew.
     storeTokens(accessToken, refreshToken);
     setAuth(user);
+    // Every sign-in starts on the student's current internship.
+    clearSelectedInternship();
 
     if (isPaymentRequired(response)) {
       storePendingRegistration(pendingRegistration ?? null);
@@ -141,6 +144,7 @@ export const useLogoutUser = () => {
       clearTokens();
       clearAuth();
       clearPendingRegistration();
+      clearSelectedInternship();
       queryClient.clear();
       navigate("/", { replace: true });
     },

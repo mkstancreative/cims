@@ -87,14 +87,3 @@ export const useSetCurrentInternship = () => {
       toast.error(getErrMsg(err, "Failed to set current internship.")),
   });
 };
-
-/**
- * True when the student's current internship was abandoned — closed because a
- * newer one was activated. `isCurrent` doesn't mean live: an abandoned
- * internship stays current until a newer one exists, and it's read-only.
- */
-export const useCurrentInternshipAbandoned = () => {
-  const { data } = useMyInternshipHistory();
-  const current = data?.data?.find((i) => i.isCurrent);
-  return current?.itStatus === "abandoned";
-};

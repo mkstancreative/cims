@@ -16,18 +16,26 @@ import Certificate from "../../components/student/view/Certificate/Certificate";
 import { useCertificateStatus } from "../../hooks/useCertificate";
 import { useCertificateDownload } from "../../hooks/useCertificateDownload";
 import { useStudentDashboard } from "../../hooks/useDashboard";
+import { useSelectedInternship } from "../../context/useInternship";
 import type { CertificateStatus } from "../../api/types/certificate";
 import { SkeletonCard } from "../../components/ui/Skeleton/Skeleton";
 import "./MyCertificate.css";
 
 export default function MyCertificate() {
-  const { data, isLoading } = useCertificateStatus();
+  // The selected internship's certificate (top-bar switcher). Its id goes
+  // with every call — without one the API answers with the latest request,
+  // whichever internship that's for.
+  const { selected, isLoading: historyLoading } = useSelectedInternship();
   const { data: dashResp } = useStudentDashboard();
+  const internshipId = selected?._id ?? dashResp?.data?.internshipId;
+  const { data, isLoading: statusLoading } = useCertificateStatus(
+    internshipId,
+    !historyLoading,
+  );
+  const isLoading = historyLoading || statusLoading;
   const [requestOpen, setRequestOpen] = useState(false);
   const { certRef, downloadingCert, certData, handleDownloadCert } =
     useCertificateDownload();
-
-  const internshipId = dashResp?.data?.internshipId;
 
   // The status endpoint returns { success, data: CertificateStatus }
   const status = (
@@ -201,7 +209,7 @@ export default function MyCertificate() {
                 className={`cert-download-btn${downloadingCert ? " is-processing" : ""}`}
                 disabled={!canDownload || downloadingCert}
                 aria-busy={downloadingCert}
-                onClick={() => handleDownloadCert(canDownload)}
+                onClick={() => handleDownloadCert(canDownload, internshipId)}
               >
                 {downloadingCert ? (
                   <>

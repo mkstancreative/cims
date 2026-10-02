@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useInternshipScope } from "../context/useInternship";
 import {
   getLogBooks,
   getLogBookById,
@@ -17,10 +18,13 @@ function getErrMsg(err: unknown, fallback: string) {
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
+/** The selected internship's logbooks (the current one by default). */
 export const useLogBooks = (params?: LogBookParams) => {
+  const scope = useInternshipScope();
+  const scoped = { ...scope, ...params };
   return useQuery({
-    queryKey: ["logbooks", params],
-    queryFn: () => getLogBooks(params),
+    queryKey: ["logbooks", scoped],
+    queryFn: () => getLogBooks(scoped),
   });
 };
 

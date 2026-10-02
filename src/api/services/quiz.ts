@@ -1,4 +1,5 @@
 import { api } from "./api";
+import type { InternshipScope } from "../types/internship";
 import type {
   QuizListResponse,
   QuizResponse,
@@ -47,13 +48,17 @@ export const reorderQuizQuestions = async ({
 };
 
 /** Dashboard overview — no questions ever, so safe to poll and show anywhere. */
-export const getMyQuizSummary = async (): Promise<QuizSummaryResponse> => {
-  const response = await api.get("/quizzes/my/summary");
+export const getMyQuizSummary = async (
+  scope?: InternshipScope,
+): Promise<QuizSummaryResponse> => {
+  const response = await api.get("/quizzes/my/summary", { params: scope });
   return response.data;
 };
 
-export const getMyQuiz = async (): Promise<MyQuizResponse> => {
-  const response = await api.get("/quizzes/my");
+export const getMyQuiz = async (
+  scope?: InternshipScope,
+): Promise<MyQuizResponse> => {
+  const response = await api.get("/quizzes/my", { params: scope });
   return response.data;
 };
 

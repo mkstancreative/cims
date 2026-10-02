@@ -25,9 +25,6 @@ interface LogBookTableProps {
   onDeleteRequest: (logbook: LogBookListItem) => void;
   /** The internship was abandoned, or is a past one — its logbooks are locked. */
   readOnly?: boolean;
-  /** Show this internship's logbooks instead of the current one's. */
-  internshipId?: string;
-  batchId?: string;
 }
 
 export default function LogBookTable({
@@ -41,16 +38,12 @@ export default function LogBookTable({
   onEdit,
   onDeleteRequest,
   readOnly = false,
-  internshipId,
-  batchId,
 }: LogBookTableProps) {
   const { data, isLoading } = useLogBooks({
     page,
     limit,
     search,
     status,
-    ...(internshipId && { internshipId }),
-    ...(batchId && { batchId }),
   });
 
   const logbooks: LogBookListItem[] = data?.data ?? [];

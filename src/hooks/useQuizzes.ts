@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInternshipScope } from "../context/useInternship";
 import { toast } from "react-toastify";
 import {
   createQuiz,
@@ -42,11 +43,13 @@ export const useQuiz = (id: string) => {
  * carries the paper — so it refreshes while the student waits on a sitting.
  */
 export const useMyQuizSummary = (enabled = true) => {
+  const scope = useInternshipScope();
   return useQuery({
-    queryKey: ["quizzes", "my", "summary"],
-    queryFn: getMyQuizSummary,
+    queryKey: ["quizzes", "my", "summary", scope],
+    queryFn: () => getMyQuizSummary(scope),
     enabled,
-    refetchInterval: 60_000,
+    // A past internship's quiz is settled — only the current one moves.
+    refetchInterval: scope.internshipId ? false : 60_000,
     retry: (count, err) => {
       const status = (err as { response?: { status?: number } })?.response
         ?.status;
@@ -61,9 +64,10 @@ export const useMyQuizSummary = (enabled = true) => {
  * question-free `/quiz-sessions/my` and `/quizzes/my/summary`.
  */
 export const useMyQuiz = (enabled = true) => {
+  const scope = useInternshipScope();
   return useQuery({
-    queryKey: ["quizzes", "my"],
-    queryFn: getMyQuiz,
+    queryKey: ["quizzes", "my", scope],
+    queryFn: () => getMyQuiz(scope),
     enabled,
     // Never refetch the paper behind the student's back mid-quiz.
     refetchOnWindowFocus: false,

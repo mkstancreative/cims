@@ -6,6 +6,7 @@ import DashBoardStudent from "../pages/Students/DashBoardStudent";
 import LogBook from "../pages/Students/LogBook";
 import MyProfile from "../pages/Students/MyProfile";
 import PageLoader from "../components/ui/PageLoader/PageLoader";
+import SelectInternshipRedirect from "./SelectInternshipRedirect";
 import Notifications from "../pages/Shared/Notifications";
 
 const MyCurriculum = lazy(() => import("../pages/Students/MyCurriculum"));
@@ -25,20 +26,17 @@ export default function StudentRoutes() {
         <Route path="logbook" element={<LogBook />} />
         <Route path="quiz" element={<MyQuiz />} />
         <Route path="internships" element={<MyInternships />} />
-        {/* Each internship's evaluation, opened from My Internships. The old
-            standalone page now lives there. */}
+        {/* The selected internship's evaluation (top-bar switcher). Reached
+            from My Internships, the dashboard and the logbook. */}
+        <Route path="evaluation" element={<MyEvaluation />} />
+        {/* Older per-internship links: select it, then show the page. */}
         <Route
           path="internships/:internshipId/evaluation"
-          element={<MyEvaluation />}
+          element={<SelectInternshipRedirect to="/student/evaluation" />}
         />
-        {/* Each internship's logbooks — past ones read-only. */}
         <Route
           path="internships/:internshipId/logbooks"
-          element={<LogBook />}
-        />
-        <Route
-          path="evaluation"
-          element={<Navigate to="/student/internships" replace />}
+          element={<SelectInternshipRedirect to="/student/logbook" />}
         />
         <Route path="certificate" element={<MyCertificate />} />
         <Route path="payments" element={<MyPayments />} />

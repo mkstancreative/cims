@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useInternshipScope } from "../context/useInternship";
 import {
   getPendingEvaluations,
   submitEvaluation,
@@ -29,10 +30,13 @@ export const usePendingEvaluations = () => {
 };
 
 /** Current internship by default; pass ids for a specific (past) one. */
+/** An internship's evaluation — the selected one unless `params` says which. */
 export const useMyEvaluation = (params?: MyEvaluationParams) => {
+  const scope = useInternshipScope();
+  const resolved = params ?? scope;
   return useQuery({
-    queryKey: ["my-evaluation", params ?? null],
-    queryFn: () => getMyEvaluation(params),
+    queryKey: ["my-evaluation", resolved],
+    queryFn: () => getMyEvaluation(resolved),
     retry: (count, err) => {
       const status = (err as { response?: { status?: number } })?.response
         ?.status;

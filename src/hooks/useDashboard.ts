@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/services/api";
+import { useInternshipScope } from "../context/useInternship";
 import { dashboardStats as studentDashboardStats } from "../api/services/itstudent";
 import { supervisorDashboardStats } from "../api/services/schoolSupervisors";
 import {
@@ -18,10 +19,12 @@ const adminDashboardStatsFn = async (): Promise<AdminDashboardResponse> => {
   return response.data;
 };
 
-export const useStudentDashboard = () =>
-  useQuery<StudentDashboardResponse>({
-    queryKey: ["student-dashboard"],
-    queryFn: studentDashboardStats,
+/** The selected internship's dashboard (the current one by default). */
+export const useStudentDashboard = () => {
+  const scope = useInternshipScope();
+  return useQuery<StudentDashboardResponse>({
+    queryKey: ["student-dashboard", scope],
+    queryFn: () => studentDashboardStats(scope),
     staleTime: 2 * 60 * 1000,
     // An unpaid fee or a missing enrolment won't fix itself on retry — show
     // the matching panel at once.
@@ -30,6 +33,7 @@ export const useStudentDashboard = () =>
       !isNoInternshipError(error) &&
       failureCount < 3,
   });
+};
 
 export const useAdminDashboard = () =>
   useQuery<AdminDashboardResponse>({

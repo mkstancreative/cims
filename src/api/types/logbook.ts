@@ -140,8 +140,8 @@ export interface LogBookParams {
   search?: string;
   weekNumber?: number | string;
   status?: LogBookStatus | "";
-  /** A past internship's logbooks (My Internships → View Logbooks). Without
-   *  these the list is the current internship's. */
+  /** Scope to one internship — `useLogBooks` sends the selected one's.
+   *  Without these the list is the current internship's. */
   internshipId?: string;
   batchId?: string;
 }
