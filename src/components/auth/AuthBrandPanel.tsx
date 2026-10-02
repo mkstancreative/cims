@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import "./AuthLayout.css";
 import heroImage from "../../assets/login-hero.webp";
 
@@ -25,93 +26,119 @@ export default function AuthBrandPanel({
 }: AuthBrandPanelProps) {
   const appName = import.meta.env.VITE_APP_NAME;
 
+  // Mobile top bar: frosted and shadowed once the page has scrolled.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <section className="auth-brand">
-      <div
-        className="auth-brand__photo"
-        style={{ backgroundImage: `url(${heroImage})` }}
-        aria-hidden="true"
-      />
-      <div className="auth-brand__fade" aria-hidden="true" />
-
-      <figure className="auth-quote" aria-hidden="true">
-        <span className="auth-quote__mark">“</span>
-        <blockquote>
-          Skilled interns.
-          <br />
-          Stronger healthcare
-          <br />
-          systems.
-        </blockquote>
-        <svg className="auth-scribble" viewBox="0 0 80 10" fill="none">
-          <path
-            d="M2 8C20 3 50 1 78 3"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      </figure>
-
-      <div className="auth-brand__content">
-        <div className="auth-logo">
-          <img src="/logo.png" alt="" width={52} height={52} />
-          <div>
-            <div className="auth-logo__name">{appName}</div>
-            <div className="auth-logo__sub">
+    <>
+      {/* Phones / small tablets only: a light bar that stays pinned while the
+          form scrolls. A direct child of .auth-page, so it sticks for the
+          whole page rather than just the brand section. */}
+      <header className={`auth-mobilebar${scrolled ? " is-scrolled" : ""}`}>
+        <Link to="/" className="auth-mobilebar__brand">
+          <img src="/logo.png" alt="" width={46} height={46} />
+          <span>
+            <span className="auth-mobilebar__name">{appName}</span>
+            <span className="auth-mobilebar__sub">
               Clinical Internship Management System
+            </span>
+          </span>
+        </Link>
+      </header>
+
+      <section className="auth-brand">
+        <div
+          className="auth-brand__photo"
+          style={{ backgroundImage: `url(${heroImage})` }}
+          aria-hidden="true"
+        />
+        <div className="auth-brand__fade" aria-hidden="true" />
+
+        <figure className="auth-quote" aria-hidden="true">
+          <span className="auth-quote__mark">“</span>
+          <blockquote>
+            Skilled interns.
+            <br />
+            Stronger healthcare
+            <br />
+            systems.
+          </blockquote>
+          <svg className="auth-scribble" viewBox="0 0 80 10" fill="none">
+            <path
+              d="M2 8C20 3 50 1 78 3"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </figure>
+
+        <div className="auth-brand__content">
+          <div className="auth-logo">
+            <img src="/logo.png" alt="" width={52} height={52} />
+            <div>
+              <div className="auth-logo__name">{appName}</div>
+              <div className="auth-logo__sub">
+                Clinical Internship Management System
+              </div>
             </div>
           </div>
+
+          <h1 className="auth-headline">
+            {headline}
+            <br />
+            <span>{accent}</span>
+          </h1>
+          <p className="auth-lead">{lead}</p>
+
+          <ul className="auth-features">
+            {features.map((f) => (
+              <li key={f.title} className="auth-feature">
+                <span
+                  className={`auth-feature__icon auth-feature__icon--${f.tone}`}
+                >
+                  {f.icon}
+                </span>
+                <span>
+                  <span className="auth-feature__title">{f.title}</span>
+                  <span className="auth-feature__desc">{f.desc}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <h1 className="auth-headline">
-          {headline}
-          <br />
-          <span>{accent}</span>
-        </h1>
-        <p className="auth-lead">{lead}</p>
-
-        <ul className="auth-features">
-          {features.map((f) => (
-            <li key={f.title} className="auth-feature">
-              <span
-                className={`auth-feature__icon auth-feature__icon--${f.tone}`}
-              >
-                {f.icon}
-              </span>
-              <span>
-                <span className="auth-feature__title">{f.title}</span>
-                <span className="auth-feature__desc">{f.desc}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="auth-wave" aria-hidden="true">
-        <svg viewBox="0 0 520 330" preserveAspectRatio="none">
-          <path d="M0 0C120 30 260 90 360 170C430 226 480 280 520 330H0Z" />
-        </svg>
-        <p className="auth-wave__text">
-          Empowering
-          <br />
-          healthcare through
-          <br />
-          structured learning.
-        </p>
-        <svg
-          className="auth-scribble auth-scribble--wave"
-          viewBox="0 0 100 10"
-          fill="none"
-        >
-          <path
-            d="M2 8C25 3 60 1 98 3"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-    </section>
+        <div className="auth-wave" aria-hidden="true">
+          <svg viewBox="0 0 520 330" preserveAspectRatio="none">
+            <path d="M0 0C120 30 260 90 360 170C430 226 480 280 520 330H0Z" />
+          </svg>
+          <p className="auth-wave__text">
+            Empowering
+            <br />
+            healthcare through
+            <br />
+            structured learning.
+          </p>
+          <svg
+            className="auth-scribble auth-scribble--wave"
+            viewBox="0 0 100 10"
+            fill="none"
+          >
+            <path
+              d="M2 8C25 3 60 1 98 3"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+      </section>
+    </>
   );
 }
