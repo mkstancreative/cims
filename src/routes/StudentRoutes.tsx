@@ -27,7 +27,16 @@ export default function StudentRoutes() {
         <Route path="logbook" element={<LogBook />} />
         <Route path="quiz" element={<MyQuiz />} />
         <Route path="internships" element={<MyInternships />} />
-        <Route path="evaluation" element={<MyEvaluation />} />
+        {/* Each internship's evaluation, opened from My Internships. The old
+            standalone page now lives there. */}
+        <Route
+          path="internships/:internshipId/evaluation"
+          element={<MyEvaluation />}
+        />
+        <Route
+          path="evaluation"
+          element={<Navigate to="/student/internships" replace />}
+        />
         <Route path="certificate" element={<MyCertificate />} />
         <Route path="payments" element={<MyPayments />} />
         <Route path="profile" element={<MyProfile />} />

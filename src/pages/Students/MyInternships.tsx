@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Briefcase, RefreshCw, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Briefcase, Eye, RefreshCw, Star } from "lucide-react";
 import GeneralTable from "../../components/ui/GeneralTable/GeneralTable";
 import InternshipStatusBadge from "../../components/ui/StatusBadge/InternshipStatusBadge";
 import type { Column } from "../../components/ui/GeneralTable/GeneralTable";
@@ -48,7 +49,23 @@ function periodText(internship: Internship): string {
   }`;
 }
 
+/** The batch's id, whether the batch arrives populated or as a bare id. */
+function batchId(batch: Internship["batch"]): string | undefined {
+  if (!batch) return undefined;
+  return typeof batch === "string" ? batch : batch._id;
+}
+
 export default function MyInternships() {
+  const navigate = useNavigate();
+
+  // Each internship's evaluation — supervisor assessment, quiz, final grade.
+  const openEvaluation = (row: Internship) => {
+    const b = batchId(row.batch);
+    navigate(
+      `/student/internships/${row._id}/evaluation${b ? `?batchId=${b}` : ""}`,
+    );
+  };
+
   const { data, isLoading } = useMyInternshipHistory();
   const internships: Internship[] = data?.data ?? [];
   const [reEnrollOpen, setReEnrollOpen] = useState(false);
@@ -85,6 +102,19 @@ export default function MyInternships() {
     {
       header: "Status",
       render: (row) => <InternshipStatusBadge status={row.itStatus} />,
+    },
+    {
+      header: "Evaluation",
+      render: (row) => (
+        <button
+          type="button"
+          className="table-view-btn"
+          onClick={() => openEvaluation(row)}
+          title="View this internship's evaluation"
+        >
+          <Eye size={14} /> View
+        </button>
+      ),
     },
   ];
 

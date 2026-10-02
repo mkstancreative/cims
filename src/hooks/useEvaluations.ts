@@ -13,6 +13,7 @@ import type {
   CompositeResultsParams,
   EvaluationSubmitError,
   EvaluationVerifyParams,
+  MyEvaluationParams,
 } from "../api/types/evaluation";
 
 function getErrMsg(err: unknown, fallback: string) {
@@ -27,10 +28,16 @@ export const usePendingEvaluations = () => {
   });
 };
 
-export const useMyEvaluation = () => {
+/** Current internship by default; pass ids for a specific (past) one. */
+export const useMyEvaluation = (params?: MyEvaluationParams) => {
   return useQuery({
-    queryKey: ["my-evaluation"],
-    queryFn: getMyEvaluation,
+    queryKey: ["my-evaluation", params ?? null],
+    queryFn: () => getMyEvaluation(params),
+    retry: (count, err) => {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      return !(status && status >= 400 && status < 500) && count < 2;
+    },
   });
 };
 

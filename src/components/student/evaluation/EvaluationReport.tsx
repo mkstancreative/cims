@@ -1,20 +1,15 @@
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
-  ArrowLeft,
   CheckCircle2,
-  ClipboardCheck,
   Clock,
   MessageSquare,
   Target,
   UserCheck,
 } from "lucide-react";
-import { useMyEvaluation } from "../../hooks/useEvaluations";
-import StatusBadge from "../../components/ui/StatusBadge/StatusBadge";
-import { GradeBadge } from "../../components/shared/dashboard/DashboardKit";
-import { SkeletonCards } from "../../components/ui/Skeleton/Skeleton";
-import { formatDate } from "../../helpers/utilities";
-import type { MyEvaluation as MyEvaluationData } from "../../api/types/evaluation";
-import "./MyEvaluation.css";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
+import { GradeBadge } from "../../shared/dashboard/DashboardKit";
+import { formatDate } from "../../../helpers/utilities";
+import type { MyEvaluation as MyEvaluationData } from "../../../api/types/evaluation";
+import "./EvaluationReport.css";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Awaiting supervisor",
@@ -229,81 +224,30 @@ function nextMin(ev: MyEvaluationData, grade: string): number {
   return ev.gradeScale[i - 1]?.minScore ?? 0;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── The report ──────────────────────────────────────────────────────────────
+
 /**
- * One internship's evaluation, reached from My Internships →
- * `/student/internships/:internshipId/evaluation?batchId=…`. Both ids go to
- * the API so the right internship is shown, not just the current one.
+ * A student's evaluation for one internship, from `GET
+ * /evaluations/my-evaluation`: status and result, what they still need on
+ * the quiz (while it's outstanding), the supervisor's criterion breakdown,
+ * how the grade is made, and the grade scale. Used by My Evaluation (current
+ * internship) and each internship's own page.
  */
-export default function MyEvaluation() {
-  const navigate = useNavigate();
-  const { internshipId } = useParams<{ internshipId: string }>();
-  const [searchParams] = useSearchParams();
-  const batchId = searchParams.get("batchId") ?? undefined;
-
-  const { data, isLoading, isError, error } = useMyEvaluation({
-    ...(internshipId && { internshipId }),
-    ...(batchId && { batchId }),
-  });
-  const ev = data?.data;
-  // The server's own message (e.g. no internship resolves) is safe to show.
-  const errorMessage = (
-    error as { response?: { data?: { message?: string } } } | null
-  )?.response?.data?.message;
-
+export function EvaluationReport({ ev }: { ev: MyEvaluationData }) {
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <div className="page-header-left">
-          <div className="page-icon">
-            <ClipboardCheck size={20} />
-          </div>
-          <div>
-            <h2 className="page-title">Internship Evaluation</h2>
-            <p className="page-sub">
-              {ev?.batch
-                ? `${ev.batch.name} · ${ev.batch.session} — your supervisor's assessment, your quiz, and your final grade`
-                : "Your supervisor's assessment, your quiz, and your final grade"}
-            </p>
-          </div>
-        </div>
-        <div className="page-header-right">
-          <button
-            type="button"
-            className="dash-btn dash-btn--ghost"
-            onClick={() => navigate("/student/internships")}
-          >
-            <ArrowLeft size={15} /> My Internships
-          </button>
-        </div>
+    <div className="mev-layout">
+      <div className="mev-main">
+        <StatusCard ev={ev} />
+        {/* Most actionable while waiting on the quiz. */}
+        {ev.status === "awaiting-quiz" && ev.projection && (
+          <ProjectionCard projection={ev.projection} />
+        )}
+        <AssessmentCard ev={ev} />
       </div>
-
-      {isLoading ? (
-        <SkeletonCards cards={3} lines={3} label="Loading evaluation" />
-      ) : isError || !ev ? (
-        <div className="mev-card mev-empty">
-          <ClipboardCheck size={36} />
-          <p>
-            {errorMessage ??
-              "We couldn't load this evaluation. Please try again later."}
-          </p>
-        </div>
-      ) : (
-        <div className="mev-layout">
-          <div className="mev-main">
-            <StatusCard ev={ev} />
-            {/* Most actionable while waiting on the quiz. */}
-            {ev.status === "awaiting-quiz" && ev.projection && (
-              <ProjectionCard projection={ev.projection} />
-            )}
-            <AssessmentCard ev={ev} />
-          </div>
-          <aside className="mev-side">
-            <CompositionCard ev={ev} />
-            <GradeScale ev={ev} />
-          </aside>
-        </div>
-      )}
+      <aside className="mev-side">
+        <CompositionCard ev={ev} />
+        <GradeScale ev={ev} />
+      </aside>
     </div>
   );
 }

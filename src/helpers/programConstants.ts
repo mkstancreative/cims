@@ -23,3 +23,21 @@ export const PROGRAM_LEVELS_BY_TYPE: Record<string, string[]> = {
   Diploma: ["Year 1", "Year 2", "Year 3"],
   Other: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"],
 };
+
+/** Full programme names for formal documents (the certificate). */
+export const PROGRAM_NAMES: Record<string, string> = {
+  ND: "National Diploma",
+  HND: "Higher National Diploma",
+  BSc: "Bachelor of Science",
+  BNSc: "Bachelor of Nursing Science",
+  RN: "Registered Nursing",
+  RM: "Registered Midwifery",
+  Diploma: "Diploma",
+};
+
+/** "ND" → "National Diploma (ND)"; unknown types are shown as given. */
+export function programFullName(type?: string): string {
+  if (!type) return "";
+  const name = PROGRAM_NAMES[type];
+  return name && name !== type ? `${name} (${type})` : type;
+}

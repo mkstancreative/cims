@@ -1,6 +1,7 @@
 import type { Column, TableMeta } from "../../ui/GeneralTable/GeneralTable";
 import GeneralTable from "../../ui/GeneralTable/GeneralTable";
 import InternshipStatusBadge from "../../ui/StatusBadge/InternshipStatusBadge";
+import StatusBadge from "../../ui/StatusBadge/StatusBadge";
 import { ABANDONED_HINT, isAbandoned } from "../../../helpers/internship";
 import { ClipboardCheck } from "lucide-react";
 import {
@@ -61,16 +62,9 @@ export default function StudentEvaluationTable({
       render: (row) =>
         // Closed when a newer internship started — the API refuses evaluation.
         row.needsEvaluation === false || row.schoolSubmitted ? (
-          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
-            Submitted
-          </span>
+          <StatusBadge status="submitted" label="Submitted" tone="teal" />
         ) : isAbandoned(row.itStatus) ? (
-          <span
-            style={{ fontSize: 12, color: "var(--color-text-muted)" }}
-            title={ABANDONED_HINT}
-          >
-            Closed
-          </span>
+          <StatusBadge status="closed" label="Closed" title={ABANDONED_HINT} />
         ) : (
           <button
             className="eval-submit-btn"

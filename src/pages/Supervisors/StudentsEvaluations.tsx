@@ -30,8 +30,14 @@ import {
 } from "../../components/ui/FilterPopover/FilterPopover";
 import { useMyBatches } from "../../hooks/useBatches";
 import { useMyDepartments } from "../../hooks/useSchoolSupervisor";
+import { useInstitutions } from "../../hooks/useInstitutions";
+import { getCompositeResults } from "../../api/services/evaluation";
+import { toast } from "react-toastify";
 import { EvaluateFirstNotice } from "../../components/supervisor/EvaluateFirstNotice";
 import type { Batch } from "../../api/types/batch";
+
+/** One request for the whole filtered set when exporting. */
+const EXPORT_LIMIT = 10000;
 
 // ─── Grade options ─────────────────────────────────────────────────────────────
 const GRADE_OPTIONS = ["A", "B", "C", "D", "E", "F"] as const;
@@ -114,6 +120,8 @@ export default function StudentsEvaluations() {
   // ── Filter state (results) ──
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
+  const [institution, setInstitution] = useState("");
+  const [exporting, setExporting] = useState(false);
   const [batchId, setBatchId] = useState("");
   const [status, setStatus] = useState<EvaluationStatus | "">("");
   const [grade, setGrade] = useState<Grade | "">("");
@@ -128,6 +136,8 @@ export default function StudentsEvaluations() {
     (myBatchesData as { data?: Batch[] } | undefined)?.data ?? [];
   // The supervisor's own departments — `/admin/all-departments` is admin-only.
   const { data: deptsData } = useMyDepartments({ limit: 100 });
+  // Institutions for the results filter (filtered by id).
+  const { data: institutionsResp } = useInstitutions({ limit: 100 });
   const deptNames = (deptsData?.data ?? []).map((d) => d.name);
   if (department && !deptNames.includes(department)) deptNames.push(department);
 
@@ -204,6 +214,7 @@ export default function StudentsEvaluations() {
   const params: CompositeResultsParams = {
     ...(search.trim() && { search: search.trim() }),
     ...(department.trim() && { department: department.trim() }),
+    ...(institution && { institution }),
     ...(batchId.trim() && { batchId: batchId.trim() }),
     ...(status && { status }),
     ...(grade && { grade }),
@@ -274,6 +285,7 @@ export default function StudentsEvaluations() {
   // Clears the filters but keeps whatever is typed in the search box.
   const clearFilters = () => {
     setDepartment("");
+    setInstitution("");
     setBatchId("");
     setStatus("");
     setGrade("");
@@ -336,11 +348,63 @@ export default function StudentsEvaluations() {
         setPage(1);
       },
     },
+    {
+      key: "institution",
+      label: "Institution",
+      options: [
+        { value: "", label: "All Institutions" },
+        ...(institutionsResp?.data ?? []).map((i) => ({
+          value: i._id,
+          label: i.code ? `${i.name} (${i.code})` : i.name,
+        })),
+      ],
+      value: institution,
+      onChange: (v) => {
+        setInstitution(v);
+        setPage(1);
+      },
+    },
   ];
+
+  // Export every matching result, not just the visible page — same filters,
+  // one request with a high limit.
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const all = await getCompositeResults({
+        ...params,
+        page: 1,
+        limit: EXPORT_LIMIT,
+      });
+      const exported = all?.data ?? [];
+      if (exported.length === 0) {
+        toast.info("No results to export.");
+        return;
+      }
+      exportToExcel(exported);
+      const totalAll = all?.total ?? exported.length;
+      if (totalAll > exported.length)
+        toast.warn(
+          `Exported the first ${exported.length.toLocaleString()} of ${totalAll.toLocaleString()} results.`,
+        );
+      else
+        toast.success(
+          `Exported ${exported.length.toLocaleString()} result${exported.length === 1 ? "" : "s"}.`,
+        );
+    } catch (err) {
+      toast.error(
+        (err as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ?? "Couldn't export the results. Please try again.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleReset = () => {
     setSearch("");
     setDepartment("");
+    setInstitution("");
     setBatchId("");
     setStatus("");
     setGrade("");
@@ -411,14 +475,20 @@ export default function StudentsEvaluations() {
       header: "Action",
       render: (row) =>
         row.status === "completed" ? (
-          <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
-            Done
-          </span>
+          <StatusBadge
+            status="completed"
+            label="Done"
+            title="Both halves are in — the final grade is calculated."
+          />
         ) : row.status === "awaiting-quiz" ? (
           // Your half is in. Re-submitting is allowed (it overwrites), so
           // offer it quietly rather than as the main action.
           <span className="eval-done-cell">
-            <span>Your part is done</span>
+            <StatusBadge
+              status="awaiting-quiz"
+              label="Your part is done"
+              title="Waiting on the student's quiz score."
+            />
             <button
               className="eval-update-btn"
               onClick={() => handleEvaluate(row)}
@@ -460,12 +530,12 @@ export default function StudentsEvaluations() {
           <div className="page-header-right">
             <button
               className="eval-export-btn"
-              onClick={() => exportToExcel(rows)}
-              disabled={rows.length === 0 || isLoading}
-              title="Export current page to Excel"
+              onClick={handleExport}
+              disabled={total === 0 || isLoading || exporting}
+              title="Export every result matching the current filters to Excel"
             >
               <Download size={14} />
-              Export Excel
+              {exporting ? "Exporting…" : "Export Excel"}
             </button>
           </div>
         )}

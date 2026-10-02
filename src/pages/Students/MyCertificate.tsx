@@ -80,7 +80,11 @@ export default function MyCertificate() {
       </div>
 
       {isLoading ? (
-        <SkeletonCard lines={4} className="cert-loading" label="Loading certificate status" />
+        <SkeletonCard
+          lines={4}
+          className="cert-loading"
+          label="Loading certificate status"
+        />
       ) : !hasRequest ? (
         <div className="cert-empty-state">
           <div className="cert-empty-icon">
@@ -88,7 +92,9 @@ export default function MyCertificate() {
           </div>
           <h3 className="cert-empty-title">No Certificate Requested Yet</h3>
           <p className="cert-empty-sub">
-            Once you finalize your daily logbook entries and your supervisor submits your final evaluation, you can request your official SIWES IT placement certificate here.
+            Once you finalize your daily logbook entries and your supervisor
+            submits your final evaluation, you can request your official SIWES
+            IT placement certificate here.
           </p>
           <button
             type="button"
@@ -143,7 +149,9 @@ export default function MyCertificate() {
               </div>
               <span className="cert-step-label">Review</span>
             </div>
-            <div className={`cert-step ${approval === "approved" ? "completed" : ""}`}>
+            <div
+              className={`cert-step ${approval === "approved" ? "completed" : ""}`}
+            >
               <div className="cert-step-dot">
                 {approval === "approved" ? <CheckCircle size={14} /> : "3"}
               </div>
@@ -164,12 +172,16 @@ export default function MyCertificate() {
             {status?.certificateNumber && (
               <div className="cert-detail-row">
                 <span className="cert-detail-lbl">Certificate ID</span>
-                <span className="cert-detail-val">{status.certificateNumber}</span>
+                <span className="cert-detail-val">
+                  {status.certificateNumber}
+                </span>
               </div>
             )}
             <div className="cert-detail-row">
               <span className="cert-detail-lbl">Document Type</span>
-              <span className="cert-detail-val">Official Placement Certificate</span>
+              <span className="cert-detail-val">
+                Official Placement Certificate
+              </span>
             </div>
             {status?.issuedAt && (
               <div className="cert-detail-row">
@@ -186,12 +198,17 @@ export default function MyCertificate() {
             {approval === "approved" ? (
               <button
                 type="button"
-                className="cert-download-btn"
+                className={`cert-download-btn${downloadingCert ? " is-processing" : ""}`}
                 disabled={!canDownload || downloadingCert}
+                aria-busy={downloadingCert}
                 onClick={() => handleDownloadCert(canDownload)}
               >
                 {downloadingCert ? (
-                  <Spinner size={14} color="#fff" />
+                  <>
+                    <Spinner size={14} color="#fff" />
+                    {/* Fetching the record, then rendering the PDF */}
+                    {certData ? "Generating PDF…" : "Preparing certificate…"}
+                  </>
                 ) : (
                   <>
                     <Download size={16} /> Download Certificate
@@ -216,7 +233,8 @@ export default function MyCertificate() {
                   textAlign: "center",
                 }}
               >
-                Your request is currently being reviewed by the department heads. You will be notified once it is approved.
+                Your request is currently being reviewed by the department
+                heads. You will be notified once it is approved.
               </p>
             )}
           </div>
@@ -237,13 +255,11 @@ export default function MyCertificate() {
             studentName={`${certData.user.firstName} ${certData.user.lastName}`}
             regNumber={certData.student.registrationNumber}
             department={certData.student.department.name}
-            program={`${certData.student.program.type} ${certData.student.program.level}`}
+            program={certData.student.program.type}
             level={certData.student.program.level}
             placeOfIT={certData.placeOfIT}
             certificateNumber={certData.certificateNumber}
             issuedAt={certData.issuedAt}
-            finalGrade={certData.finalGrade}
-            finalScore={certData.finalScore}
             itStartDate={certData.student.itPeriod?.startDate}
             itEndDate={certData.student.itPeriod?.endDate}
           />

@@ -6,7 +6,6 @@ import {
   FileText,
   ListChecks,
   GraduationCap,
-  Award,
   User,
   Receipt,
 } from "lucide-react";
@@ -49,11 +48,6 @@ export const STUDENT_NAV = [
         label: "Internships",
         icon: <Briefcase size={18} />,
         path: "/student/internships",
-      },
-      {
-        label: "Evaluation",
-        icon: <Award size={18} />,
-        path: "/student/evaluation",
       },
       {
         label: "Certificate",

@@ -20,8 +20,7 @@
 /* Loading — sized like the status card it stands in for */
 .cert-loading {
   width: 100%;
-  max-width: 680px;
-  margin: 20px auto 0;
+  margin: 20px 0 0;
   padding: 32px;
   border-radius: 18px;
 }
@@ -75,8 +74,7 @@
 /* ── Modern Status Card ──────────────────────────────────────────────────── */
 .cert-status-card {
   width: 100%;
-  max-width: 680px;
-  margin: 20px auto 0;
+  margin: 20px 0 0;
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 18px;
@@ -300,6 +298,12 @@
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+/* Working, not unavailable — keep it solid and show progress */
+.cert-download-btn.is-processing:disabled {
+  opacity: 0.85;
+  cursor: progress;
 }
 
 .cert-re-request-btn {

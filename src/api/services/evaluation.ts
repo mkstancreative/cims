@@ -7,6 +7,7 @@ import type {
   CompositeResultsResponse,
   CompositeResultsParams,
   EvaluationVerifyParams,
+  MyEvaluationParams,
   EvaluationVerifyResponse,
 } from "../types/evaluation";
 
@@ -38,8 +39,14 @@ export const submitEvaluation = async (
   return response.data;
 };
 
-export const getMyEvaluation = async (): Promise<MyEvaluationResponse> => {
-  const response = await api.get("/evaluations/my-evaluation");
+/**
+ * The student's evaluation — for their current internship by default, or a
+ * specific one via `internshipId` / `batchId`.
+ */
+export const getMyEvaluation = async (
+  params?: MyEvaluationParams,
+): Promise<MyEvaluationResponse> => {
+  const response = await api.get("/evaluations/my-evaluation", { params });
   return response.data;
 };
 

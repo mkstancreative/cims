@@ -67,7 +67,7 @@ export const useCertificateDownload = () => {
         try {
           const opt: Html2PdfOptions = {
             margin: [0, 0],
-            filename: `SIWES_Certificate_${certData.student.registrationNumber}.pdf`,
+            filename: `Clinical_Internship_Certificate_${certData.student.registrationNumber}.pdf`,
             image: { type: "jpeg", quality: 0.95 },
             html2canvas: {
               scale: 2,
@@ -76,7 +76,8 @@ export const useCertificateDownload = () => {
               backgroundColor: "#ffffff",
               windowWidth: 1200, // Fixed width for consistent rendering
             },
-            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+            // The certificate is a landscape A4 page (1123 × 794 px).
+            jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
           };
 
           await html2pdf().from(element).set(opt).save();

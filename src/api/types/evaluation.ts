@@ -274,6 +274,11 @@ export interface MyEvaluation {
   gradeScale: { grade: string; minScore: number }[];
 }
 
+export interface MyEvaluationParams {
+  internshipId?: string;
+  batchId?: string;
+}
+
 export interface MyEvaluationResponse {
   success: boolean;
   data: MyEvaluation;
@@ -294,6 +299,8 @@ export interface CompositeResultsResponse {
 
 export interface CompositeResultsParams {
   department?: string;    // case-insensitive department name
+  /** Institution `_id`. */
+  institution?: string;
   batchId?: string;       // batch _id
   search?: string;        // registration number match
   status?: EvaluationStatus;
